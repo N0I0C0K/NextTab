@@ -40,6 +40,7 @@ export const DomainHistoryDialog: FC<DomainHistoryDialogProps> = ({ domain }) =>
         const allHistory = await chrome.history.search({
           text: domain,
           maxResults: 100,
+          startTime: moment().add(-6, 'month').valueOf(),
         })
 
         // Filter to only include items from the exact domain
@@ -75,9 +76,9 @@ export const DomainHistoryDialog: FC<DomainHistoryDialogProps> = ({ domain }) =>
   }, [domain])
 
   return (
-    <div className="flex flex-col gap-3 w-full max-w-3xl">
+    <div className="flex flex-col gap-3 max-w-full">
       <div className="flex items-center gap-2 min-w-0">
-        <Text level="m" className="font-semibold truncate">
+        <Text level="md" className="font-semibold truncate">
           {domain}
         </Text>
         <Text level="s" className="text-muted-foreground flex-shrink-0">
@@ -147,7 +148,7 @@ const DomainHistoryItem: FC<DomainHistoryItemProps> = ({ title, url, lastVisitTi
           e.currentTarget.style.display = 'none'
         }}
       />
-      <div className="flex flex-col flex-1 min-w-0 gap-0.5">
+      <div className="flex flex-col flex-1 min-w-0 gap-0.5 max-w-full">
         <Text level="s" className="font-medium truncate">
           {title}
         </Text>
