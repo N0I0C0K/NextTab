@@ -76,7 +76,7 @@ export const DomainHistoryDialog: FC<DomainHistoryDialogProps> = ({ domain }) =>
   }, [domain])
 
   return (
-    <div className="flex flex-col gap-3 max-w-full">
+    <div className="flex flex-col gap-3 max-w-[48rem]">
       <div className="flex items-center gap-2 min-w-0">
         <Text level="md" className="font-semibold truncate">
           {domain}
@@ -136,7 +136,7 @@ const DomainHistoryItem: FC<DomainHistoryItemProps> = ({ title, url, lastVisitTi
       tabIndex={0}
       className={cn(
         'flex items-center gap-3 py-2.5 px-3 cursor-pointer group',
-        'hover:bg-accent/50 rounded-md transition-colors duration-200',
+        'hover:bg-accent/50 rounded-md transition-colors duration-200 max-w-[46rem]',
       )}
       onClick={handleClick}
       onKeyDown={handleKeyDown}>
