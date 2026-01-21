@@ -54,8 +54,8 @@ export const DomainHistoryDialog: FC<DomainHistoryDialogProps> = ({ domain }) =>
               return false
             }
           })
-          .map(item => ({
-            id: item.id || '',
+          .map((item, index) => ({
+            id: item.id ?? (item.url ? `${item.url}-${item.lastVisitTime ?? ''}` : `index-${index}`),
             title: item.title || item.url || '',
             url: item.url || '',
             lastVisitTime: item.lastVisitTime,
@@ -76,7 +76,7 @@ export const DomainHistoryDialog: FC<DomainHistoryDialogProps> = ({ domain }) =>
   }, [domain])
 
   return (
-    <div className="flex flex-col gap-3 max-w-[48rem]">
+    <div className="flex flex-col gap-3 w-full">
       <div className="flex items-center gap-2 min-w-0">
         <Text level="md" className="font-semibold truncate">
           {domain}
@@ -116,7 +116,7 @@ const DomainHistoryItem: FC<DomainHistoryItemProps> = ({ title, url, lastVisitTi
   }, [lastVisitTime])
 
   const handleClick = (ev: React.MouseEvent<HTMLDivElement>) => {
-    if (ev.ctrlKey) {
+    if (ev.ctrlKey || ev.metaKey) {
       chrome.tabs.create({ url: url, active: true })
     } else {
       chrome.tabs.update({ url: url })
@@ -136,7 +136,7 @@ const DomainHistoryItem: FC<DomainHistoryItemProps> = ({ title, url, lastVisitTi
       tabIndex={0}
       className={cn(
         'flex items-center gap-3 py-2.5 px-3 cursor-pointer group',
-        'hover:bg-accent/50 rounded-md transition-colors duration-200 max-w-[46rem]',
+        'hover:bg-accent/50 rounded-md transition-colors duration-200',
       )}
       onClick={handleClick}
       onKeyDown={handleKeyDown}>

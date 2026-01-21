@@ -25,6 +25,17 @@ interface LinkCardContextMenuContentProps {
 }
 
 /**
+ * Extract domain from URL string
+ */
+const getDomainFromUrl = (urlString: string): string => {
+  try {
+    return new URL(urlString).hostname
+  } catch {
+    return urlString
+  }
+}
+
+/**
  * LinkCardContextMenuContent - The context menu items (edit, delete, bookmarks, and open tabs)
  * Returns an array of menu items to be placed inside ContextMenuContent
  */
@@ -38,13 +49,6 @@ export const LinkCardContextMenuContent = ({
   showOpenTabs,
   globalDialog,
 }: LinkCardContextMenuContentProps): ReactNode => {
-  const getDomainFromUrl = (urlString: string): string => {
-    try {
-      return new URL(urlString).hostname
-    } catch {
-      return urlString
-    }
-  }
 
   return (
     <>

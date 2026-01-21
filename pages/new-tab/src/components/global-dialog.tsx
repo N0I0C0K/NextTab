@@ -20,7 +20,7 @@ export const GlobalDialog: FC<{
             {dialogState.title && <DialogTitle>{dialogState.title}</DialogTitle>}
             {dialogState.description && <DialogDescription>{dialogState.description}</DialogDescription>}
           </DialogHeader>
-          <div className={'w-full'}>{dialogState.showElement ?? null}</div>
+          {dialogState.showElement ?? null}
         </DialogContent>
       </Dialog>
     </>
