@@ -548,5 +548,25 @@
   "failedToCheckUpdates": {
     "description": "Failed to check for updates message",
     "message": "检查失败"
+  },
+  "addCurrentPageToQuickLinks": {
+    "description": "Add current page to quick links button",
+    "message": "将当前页面添加到快捷链接"
+  },
+  "pageAddedToQuickLinks": {
+    "description": "Success notification when page is added to quick links",
+    "message": "页面已添加到快捷链接"
+  },
+  "cannotAddPageTitle": {
+    "description": "Error notification title when page cannot be added",
+    "message": "无法添加页面"
+  },
+  "cannotAddPageMissingInfo": {
+    "description": "Error notification when page is missing required info",
+    "message": "当前页面缺少必要信息，无法添加到快捷链接。"
+  },
+  "cannotAddPageRestricted": {
+    "description": "Error notification when page uses restricted protocol",
+    "message": "此类型的页面无法添加到快捷链接。"
   }
 }

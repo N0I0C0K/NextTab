@@ -548,5 +548,25 @@
   "failedToCheckUpdates": {
     "description": "Failed to check for updates message",
     "message": "Failed to check"
+  },
+  "addCurrentPageToQuickLinks": {
+    "description": "Add current page to quick links button",
+    "message": "Add Current Page to Quick Links"
+  },
+  "pageAddedToQuickLinks": {
+    "description": "Success notification when page is added to quick links",
+    "message": "Page added to quick links"
+  },
+  "cannotAddPageTitle": {
+    "description": "Error notification title when page cannot be added",
+    "message": "Cannot add page"
+  },
+  "cannotAddPageMissingInfo": {
+    "description": "Error notification when page is missing required info",
+    "message": "The current page is missing required information and cannot be added to quick links."
+  },
+  "cannotAddPageRestricted": {
+    "description": "Error notification when page uses restricted protocol",
+    "message": "This type of page cannot be added to quick links."
   }
 }
