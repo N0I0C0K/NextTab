@@ -178,7 +178,7 @@ const ContextMenuItemWitchIcon = React.forwardRef<
   return (
     <ContextMenuItem ref={ref} {...props}>
       <div className="flex gap-2 flex-row items-center w-full">
-        <IconType className="fill-current size-[1em]" />
+        <IconType className="text-current size-[1em]" strokeWidth={3} />
         <span className="flex-1">{children}</span>
         {shortCut && <ContextMenuShortcut>{shortCut}</ContextMenuShortcut>}
       </div>

@@ -76,7 +76,7 @@ export const DomainHistoryDialog: FC<DomainHistoryDialogProps> = ({ domain }) =>
   }, [domain])
 
   return (
-    <div className="flex flex-col gap-3 w-full">
+    <div className="flex flex-col gap-3 max-w-[50rem]">
       <div className="flex items-center gap-2 min-w-0">
         <Text level="md" className="font-semibold truncate">
           {domain}
@@ -95,8 +95,8 @@ export const DomainHistoryDialog: FC<DomainHistoryDialogProps> = ({ domain }) =>
           <Text className="text-muted-foreground">{t('noHistoryFound')}</Text>
         </div>
       ) : (
-        <ScrollArea className="h-[400px] w-full">
-          <div className="flex flex-col">
+        <ScrollArea className="h-[400px]">
+          <div className="flex flex-col items-center">
             {historyItems.map(item => (
               <DomainHistoryItem key={item.id} {...item} />
             ))}
@@ -135,7 +135,7 @@ const DomainHistoryItem: FC<DomainHistoryItemProps> = ({ title, url, lastVisitTi
       role="button"
       tabIndex={0}
       className={cn(
-        'flex items-center gap-3 py-2.5 px-3 cursor-pointer group',
+        'flex items-center gap-3 py-2.5 px-3 cursor-pointer group w-full',
         'hover:bg-accent/50 rounded-md transition-colors duration-200',
       )}
       onClick={handleClick}

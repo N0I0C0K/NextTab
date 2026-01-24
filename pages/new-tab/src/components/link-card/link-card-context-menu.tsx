@@ -49,12 +49,10 @@ export const LinkCardContextMenuContent = ({
   showOpenTabs,
   globalDialog,
 }: LinkCardContextMenuContentProps): ReactNode => {
-
   return (
     <>
       <ContextMenuItemWitchIcon
         IconType={Pencil}
-        shortCut="Ctrl+E"
         onClick={() => {
           globalDialog.show(
             <QuickItemEditForm
@@ -78,14 +76,13 @@ export const LinkCardContextMenuContent = ({
         IconType={History}
         onClick={() => {
           const domain = getDomainFromUrl(url)
-          globalDialog.show(<DomainHistoryDialog domain={domain} />, t('domainHistory'), undefined, 'max-w-3xl')
+          globalDialog.show(<DomainHistoryDialog domain={domain} />, t('domainHistory'), undefined)
         }}>
         {t('viewRecentHistory')}
       </ContextMenuItemWitchIcon>
       <ContextMenuItemWitchIcon
         className="text-red-800"
         IconType={Trash}
-        shortCut="Ctrl+D"
         onClick={() => {
           globalDialog.confirm(`Continue delete ${title}?`, 'Delete can not recover', () => {
             quickUrlItemsStorage.removeById(id)

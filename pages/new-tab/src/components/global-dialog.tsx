@@ -1,3 +1,4 @@
+import { cn } from '@/lib/utils'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@extension/ui/lib/components'
 import type { GlobalDialogInnerProps } from '@src/provider'
 import { GlobalDialogContext } from '@src/provider/global-dialog'
@@ -15,12 +16,14 @@ export const GlobalDialog: FC<{
         onOpenChange={open => {
           setDialogState({ open })
         }}>
-        <DialogContent className={dialogState.className}>
+        <DialogContent>
           <DialogHeader>
             {dialogState.title && <DialogTitle>{dialogState.title}</DialogTitle>}
             {dialogState.description && <DialogDescription>{dialogState.description}</DialogDescription>}
           </DialogHeader>
-          {dialogState.showElement ?? null}
+          <div className={cn('min-w-[20rem] max-w-screen-xl', dialogState.className)}>
+            {dialogState.showElement ?? null}
+          </div>
         </DialogContent>
       </Dialog>
     </>

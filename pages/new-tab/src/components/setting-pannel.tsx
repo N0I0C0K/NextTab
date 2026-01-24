@@ -398,7 +398,8 @@ const SidebarButton: FC<{
             </Button>
           </DialogTrigger>
         </TooltipTrigger>
-        <DialogContent className={cn('', className)}>
+        <DialogContent
+          className={cn('min-w-[30rem] w-[30vw] max-w-[60rem] min-h-[30rem] h-[60vh] flex flex-col', className)}>
           <DialogHeader>
             <DialogTitle>{label}</DialogTitle>
             <DialogDescription>{description}</DialogDescription>
