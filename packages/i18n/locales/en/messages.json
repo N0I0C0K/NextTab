@@ -85,6 +85,18 @@
     "description": "Common settings tab",
     "message": "Common"
   },
+  "appearanceTab": {
+    "description": "Appearance settings tab",
+    "message": "Appearance"
+  },
+  "homepageTab": {
+    "description": "Homepage settings tab",
+    "message": "Homepage"
+  },
+  "dataTab": {
+    "description": "Data settings tab",
+    "message": "Data"
+  },
   "serverTab": {
     "description": "Server settings tab",
     "message": "Server"
@@ -168,6 +180,18 @@
   "configureGeneralSettings": {
     "description": "General settings description",
     "message": "Configure your general settings."
+  },
+  "configureAppearanceSettings": {
+    "description": "Appearance settings description",
+    "message": "Configure appearance settings."
+  },
+  "configureHomepageSettings": {
+    "description": "Homepage settings description",
+    "message": "Configure homepage functionality settings."
+  },
+  "configureDataSettings": {
+    "description": "Data settings description",
+    "message": "Manage your data import and export."
   },
   "configureCommandSettings": {
     "description": "Command settings description",

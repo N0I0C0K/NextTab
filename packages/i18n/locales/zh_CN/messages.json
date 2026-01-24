@@ -85,6 +85,18 @@
     "description": "Common settings tab",
     "message": "通用"
   },
+  "appearanceTab": {
+    "description": "Appearance settings tab",
+    "message": "外观"
+  },
+  "homepageTab": {
+    "description": "Homepage settings tab",
+    "message": "主页"
+  },
+  "dataTab": {
+    "description": "Data settings tab",
+    "message": "数据"
+  },
   "serverTab": {
     "description": "Server settings tab",
     "message": "服务器"
@@ -168,6 +180,18 @@
   "configureGeneralSettings": {
     "description": "General settings description",
     "message": "配置您的通用设置。"
+  },
+  "configureAppearanceSettings": {
+    "description": "Appearance settings description",
+    "message": "配置外观设置。"
+  },
+  "configureHomepageSettings": {
+    "description": "Homepage settings description",
+    "message": "配置主页功能设置。"
+  },
+  "configureDataSettings": {
+    "description": "Data settings description",
+    "message": "管理您的数据导入导出。"
   },
   "configureCommandSettings": {
     "description": "Command settings description",
