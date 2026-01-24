@@ -3,7 +3,7 @@ import type { FC, ReactElement } from 'react'
 import { createContext, useCallback, useContext } from 'react'
 
 export interface GlobalDialogProps {
-  show: (element: ReactElement, title?: string, description?: string) => void
+  show: (element: ReactElement, title?: string, description?: string, className?: string) => void
   confirm: (title: string, description: string, onConfirm: () => void) => void
   close: () => void
 }
@@ -25,11 +25,12 @@ const RenderDefaultConfirmDialog: FC<{
 export function useGlobalDialog(): GlobalDialogProps {
   const [, setInnerProps] = useInnerGlobalDialog()
   const show = useCallback(
-    (element: ReactElement, title?: string, description?: string) => {
+    (element: ReactElement, title?: string, description?: string, className?: string) => {
       setInnerProps({
         showElement: element,
         title,
         description,
+        className,
         open: true,
       })
     },
@@ -57,6 +58,7 @@ export interface GlobalDialogInnerProps {
   showElement?: ReactElement
   title?: string
   description?: string
+  className?: string
   open: boolean
 }
 

@@ -1,7 +1,2 @@
-export {
-  useGlobalDialog,
-  useInnerGlobalDialog,
-  GlobalDialogInnerProps,
-  GlobalDialogProps,
-  GlobalDialogContext as globalDialogContext,
-} from './global-dialog'
+export { useGlobalDialog, useInnerGlobalDialog, GlobalDialogContext as globalDialogContext } from './global-dialog'
+export type { GlobalDialogInnerProps, GlobalDialogProps } from './global-dialog'

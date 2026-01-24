@@ -149,6 +149,30 @@
     "description": "Related open tabs section label in context menu",
     "message": "Tabs"
   },
+  "viewRecentHistory": {
+    "description": "View recent history menu item",
+    "message": "View Recent History"
+  },
+  "domainHistory": {
+    "description": "Domain history dialog title",
+    "message": "Domain History"
+  },
+  "noHistoryFound": {
+    "description": "No history found message",
+    "message": "No history found"
+  },
+  "historyItem": {
+    "description": "Singular history item",
+    "message": "item"
+  },
+  "historyItems": {
+    "description": "Plural history items",
+    "message": "items"
+  },
+  "visits": {
+    "description": "Visit count suffix",
+    "message": "visits"
+  },
   "wallpaperUrl": {
     "description": "Wallpaper URL setting title",
     "message": "Wallpaper URL"

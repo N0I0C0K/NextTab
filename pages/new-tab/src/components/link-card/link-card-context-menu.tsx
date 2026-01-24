@@ -8,9 +8,10 @@ import {
   ContextMenuLabel,
 } from '@extension/ui/lib/components/ui/context-menu'
 import type { GlobalDialogProps } from '@src/provider'
-import { Pencil, Trash } from 'lucide-react'
+import { Pencil, Trash, History } from 'lucide-react'
 import { t } from '@extension/i18n'
 import type { ReactNode } from 'react'
+import { DomainHistoryDialog } from './domain-history-dialog'
 
 interface LinkCardContextMenuContentProps {
   id: string
@@ -21,6 +22,17 @@ interface LinkCardContextMenuContentProps {
   relatedTabs: chrome.tabs.Tab[]
   showOpenTabs: boolean
   globalDialog: GlobalDialogProps
+}
+
+/**
+ * Extract domain from URL string
+ */
+const getDomainFromUrl = (urlString: string): string => {
+  try {
+    return new URL(urlString).hostname
+  } catch {
+    return urlString
+  }
 }
 
 /**
@@ -41,7 +53,6 @@ export const LinkCardContextMenuContent = ({
     <>
       <ContextMenuItemWitchIcon
         IconType={Pencil}
-        shortCut="Ctrl+E"
         onClick={() => {
           globalDialog.show(
             <QuickItemEditForm
@@ -62,9 +73,16 @@ export const LinkCardContextMenuContent = ({
         Edit
       </ContextMenuItemWitchIcon>
       <ContextMenuItemWitchIcon
+        IconType={History}
+        onClick={() => {
+          const domain = getDomainFromUrl(url)
+          globalDialog.show(<DomainHistoryDialog domain={domain} />, t('domainHistory'), undefined)
+        }}>
+        {t('viewRecentHistory')}
+      </ContextMenuItemWitchIcon>
+      <ContextMenuItemWitchIcon
         className="text-red-800"
         IconType={Trash}
-        shortCut="Ctrl+D"
         onClick={() => {
           globalDialog.confirm(`Continue delete ${title}?`, 'Delete can not recover', () => {
             quickUrlItemsStorage.removeById(id)

@@ -149,6 +149,30 @@
     "description": "Related open tabs section label in context menu",
     "message": "标签页"
   },
+  "viewRecentHistory": {
+    "description": "View recent history menu item",
+    "message": "查看最近历史记录"
+  },
+  "domainHistory": {
+    "description": "Domain history dialog title",
+    "message": "域名历史记录"
+  },
+  "noHistoryFound": {
+    "description": "No history found message",
+    "message": "未找到历史记录"
+  },
+  "historyItem": {
+    "description": "Singular history item",
+    "message": "条记录"
+  },
+  "historyItems": {
+    "description": "Plural history items",
+    "message": "条记录"
+  },
+  "visits": {
+    "description": "Visit count suffix",
+    "message": "次访问"
+  },
   "wallpaperUrl": {
     "description": "Wallpaper URL setting title",
     "message": "壁纸 URL"
