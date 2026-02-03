@@ -1,7 +1,7 @@
 import { useStorage } from '@extension/shared'
 import { settingStorage } from '@extension/storage'
 import { Stack, Text, Switch } from '@extension/ui'
-import { History, Pointer, MousePointerClick, Bookmark, NotebookTabs, Keyboard } from 'lucide-react'
+import { History, Bookmark, NotebookTabs } from 'lucide-react'
 import type { FC } from 'react'
 import { t } from '@extension/i18n'
 import { SettingItem } from '../setting-pannel'
@@ -26,28 +26,6 @@ export const HomepageSettings: FC = () => {
         }
       />
       <SettingItem
-        IconClass={Pointer}
-        title={t('autoFocusCommandInput')}
-        description={t('autoFocusCommandInputDescription')}
-        control={
-          <Switch
-            checked={settings.autoFocusCommandInput}
-            onCheckedChange={val => settingStorage.update({ autoFocusCommandInput: val })}
-          />
-        }
-      />
-      <SettingItem
-        IconClass={MousePointerClick}
-        title={t('doubleClickBackgroundFocusCommand')}
-        description={t('doubleClickBackgroundFocusCommandDescription')}
-        control={
-          <Switch
-            checked={settings.doubleClickBackgroundFocusCommand}
-            onCheckedChange={val => settingStorage.update({ doubleClickBackgroundFocusCommand: val })}
-          />
-        }
-      />
-      <SettingItem
         IconClass={Bookmark}
         title={t('showBookmarksInQuickUrlMenu')}
         description={t('showBookmarksInQuickUrlMenuDescription')}
@@ -66,17 +44,6 @@ export const HomepageSettings: FC = () => {
           <Switch
             checked={settings.showOpenTabsInQuickUrlMenu}
             onCheckedChange={val => settingStorage.update({ showOpenTabsInQuickUrlMenu: val })}
-          />
-        }
-      />
-      <SettingItem
-        IconClass={Keyboard}
-        title={t('enableQuickUrlKeyboardNav')}
-        description={t('enableQuickUrlKeyboardNavDescription')}
-        control={
-          <Switch
-            checked={settings.enableQuickUrlKeyboardNav}
-            onCheckedChange={val => settingStorage.update({ enableQuickUrlKeyboardNav: val })}
           />
         }
       />

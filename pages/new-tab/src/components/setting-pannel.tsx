@@ -205,20 +205,20 @@ const MqttSettings: FC = () => {
 
 const SettingTabs: FC = () => {
   return (
-    <Tabs defaultValue="appearance-settings">
+    <Tabs defaultValue="homepage-settings">
       <TabsList>
-        <TabsTrigger value="appearance-settings">{t('appearanceTab')}</TabsTrigger>
         <TabsTrigger value="homepage-settings">{t('homepageTab')}</TabsTrigger>
+        <TabsTrigger value="appearance-settings">{t('appearanceTab')}</TabsTrigger>
         <TabsTrigger value="command-settings">{t('commandTab')}</TabsTrigger>
         <TabsTrigger value="mqtt-settings">{t('serverTab')}</TabsTrigger>
         <TabsTrigger value="data-settings">{t('dataTab')}</TabsTrigger>
         <TabsTrigger value="about-settings">{t('aboutTab')}</TabsTrigger>
       </TabsList>
-      <TabsContent value="appearance-settings">
-        <AppearanceSettings />
-      </TabsContent>
       <TabsContent value="homepage-settings">
         <HomepageSettings />
+      </TabsContent>
+      <TabsContent value="appearance-settings">
+        <AppearanceSettings />
       </TabsContent>
       <TabsContent value="command-settings">
         <CommandSettings />
