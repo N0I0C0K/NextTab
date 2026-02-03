@@ -130,6 +130,9 @@ export const CommandSettings: FC = () => {
         }
       />
       <Separator className="my-2" />
+      <Text gray level="s">
+        {t('commandPluginSettings')}
+      </Text>
       <Accordion type="multiple" className="flex flex-col gap-2">
         {plugins.map(plugin => {
           const pluginSettings =

@@ -572,5 +572,9 @@
   "failedToCheckUpdates": {
     "description": "Failed to check for updates message",
     "message": "Failed to check"
+  },
+  "commandPluginSettings": {
+    "description": "Command plugin settings section title",
+    "message": "Command Plugin Settings"
   }
 }
