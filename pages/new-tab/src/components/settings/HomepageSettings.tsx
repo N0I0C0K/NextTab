@@ -4,7 +4,7 @@ import { Stack, Text, Switch } from '@extension/ui'
 import { History, Bookmark, NotebookTabs } from 'lucide-react'
 import type { FC } from 'react'
 import { t } from '@extension/i18n'
-import { SettingItem } from '../setting-pannel'
+import { SettingItem } from './SettingItem'
 
 export const HomepageSettings: FC = () => {
   const settings = useStorage(settingStorage)

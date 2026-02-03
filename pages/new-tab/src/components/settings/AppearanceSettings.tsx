@@ -2,7 +2,7 @@ import { Stack, Text, ThemeToggle, Separator } from '@extension/ui'
 import { SunMoon } from 'lucide-react'
 import type { FC } from 'react'
 import { t } from '@extension/i18n'
-import { SettingItem } from '../setting-pannel'
+import { SettingItem } from './SettingItem'
 import { WallpaperSettings } from './WallpaperSettings'
 
 export const AppearanceSettings: FC = () => {

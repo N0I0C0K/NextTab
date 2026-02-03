@@ -425,6 +425,22 @@
     "description": "Import button text",
     "message": "Import"
   },
+  "exportSettingsSuccess": {
+    "description": "Export settings success message",
+    "message": "Settings exported successfully!"
+  },
+  "exportSettingsError": {
+    "description": "Export settings error message",
+    "message": "Failed to export settings. Please try again."
+  },
+  "importSettingsSuccess": {
+    "description": "Import settings success message",
+    "message": "Settings imported successfully!"
+  },
+  "importSettingsError": {
+    "description": "Import settings error message",
+    "message": "Failed to import settings: {error}"
+  },
   "commandPluginBookmarks": {
     "description": "Bookmarks command plugin name",
     "message": "Bookmarks"

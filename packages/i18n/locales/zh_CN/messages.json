@@ -425,6 +425,22 @@
     "description": "Import button text",
     "message": "导入"
   },
+  "exportSettingsSuccess": {
+    "description": "Export settings success message",
+    "message": "设置导出成功！"
+  },
+  "exportSettingsError": {
+    "description": "Export settings error message",
+    "message": "导出设置失败，请重试。"
+  },
+  "importSettingsSuccess": {
+    "description": "Import settings success message",
+    "message": "设置导入成功！"
+  },
+  "importSettingsError": {
+    "description": "Import settings error message",
+    "message": "导入设置失败：{error}"
+  },
   "commandPluginBookmarks": {
     "description": "Bookmarks command plugin name",
     "message": "收藏夹"

@@ -1,9 +1,9 @@
 import { exportAllData, importAllData } from '@extension/storage'
-import { Button, Stack, Text } from '@extension/ui'
+import { Button, Stack, Text, toast } from '@extension/ui'
 import { Download, Upload } from 'lucide-react'
 import React, { type FC } from 'react'
 import { t } from '@extension/i18n'
-import { SettingItem } from '../setting-pannel'
+import { SettingItem } from './SettingItem'
 
 export const DataSettings: FC = () => {
   const fileInputRef = React.useRef<HTMLInputElement>(null)
@@ -11,9 +11,10 @@ export const DataSettings: FC = () => {
   const handleExport = async () => {
     try {
       await exportAllData()
+      toast.success(t('exportSettingsSuccess'))
     } catch (error) {
       console.error('Failed to export settings:', error)
-      alert('Failed to export settings. Please try again.')
+      toast.error(t('exportSettingsError'))
     }
   }
 
@@ -23,14 +24,15 @@ export const DataSettings: FC = () => {
 
     try {
       await importAllData(file)
-      alert('Settings imported successfully!')
+      toast.success(t('importSettingsSuccess'))
       // Reset file input
       if (fileInputRef.current) {
         fileInputRef.current.value = ''
       }
     } catch (error) {
       console.error('Failed to import settings:', error)
-      alert('Failed to import settings: ' + (error as Error).message)
+      const errorMessage = t('importSettingsError').replace('{error}', (error as Error).message)
+      toast.error(errorMessage)
       // Reset file input
       if (fileInputRef.current) {
         fileInputRef.current.value = ''
