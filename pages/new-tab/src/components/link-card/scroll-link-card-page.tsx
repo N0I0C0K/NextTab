@@ -15,17 +15,27 @@ const MAX_ROWS = 6 // Maximum expanded height in rows
 export const ScrollLinkCardPage: FC<{ className?: string; maxRow?: number }> = ({ className, maxRow = 2 }) => {
   const [isExpanded, setIsExpanded] = useState(false)
   const scrollAreaRef = useRef<HTMLDivElement>(null)
+  const contentRef = useRef<HTMLDivElement>(null)
   const quickUrlItems = useStorage(quickUrlItemsStorage) as QuickUrlItem[]
 
   // Calculate the number of rows needed to show all content
-  const calculateRowsNeeded = useCallback(() => {
-    // Assuming auto-fit grid with minmax(6.5rem, 1fr), we need to estimate columns
-    // For a rough estimate, assume average 8-10 items per row depending on container width
+  const calculateExpandedHeight = useCallback(() => {
+    // Get the actual content height if available
+    const viewport = scrollAreaRef.current?.querySelector('[data-radix-scroll-area-viewport]')
+    if (viewport) {
+      const scrollHeight = viewport.scrollHeight
+      // Cap at maximum of MAX_ROWS
+      const maxHeight = ROW_HEIGHT * MAX_ROWS
+      return Math.min(scrollHeight, maxHeight)
+    }
+    
+    // Fallback: estimate based on number of items
     const itemsCount = quickUrlItems.length
     const estimatedItemsPerRow = 8 // Conservative estimate
     const rowsNeeded = Math.ceil(itemsCount / estimatedItemsPerRow)
-    return Math.min(rowsNeeded, MAX_ROWS)
-  }, [quickUrlItems])
+    const estimatedRows = Math.min(Math.max(rowsNeeded, maxRow), MAX_ROWS)
+    return ROW_HEIGHT * estimatedRows
+  }, [quickUrlItems, maxRow])
 
   // Handle scroll event
   const handleScroll = useCallback((event: Event) => {
@@ -47,7 +57,7 @@ export const ScrollLinkCardPage: FC<{ className?: string; maxRow?: number }> = (
   }, [handleScroll])
 
   const currentHeight = ROW_HEIGHT * maxRow
-  const expandedHeight = ROW_HEIGHT * Math.max(calculateRowsNeeded(), maxRow)
+  const expandedHeight = calculateExpandedHeight()
 
   return (
     <motion.div
@@ -61,7 +71,9 @@ export const ScrollLinkCardPage: FC<{ className?: string; maxRow?: number }> = (
       }}>
       <div ref={scrollAreaRef} className="h-full">
         <ScrollArea className="w-full h-full" scrollHideDelay={200}>
-          <DndLinkCardPage />
+          <div ref={contentRef}>
+            <DndLinkCardPage />
+          </div>
           <AddButton className="absolute bottom-2 right-2" />
         </ScrollArea>
       </div>
