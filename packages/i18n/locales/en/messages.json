@@ -557,14 +557,6 @@
     "description": "Repository description",
     "message": "GitHub repository for NextTab"
   },
-  "enableQuickUrlKeyboardNav": {
-    "description": "Enable keyboard navigation for quick URLs setting title",
-    "message": "Enable Quick URL Keyboard Navigation"
-  },
-  "enableQuickUrlKeyboardNavDescription": {
-    "description": "Enable keyboard navigation for quick URLs setting description",
-    "message": "Use arrow keys to navigate quick URLs and Enter to open them."
-  },
   "latestVersion": {
     "description": "Latest version label",
     "message": "Latest Version"

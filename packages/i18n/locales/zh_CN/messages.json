@@ -557,14 +557,6 @@
     "description": "Repository description",
     "message": "NextTab 的 GitHub 代码仓库"
   },
-  "enableQuickUrlKeyboardNav": {
-    "description": "Enable keyboard navigation for quick URLs setting title",
-    "message": "启用快捷链接键盘导航"
-  },
-  "enableQuickUrlKeyboardNavDescription": {
-    "description": "Enable keyboard navigation for quick URLs setting description",
-    "message": "使用方向键在快捷链接中导航，按回车键打开链接。"
-  },
   "latestVersion": {
     "description": "Latest version label",
     "message": "最新版本"

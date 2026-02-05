@@ -60,17 +60,6 @@ const NewTab = () => {
   })
   const commandModuleRef = useRef<CommandModuleRef>(null)
 
-  // Force-enable keyboard navigation for users who had it disabled (one-time migration)
-  useEffect(() => {
-    const forceEnableKeyboardNav = async () => {
-      if (!settings.enableQuickUrlKeyboardNav) {
-        await settingStorage.update({ enableQuickUrlKeyboardNav: true })
-      }
-    }
-    forceEnableKeyboardNav()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []) // Run only once on mount
-
   useEffect(() => {
     // Update wallpaper source when settings change
     if (settings.wallpaperType === 'local' && settings.localWallpaperData) {
