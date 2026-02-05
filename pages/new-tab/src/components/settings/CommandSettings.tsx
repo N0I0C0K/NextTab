@@ -1,5 +1,5 @@
 import { useStorage } from '@extension/shared'
-import { commandSettingsStorage, defaultCommandSettings } from '@extension/storage'
+import { commandSettingsStorage, defaultCommandSettings, settingStorage } from '@extension/storage'
 import type { CommandPluginSettings } from '@extension/storage'
 import {
   Stack,
@@ -13,12 +13,13 @@ import {
   AccordionTrigger,
   AccordionContent,
 } from '@extension/ui'
-import { Layers } from 'lucide-react'
+import { Layers, Pointer, MousePointerClick } from 'lucide-react'
 import { useState, type FC } from 'react'
 import { t } from '@extension/i18n'
 import type { ICommandResolver } from '@src/service/command-resolver'
 import { commandResolverService } from '@src/service/command-resolver'
 import { cn } from '@/lib/utils'
+import { SettingItem } from './SettingItem'
 
 const CommandPluginSettingItem: FC<{
   plugin: ICommandResolver
@@ -94,6 +95,7 @@ const CommandPluginSettingItem: FC<{
 
 export const CommandSettings: FC = () => {
   const commandSettings = useStorage(commandSettingsStorage)
+  const settings = useStorage(settingStorage)
 
   const [plugins] = useState(commandResolverService.registeredResolvers)
   const handlePluginUpdate = async (pluginName: string, updates: Partial<CommandPluginSettings>) => {
@@ -104,6 +106,32 @@ export const CommandSettings: FC = () => {
     <Stack direction={'column'} className={'gap-2 w-full'}>
       <Text gray level="s">
         {t('configureCommandSettings')}
+      </Text>
+      <SettingItem
+        IconClass={Pointer}
+        title={t('autoFocusCommandInput')}
+        description={t('autoFocusCommandInputDescription')}
+        control={
+          <Switch
+            checked={settings.autoFocusCommandInput}
+            onCheckedChange={val => settingStorage.update({ autoFocusCommandInput: val })}
+          />
+        }
+      />
+      <SettingItem
+        IconClass={MousePointerClick}
+        title={t('doubleClickBackgroundFocusCommand')}
+        description={t('doubleClickBackgroundFocusCommandDescription')}
+        control={
+          <Switch
+            checked={settings.doubleClickBackgroundFocusCommand}
+            onCheckedChange={val => settingStorage.update({ doubleClickBackgroundFocusCommand: val })}
+          />
+        }
+      />
+      <Separator className="my-2" />
+      <Text gray level="s">
+        {t('commandPluginSettings')}
       </Text>
       <Accordion type="multiple" className="flex flex-col gap-2">
         {plugins.map(plugin => {

@@ -85,6 +85,18 @@
     "description": "Common settings tab",
     "message": "通用"
   },
+  "appearanceTab": {
+    "description": "Appearance settings tab",
+    "message": "外观"
+  },
+  "homepageTab": {
+    "description": "Homepage settings tab",
+    "message": "主页"
+  },
+  "dataTab": {
+    "description": "Data settings tab",
+    "message": "数据"
+  },
   "serverTab": {
     "description": "Server settings tab",
     "message": "服务器"
@@ -192,6 +204,18 @@
   "configureGeneralSettings": {
     "description": "General settings description",
     "message": "配置您的通用设置。"
+  },
+  "configureAppearanceSettings": {
+    "description": "Appearance settings description",
+    "message": "配置外观设置。"
+  },
+  "configureHomepageSettings": {
+    "description": "Homepage settings description",
+    "message": "配置主页功能设置。"
+  },
+  "configureDataSettings": {
+    "description": "Data settings description",
+    "message": "管理您的数据导入导出。"
   },
   "configureCommandSettings": {
     "description": "Command settings description",
@@ -425,6 +449,22 @@
     "description": "Import button text",
     "message": "导入"
   },
+  "exportSettingsSuccess": {
+    "description": "Export settings success message",
+    "message": "设置导出成功！"
+  },
+  "exportSettingsError": {
+    "description": "Export settings error message",
+    "message": "导出设置失败，请重试。"
+  },
+  "importSettingsSuccess": {
+    "description": "Import settings success message",
+    "message": "设置导入成功！"
+  },
+  "importSettingsError": {
+    "description": "Import settings error message",
+    "message": "导入设置失败：{error}"
+  },
   "commandPluginBookmarks": {
     "description": "Bookmarks command plugin name",
     "message": "收藏夹"
@@ -541,14 +581,6 @@
     "description": "Repository description",
     "message": "NextTab 的 GitHub 代码仓库"
   },
-  "enableQuickUrlKeyboardNav": {
-    "description": "Enable keyboard navigation for quick URLs setting title",
-    "message": "启用快捷链接键盘导航"
-  },
-  "enableQuickUrlKeyboardNavDescription": {
-    "description": "Enable keyboard navigation for quick URLs setting description",
-    "message": "使用方向键在快捷链接中导航，按回车键打开链接。"
-  },
   "latestVersion": {
     "description": "Latest version label",
     "message": "最新版本"
@@ -572,5 +604,9 @@
   "failedToCheckUpdates": {
     "description": "Failed to check for updates message",
     "message": "检查失败"
+  },
+  "commandPluginSettings": {
+    "description": "Command plugin settings section title",
+    "message": "命令插件设置"
   }
 }

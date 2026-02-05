@@ -5,13 +5,11 @@ import {
   useStorage,
   sendDrinkWaterReminderMessage,
 } from '@extension/shared'
-import { mqttStateManager, settingStorage, exportAllData, importAllData } from '@extension/storage'
+import { mqttStateManager, settingStorage } from '@extension/storage'
 import {
   Button,
-  Space,
   Stack,
   Text,
-  ThemeToggle,
   Switch,
   Input,
   Tooltip,
@@ -31,60 +29,22 @@ import {
 import type { LucideProps } from 'lucide-react'
 import {
   AlignJustify,
-  SunMoon,
-  History,
-  Pointer,
   CupSoda,
   KeyRound,
   ToggleRight,
   User,
   Activity,
   Dot,
-  Download,
-  Upload,
-  MousePointerClick,
-  Bookmark,
-  Keyboard,
-  NotebookTabs,
 } from 'lucide-react'
 import React, { type ElementType, type FC, type ReactElement, type ReactNode } from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@extension/ui/lib/components/ui/tabs'
 import { t } from '@extension/i18n'
-import { WallpaperSettings } from './settings/WallpaperSettings'
+import { AppearanceSettings } from './settings/AppearanceSettings'
+import { HomepageSettings } from './settings/HomepageSettings'
+import { DataSettings } from './settings/DataSettings'
 import { CommandSettings } from './settings/CommandSettings'
 import { AboutSettings } from './settings/AboutSettings'
-
-const SettingItem: FC<{
-  className?: string
-  title: string
-  description?: string
-  control: ReactElement
-  IconClass: ElementType<LucideProps>
-  additionalControl?: ReactElement
-}> = ({ control, title, className, description, IconClass, additionalControl }) => {
-  return (
-    <Stack
-      direction={'row'}
-      className={cn(
-        'items-center overflow-hidden relative rounded-md p-3 border-slate-400/20',
-        'bg-muted gap-2',
-        className,
-      )}>
-      <IconClass className="min-w-8 size-8 text-muted-foreground" />
-      <Stack direction={'column'} className="gap-0.5">
-        <Text className="font-medium" level="md">
-          {title}
-        </Text>
-        <Text gray className="-mt-1 max-w-[20em]" level="s">
-          {description}
-        </Text>
-      </Stack>
-      <Space className="mx-1" />
-      <div className="max-w-[50%]">{control}</div>
-      {additionalControl}
-    </Stack>
-  )
-}
+import { SettingItem } from './settings/SettingItem'
 
 export { SettingItem }
 
@@ -211,166 +171,31 @@ const MqttSettings: FC = () => {
   )
 }
 
-const CommonSettings: FC = () => {
-  const settings = useStorage(settingStorage)
-  const fileInputRef = React.useRef<HTMLInputElement>(null)
-
-  const handleExport = async () => {
-    try {
-      await exportAllData()
-    } catch (error) {
-      console.error('Failed to export settings:', error)
-      alert('Failed to export settings. Please try again.')
-    }
-  }
-
-  const handleImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (!file) return
-
-    try {
-      await importAllData(file)
-      alert('Settings imported successfully!')
-      // Reset file input
-      if (fileInputRef.current) {
-        fileInputRef.current.value = ''
-      }
-    } catch (error) {
-      console.error('Failed to import settings:', error)
-      alert('Failed to import settings: ' + (error as Error).message)
-      // Reset file input
-      if (fileInputRef.current) {
-        fileInputRef.current.value = ''
-      }
-    }
-  }
-
-  return (
-    <Stack direction={'column'} className={'gap-2 w-full'}>
-      <Text gray level="s">
-        {t('configureGeneralSettings')}
-      </Text>
-      <SettingItem
-        IconClass={SunMoon}
-        title={t('theme')}
-        description={t('themeDescription')}
-        control={<ThemeToggle />}
-      />
-      <SettingItem
-        IconClass={History}
-        title={t('historySuggestion')}
-        description={t('historySuggestionDescription')}
-        control={
-          <Switch
-            checked={settings.useHistorySuggestion}
-            onCheckedChange={val => settingStorage.update({ useHistorySuggestion: val })}
-          />
-        }
-      />
-      <SettingItem
-        IconClass={Pointer}
-        title={t('autoFocusCommandInput')}
-        description={t('autoFocusCommandInputDescription')}
-        control={
-          <Switch
-            checked={settings.autoFocusCommandInput}
-            onCheckedChange={val => settingStorage.update({ autoFocusCommandInput: val })}
-          />
-        }
-      />
-      <SettingItem
-        IconClass={MousePointerClick}
-        title={t('doubleClickBackgroundFocusCommand')}
-        description={t('doubleClickBackgroundFocusCommandDescription')}
-        control={
-          <Switch
-            checked={settings.doubleClickBackgroundFocusCommand}
-            onCheckedChange={val => settingStorage.update({ doubleClickBackgroundFocusCommand: val })}
-          />
-        }
-      />
-      <SettingItem
-        IconClass={Bookmark}
-        title={t('showBookmarksInQuickUrlMenu')}
-        description={t('showBookmarksInQuickUrlMenuDescription')}
-        control={
-          <Switch
-            checked={settings.showBookmarksInQuickUrlMenu}
-            onCheckedChange={val => settingStorage.update({ showBookmarksInQuickUrlMenu: val })}
-          />
-        }
-      />
-      <SettingItem
-        IconClass={NotebookTabs}
-        title={t('showOpenTabsInQuickUrlMenu')}
-        description={t('showOpenTabsInQuickUrlMenuDescription')}
-        control={
-          <Switch
-            checked={settings.showOpenTabsInQuickUrlMenu}
-            onCheckedChange={val => settingStorage.update({ showOpenTabsInQuickUrlMenu: val })}
-          />
-        }
-      />
-      <SettingItem
-        IconClass={Keyboard}
-        title={t('enableQuickUrlKeyboardNav')}
-        description={t('enableQuickUrlKeyboardNavDescription')}
-        control={
-          <Switch
-            checked={settings.enableQuickUrlKeyboardNav}
-            onCheckedChange={val => settingStorage.update({ enableQuickUrlKeyboardNav: val })}
-          />
-        }
-      />
-      <Separator className="my-2" />
-      <SettingItem
-        IconClass={Download}
-        title={t('exportSettings')}
-        description={t('exportSettingsDescription')}
-        control={
-          <Button variant={'outline'} onClick={handleExport}>
-            {t('export')}
-          </Button>
-        }
-      />
-      <SettingItem
-        IconClass={Upload}
-        title={t('importSettings')}
-        description={t('importSettingsDescription')}
-        control={
-          <>
-            <input ref={fileInputRef} type="file" accept=".json" onChange={handleImport} style={{ display: 'none' }} />
-            <Button variant={'outline'} onClick={() => fileInputRef.current?.click()}>
-              {t('import')}
-            </Button>
-          </>
-        }
-      />
-    </Stack>
-  )
-}
-
 const SettingTabs: FC = () => {
   return (
-    <Tabs defaultValue="common-settings">
+    <Tabs defaultValue="homepage-settings">
       <TabsList>
-        <TabsTrigger value="common-settings">{t('commonTab')}</TabsTrigger>
-        <TabsTrigger value="wallpaper-settings">{t('wallpaperTab')}</TabsTrigger>
+        <TabsTrigger value="homepage-settings">{t('homepageTab')}</TabsTrigger>
+        <TabsTrigger value="appearance-settings">{t('appearanceTab')}</TabsTrigger>
         <TabsTrigger value="command-settings">{t('commandTab')}</TabsTrigger>
         <TabsTrigger value="mqtt-settings">{t('serverTab')}</TabsTrigger>
+        <TabsTrigger value="data-settings">{t('dataTab')}</TabsTrigger>
         <TabsTrigger value="about-settings">{t('aboutTab')}</TabsTrigger>
       </TabsList>
-      <TabsContent value="common-settings">
-        <CommonSettings />
+      <TabsContent value="homepage-settings">
+        <HomepageSettings />
       </TabsContent>
-      <TabsContent value="wallpaper-settings">
-        <WallpaperSettings />
+      <TabsContent value="appearance-settings">
+        <AppearanceSettings />
       </TabsContent>
       <TabsContent value="command-settings">
         <CommandSettings />
       </TabsContent>
       <TabsContent value="mqtt-settings">
         <MqttSettings />
+      </TabsContent>
+      <TabsContent value="data-settings">
+        <DataSettings />
       </TabsContent>
       <TabsContent value="about-settings">
         <AboutSettings />

@@ -85,6 +85,18 @@
     "description": "Common settings tab",
     "message": "Common"
   },
+  "appearanceTab": {
+    "description": "Appearance settings tab",
+    "message": "Appearance"
+  },
+  "homepageTab": {
+    "description": "Homepage settings tab",
+    "message": "Homepage"
+  },
+  "dataTab": {
+    "description": "Data settings tab",
+    "message": "Data"
+  },
   "serverTab": {
     "description": "Server settings tab",
     "message": "Server"
@@ -192,6 +204,18 @@
   "configureGeneralSettings": {
     "description": "General settings description",
     "message": "Configure your general settings."
+  },
+  "configureAppearanceSettings": {
+    "description": "Appearance settings description",
+    "message": "Configure appearance settings."
+  },
+  "configureHomepageSettings": {
+    "description": "Homepage settings description",
+    "message": "Configure homepage functionality settings."
+  },
+  "configureDataSettings": {
+    "description": "Data settings description",
+    "message": "Manage your data import and export."
   },
   "configureCommandSettings": {
     "description": "Command settings description",
@@ -425,6 +449,22 @@
     "description": "Import button text",
     "message": "Import"
   },
+  "exportSettingsSuccess": {
+    "description": "Export settings success message",
+    "message": "Settings exported successfully!"
+  },
+  "exportSettingsError": {
+    "description": "Export settings error message",
+    "message": "Failed to export settings. Please try again."
+  },
+  "importSettingsSuccess": {
+    "description": "Import settings success message",
+    "message": "Settings imported successfully!"
+  },
+  "importSettingsError": {
+    "description": "Import settings error message",
+    "message": "Failed to import settings: {error}"
+  },
   "commandPluginBookmarks": {
     "description": "Bookmarks command plugin name",
     "message": "Bookmarks"
@@ -541,14 +581,6 @@
     "description": "Repository description",
     "message": "GitHub repository for NextTab"
   },
-  "enableQuickUrlKeyboardNav": {
-    "description": "Enable keyboard navigation for quick URLs setting title",
-    "message": "Enable Quick URL Keyboard Navigation"
-  },
-  "enableQuickUrlKeyboardNavDescription": {
-    "description": "Enable keyboard navigation for quick URLs setting description",
-    "message": "Use arrow keys to navigate quick URLs and Enter to open them."
-  },
   "latestVersion": {
     "description": "Latest version label",
     "message": "Latest Version"
@@ -572,5 +604,9 @@
   "failedToCheckUpdates": {
     "description": "Failed to check for updates message",
     "message": "Failed to check"
+  },
+  "commandPluginSettings": {
+    "description": "Command plugin settings section title",
+    "message": "Command Plugin Settings"
   }
 }

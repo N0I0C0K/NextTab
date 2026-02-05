@@ -2,7 +2,7 @@ import { DragDropProvider, PointerSensor } from '@dnd-kit/react'
 import { isSortable } from '@dnd-kit/react/sortable'
 import { arrayMove } from '@dnd-kit/helpers'
 import { useStorage } from '@extension/shared'
-import { quickUrlItemsStorage, settingStorage } from '@extension/storage'
+import { quickUrlItemsStorage } from '@extension/storage'
 import { type FC, useRef } from 'react'
 
 import { SortableLinkCardItem } from '@/src/components/link-card/link-card-item'
@@ -13,12 +13,11 @@ export const DndLinkCardPage: FC<{
   className?: string
 }> = ({ className }) => {
   const userStorageItems = useStorage(quickUrlItemsStorage)
-  const settings = useStorage(settingStorage)
   const containerRef = useRef<HTMLDivElement>(null)
 
   const { selectedIndex } = useKeyboardNavigation({
     items: userStorageItems,
-    enabled: settings.enableQuickUrlKeyboardNav,
+    enabled: true, // Always enabled
     containerRef,
   })
 
