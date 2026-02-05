@@ -5,18 +5,19 @@ import { ScrollArea } from '@extension/ui'
 import { AddButton } from '@/src/components/add-button'
 import { motion } from 'framer-motion'
 import { useStorage } from '@extension/shared'
-import { quickUrlItemsStorage, type QuickUrlItem } from '@extension/storage'
+import { quickUrlItemsStorage } from '@extension/storage'
 
 import './scroll-link-card-page.css'
 
 const ROW_HEIGHT = 130
 const MAX_ROWS = 6 // Maximum expanded height in rows
+const ESTIMATED_ITEMS_PER_ROW = 8 // Conservative estimate for grid auto-fit calculation
 
 export const ScrollLinkCardPage: FC<{ className?: string; maxRow?: number }> = ({ className, maxRow = 2 }) => {
   const [isExpanded, setIsExpanded] = useState(false)
   const scrollAreaRef = useRef<HTMLDivElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
-  const quickUrlItems = useStorage(quickUrlItemsStorage) as QuickUrlItem[]
+  const quickUrlItems = useStorage(quickUrlItemsStorage)
 
   // Calculate the number of rows needed to show all content
   const calculateExpandedHeight = useCallback(() => {
@@ -30,9 +31,8 @@ export const ScrollLinkCardPage: FC<{ className?: string; maxRow?: number }> = (
     }
     
     // Fallback: estimate based on number of items
-    const itemsCount = quickUrlItems.length
-    const estimatedItemsPerRow = 8 // Conservative estimate
-    const rowsNeeded = Math.ceil(itemsCount / estimatedItemsPerRow)
+    const itemsCount = quickUrlItems?.length ?? 0
+    const rowsNeeded = Math.ceil(itemsCount / ESTIMATED_ITEMS_PER_ROW)
     const estimatedRows = Math.min(Math.max(rowsNeeded, maxRow), MAX_ROWS)
     return ROW_HEIGHT * estimatedRows
   }, [quickUrlItems, maxRow])
@@ -47,13 +47,12 @@ export const ScrollLinkCardPage: FC<{ className?: string; maxRow?: number }> = (
 
   useEffect(() => {
     const scrollViewport = scrollAreaRef.current?.querySelector('[data-radix-scroll-area-viewport]')
-    if (scrollViewport) {
-      scrollViewport.addEventListener('scroll', handleScroll)
-      return () => {
-        scrollViewport.removeEventListener('scroll', handleScroll)
-      }
+    if (!scrollViewport) return
+
+    scrollViewport.addEventListener('scroll', handleScroll)
+    return () => {
+      scrollViewport.removeEventListener('scroll', handleScroll)
     }
-    return undefined
   }, [handleScroll])
 
   const currentHeight = ROW_HEIGHT * maxRow
