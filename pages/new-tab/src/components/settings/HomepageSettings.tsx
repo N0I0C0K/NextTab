@@ -22,16 +22,13 @@ export const HomepageSettings: FC = () => {
 
     if (cachedBookmarkFolders) {
       setBookmarkFolders(cachedBookmarkFolders)
-      return () => {
-        isMounted = false
-      }
+    } else {
+      getBookmarkFolders().then(folders => {
+        if (!isMounted) return
+        cachedBookmarkFolders = folders
+        setBookmarkFolders(folders)
+      })
     }
-
-    getBookmarkFolders().then(folders => {
-      if (!isMounted) return
-      cachedBookmarkFolders = folders
-      setBookmarkFolders(folders)
-    })
 
     return () => {
       isMounted = false

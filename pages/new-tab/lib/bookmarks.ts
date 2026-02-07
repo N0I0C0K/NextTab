@@ -27,7 +27,7 @@ export async function getBookmarkFolders(): Promise<chrome.bookmarks.BookmarkTre
             }
           })
         } catch (childError) {
-          console.error('Failed to get children for bookmark folder:', root.id, childError)
+          console.error('Failed to get children for bookmark folder (continuing):', root.id, childError)
         }
       }
     }
