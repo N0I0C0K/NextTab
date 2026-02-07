@@ -9,26 +9,28 @@ import { getDomainFromUrl } from '@/lib/url'
  */
 export async function getBookmarkFolders(): Promise<chrome.bookmarks.BookmarkTreeNode[]> {
   try {
-    const tree = await chrome.bookmarks.getTree()
+    // Fetch only the immediate children of the bookmarks root ("0")
+    const rootFolders = await chrome.bookmarks.getChildren('0')
     const folders: chrome.bookmarks.BookmarkTreeNode[] = []
 
-    // Chrome bookmarks root has children like "Bookmarks Bar", "Other Bookmarks", etc.
-    tree.forEach(root => {
-      if (root.children) {
-        root.children.forEach(child => {
-          if (child.children) {
-            // This is a folder (has children), add it to the list
-            folders.push(child)
-            // Also add its direct children if they are folders
-            child.children.forEach(grandchild => {
-              if (grandchild.children) {
-                folders.push(grandchild)
-              }
-            })
-          }
-        })
+    // Root folders like "Bookmarks Bar", "Other Bookmarks", etc., and their direct child folders
+    for (const root of rootFolders) {
+      // Folders have no URL; bookmarks have a URL
+      if (!root.url) {
+        folders.push(root)
+
+        try {
+          const children = await chrome.bookmarks.getChildren(root.id)
+          children.forEach(child => {
+            if (!child.url) {
+              folders.push(child)
+            }
+          })
+        } catch (childError) {
+          console.error('Failed to get children for bookmark folder:', root.id, childError)
+        }
       }
-    })
+    }
 
     return folders
   } catch (error) {
@@ -40,8 +42,9 @@ export async function getBookmarkFolders(): Promise<chrome.bookmarks.BookmarkTre
 /**
  * Get all bookmark IDs within a folder (including nested children)
  * More efficient than checking each bookmark individually
+ * Returns null if the folder doesn't exist (deleted/invalid)
  */
-async function getBookmarkIdsInFolder(folderId: string): Promise<Set<string>> {
+async function getBookmarkIdsInFolder(folderId: string): Promise<Set<string> | null> {
   try {
     const [subtree] = await chrome.bookmarks.getSubTree(folderId)
     const ids = new Set<string>()
@@ -57,7 +60,8 @@ async function getBookmarkIdsInFolder(folderId: string): Promise<Set<string>> {
     return ids
   } catch (error) {
     console.error('Failed to get folder subtree:', error)
-    return new Set()
+    // Return null to indicate the folder is invalid/deleted
+    return null
   }
 }
 
@@ -87,7 +91,10 @@ export async function findBookmarksByDomain(
     if (folderId) {
       // Get all bookmark IDs within the folder once (more efficient than per-bookmark checks)
       const folderBookmarkIds = await getBookmarkIdsInFolder(folderId)
-      filteredResults = filteredResults.filter(bookmark => folderBookmarkIds.has(bookmark.id))
+      // If folder is invalid/deleted, skip filtering and return all results
+      if (folderBookmarkIds !== null) {
+        filteredResults = filteredResults.filter(bookmark => folderBookmarkIds.has(bookmark.id))
+      }
     }
 
     return filteredResults

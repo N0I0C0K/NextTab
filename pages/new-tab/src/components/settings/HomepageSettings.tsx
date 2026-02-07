@@ -8,14 +8,46 @@ import { t } from '@extension/i18n'
 import { SettingItem } from './SettingItem'
 import { getBookmarkFolders } from '@/lib/bookmarks'
 
+// Cache folders to avoid repeated API calls
+let cachedBookmarkFolders: chrome.bookmarks.BookmarkTreeNode[] | null = null
+
 export const HomepageSettings: FC = () => {
   const settings = useStorage(settingStorage)
   const [bookmarkFolders, setBookmarkFolders] = useState<chrome.bookmarks.BookmarkTreeNode[]>([])
 
   useEffect(() => {
-    // Fetch bookmark folders when component mounts
-    getBookmarkFolders().then(setBookmarkFolders)
-  }, [])
+    if (!settings.showBookmarksInQuickUrlMenu) return
+
+    let isMounted = true
+
+    if (cachedBookmarkFolders) {
+      setBookmarkFolders(cachedBookmarkFolders)
+      return () => {
+        isMounted = false
+      }
+    }
+
+    getBookmarkFolders().then(folders => {
+      if (!isMounted) return
+      cachedBookmarkFolders = folders
+      setBookmarkFolders(folders)
+    })
+
+    return () => {
+      isMounted = false
+    }
+  }, [settings.showBookmarksInQuickUrlMenu])
+
+  // Normalize bookmarkFolderId if it's invalid (folder was deleted)
+  useEffect(() => {
+    if (!settings.bookmarkFolderId || bookmarkFolders.length === 0) return
+
+    const folderExists = bookmarkFolders.some(folder => folder.id === settings.bookmarkFolderId)
+    if (!folderExists) {
+      // Reset to "All Bookmarks" if the selected folder no longer exists
+      settingStorage.update({ bookmarkFolderId: null })
+    }
+  }, [settings.bookmarkFolderId, bookmarkFolders])
 
   return (
     <Stack direction={'column'} className={'gap-2 w-full'}>
