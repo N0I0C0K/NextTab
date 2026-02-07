@@ -18,13 +18,12 @@ type Theme = 'light' | 'dark' | 'system'
 /**
  * Interface for exported data structure.
  * 
- * IMPORTANT: When adding new storage types that should be exported:
- * 1. Add the storage import at the top of this file
- * 2. Add the field to this interface (optional fields should use `?`)
- * 3. Add to the exportAllData function to read the data
- * 4. Add to the importAllData function to write the data
- * 5. Add validation in parseAndValidateImportFile if needed
- * 6. Update the StorageTypeCheck type below to ensure type safety
+ * Note: Not all storage types need to be exported. Only user settings and data
+ * that should be portable across devices are included.
+ * 
+ * Excluded storage types:
+ * - historySuggestStorage: Generated from browser history, not portable
+ * - mqttStateStorage: Runtime connection state, not user settings
  */
 export interface ExportedData {
   version: string
@@ -35,49 +34,6 @@ export interface ExportedData {
   commandSettings?: CommandSettingsData
   wallpaperHistory?: WallpaperHistoryProps
 }
-
-/**
- * Type-level validation to ensure all exportable storage types are included.
- * This creates a mapping of storage names to their expected types in ExportedData.
- * 
- * To add a new storage type:
- * 1. Add it to this type with the corresponding field from ExportedData
- * 2. TypeScript will ensure the types match
- */
-type StorageTypeCheck = {
-  settingStorage: Omit<SettingProps, 'localWallpaperData'>
-  quickUrlItemsStorage: QuickUrlItem[]
-  exampleThemeStorage: Theme | undefined
-  commandSettingsStorage: CommandSettingsData | undefined
-  wallpaperHistoryStorage: WallpaperHistoryProps | undefined
-  // Note: historySuggestStorage is intentionally excluded (generated from browser history)
-  // Note: mqttStateStorage is intentionally excluded (runtime state, not user settings)
-}
-
-/**
- * Compile-time check to ensure ExportedData includes all storage types.
- * This type should resolve without errors. If it fails, it means a storage type
- * is missing from ExportedData or has mismatched types.
- */
-type ValidateExportedData = {
-  [K in keyof StorageTypeCheck]: K extends 'settingStorage'
-    ? ExportedData['settings']
-    : K extends 'quickUrlItemsStorage'
-    ? ExportedData['quickUrls']
-    : K extends 'exampleThemeStorage'
-    ? ExportedData['theme']
-    : K extends 'commandSettingsStorage'
-    ? ExportedData['commandSettings']
-    : K extends 'wallpaperHistoryStorage'
-    ? ExportedData['wallpaperHistory']
-    : never
-} extends Record<keyof StorageTypeCheck, StorageTypeCheck[keyof StorageTypeCheck]>
-  ? true
-  : 'Error: ExportedData is missing storage types or has type mismatches'
-
-// This will cause a compile error if the validation fails
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const _typeCheck: ValidateExportedData = true
 
 /**
  * Export all user data as JSON and download it
