@@ -151,7 +151,7 @@
   },
   "bookmarkFolderDescription": {
     "description": "Bookmark folder filter setting description",
-    "message": "选择一个特定的收藏夹来筛选右键菜单中显示的收藏。选择「所有收藏」将显示所有文件夹中的收藏。"
+    "message": "选择特定的收藏夹来筛选右键菜单中显示的收藏。默认为「所有收藏」以显示所有文件夹中的收藏。"
   },
   "allBookmarks": {
     "description": "All bookmarks option in folder selector",
