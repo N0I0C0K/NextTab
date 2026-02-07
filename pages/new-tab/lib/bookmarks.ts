@@ -4,9 +4,10 @@
 import { getDomainFromUrl } from '@/lib/url'
 
 /**
- * Get all top-level bookmark folders (direct children of root folders)
+ * Get bookmark folders for display in settings
+ * Returns root folders (Bookmarks Bar, Other Bookmarks) and their direct children
  */
-export async function getTopLevelBookmarkFolders(): Promise<chrome.bookmarks.BookmarkTreeNode[]> {
+export async function getBookmarkFolders(): Promise<chrome.bookmarks.BookmarkTreeNode[]> {
   try {
     const tree = await chrome.bookmarks.getTree()
     const folders: chrome.bookmarks.BookmarkTreeNode[] = []
@@ -37,28 +38,26 @@ export async function getTopLevelBookmarkFolders(): Promise<chrome.bookmarks.Boo
 }
 
 /**
- * Check if a bookmark node is within a specific folder (including nested children)
+ * Get all bookmark IDs within a folder (including nested children)
+ * More efficient than checking each bookmark individually
  */
-async function isBookmarkInFolder(bookmarkId: string, targetFolderId: string): Promise<boolean> {
+async function getBookmarkIdsInFolder(folderId: string): Promise<Set<string>> {
   try {
-    let currentId: string | undefined = bookmarkId
+    const [subtree] = await chrome.bookmarks.getSubTree(folderId)
+    const ids = new Set<string>()
 
-    // Traverse up the tree until we find the target folder or reach the root
-    while (currentId) {
-      const [node] = await chrome.bookmarks.get(currentId)
-      if (!node) break
-
-      if (node.id === targetFolderId) {
-        return true
+    const collectIds = (node: chrome.bookmarks.BookmarkTreeNode) => {
+      ids.add(node.id)
+      if (node.children) {
+        node.children.forEach(collectIds)
       }
-
-      currentId = node.parentId
     }
 
-    return false
+    collectIds(subtree)
+    return ids
   } catch (error) {
-    console.error('Failed to check bookmark folder:', error)
-    return false
+    console.error('Failed to get folder subtree:', error)
+    return new Set()
   }
 }
 
@@ -86,13 +85,9 @@ export async function findBookmarksByDomain(
 
     // If a folder ID is specified, further filter to only bookmarks in that folder
     if (folderId) {
-      const folderFilteredResults = await Promise.all(
-        filteredResults.map(async bookmark => {
-          const isInFolder = await isBookmarkInFolder(bookmark.id, folderId)
-          return isInFolder ? bookmark : null
-        }),
-      )
-      filteredResults = folderFilteredResults.filter((b): b is chrome.bookmarks.BookmarkTreeNode => b !== null)
+      // Get all bookmark IDs within the folder once (more efficient than per-bookmark checks)
+      const folderBookmarkIds = await getBookmarkIdsInFolder(folderId)
+      filteredResults = filteredResults.filter(bookmark => folderBookmarkIds.has(bookmark.id))
     }
 
     return filteredResults

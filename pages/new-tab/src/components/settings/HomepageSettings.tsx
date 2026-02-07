@@ -6,7 +6,7 @@ import type { FC } from 'react'
 import { useEffect, useState } from 'react'
 import { t } from '@extension/i18n'
 import { SettingItem } from './SettingItem'
-import { getTopLevelBookmarkFolders } from '@/lib/bookmarks'
+import { getBookmarkFolders } from '@/lib/bookmarks'
 
 export const HomepageSettings: FC = () => {
   const settings = useStorage(settingStorage)
@@ -14,7 +14,7 @@ export const HomepageSettings: FC = () => {
 
   useEffect(() => {
     // Fetch bookmark folders when component mounts
-    getTopLevelBookmarkFolders().then(setBookmarkFolders)
+    getBookmarkFolders().then(setBookmarkFolders)
   }, [])
 
   return (
