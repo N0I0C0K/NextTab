@@ -5,14 +5,26 @@
 import type { QuickUrlItem } from '../base/types'
 import type { SettingProps } from './settingsStorage'
 import type { CommandSettingsData } from './commandSettingsStorage'
+import type { WallpaperHistoryProps } from './wallpaperHistoryStorage'
 import { settingStorage } from './settingsStorage'
 import { quickUrlItemsStorage } from './quickUrlStorage'
 import { exampleThemeStorage } from './exampleThemeStorage'
 import { commandSettingsStorage } from './commandSettingsStorage'
+import { wallpaperHistoryStorage } from './wallpaperHistoryStorage'
 
 // Import types from existing implementations
 type Theme = 'light' | 'dark' | 'system'
 
+/**
+ * Interface for exported data structure.
+ * 
+ * Note: Not all storage types need to be exported. Only user settings and data
+ * that should be portable across devices are included.
+ * 
+ * Excluded storage types:
+ * - historySuggestStorage: Generated from browser history, not portable
+ * - mqttStateStorage: Runtime connection state, not user settings
+ */
 export interface ExportedData {
   version: string
   exportDate: string
@@ -20,6 +32,7 @@ export interface ExportedData {
   settings: Omit<SettingProps, 'localWallpaperData'>
   quickUrls: QuickUrlItem[]
   commandSettings?: CommandSettingsData
+  wallpaperHistory?: WallpaperHistoryProps
 }
 
 /**
@@ -30,6 +43,7 @@ export async function exportAllData(): Promise<void> {
   const quickUrls = await quickUrlItemsStorage.get()
   const theme = await exampleThemeStorage.get()
   const commandSettings = await commandSettingsStorage.get()
+  const wallpaperHistory = await wallpaperHistoryStorage.get()
   
   // Exclude localWallpaperData from export to reduce file size
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -42,6 +56,7 @@ export async function exportAllData(): Promise<void> {
     settings: settingsToExport,
     quickUrls,
     commandSettings,
+    wallpaperHistory,
   }
   
   const jsonString = JSON.stringify(exportData, null, 2)
@@ -104,6 +119,11 @@ export async function importAllData(file: File): Promise<void> {
   if (data.commandSettings) {
     await commandSettingsStorage.set(data.commandSettings)
   }
+  
+  // Import wallpaper history if present
+  if (data.wallpaperHistory) {
+    await wallpaperHistoryStorage.set(data.wallpaperHistory)
+  }
 }
 
 /**
@@ -148,6 +168,23 @@ function parseAndValidateImportFile(file: File): Promise<ExportedData> {
                 typeof pluginSettings.activeKey !== 'string' ||
                 typeof pluginSettings.includeInGlobal !== 'boolean') {
               throw new Error('Invalid command settings format')
+            }
+          }
+        }
+        
+        // Validate wallpaper history if present
+        if (data.wallpaperHistory) {
+          if (typeof data.wallpaperHistory !== 'object' || Array.isArray(data.wallpaperHistory) || data.wallpaperHistory === null) {
+            throw new Error('Invalid wallpaper history format: must be an object')
+          }
+          if (!Array.isArray(data.wallpaperHistory.history)) {
+            throw new Error('Invalid wallpaper history format: history must be an array')
+          }
+          for (const historyItem of data.wallpaperHistory.history) {
+            if (typeof historyItem.url !== 'string' ||
+                typeof historyItem.thumbnailUrl !== 'string' ||
+                typeof historyItem.addedAt !== 'number') {
+              throw new Error('Invalid wallpaper history item format')
             }
           }
         }
