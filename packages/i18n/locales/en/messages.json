@@ -145,6 +145,18 @@
     "description": "Show bookmarks in quick URL context menu setting description",
     "message": "Display related bookmarks when right-clicking quick URL items."
   },
+  "bookmarkFolder": {
+    "description": "Bookmark folder filter setting title",
+    "message": "Bookmark Folder Filter"
+  },
+  "bookmarkFolderDescription": {
+    "description": "Bookmark folder filter setting description",
+    "message": "Select a specific folder to filter bookmarks shown in the context menu. Leave as 'All Bookmarks' to show bookmarks from all folders."
+  },
+  "allBookmarks": {
+    "description": "All bookmarks option in folder selector",
+    "message": "All Bookmarks"
+  },
   "relatedBookmarks": {
     "description": "Related bookmarks section label in context menu",
     "message": "Bookmarks"

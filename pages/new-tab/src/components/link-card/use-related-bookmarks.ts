@@ -19,7 +19,7 @@ export const useRelatedBookmarks = (url: string, contextMenuOpen: boolean) => {
     if (contextMenuOpen) {
       const domain = getDomainFromUrl(url)
       if (domain) {
-        findBookmarksByDomain(domain)
+        findBookmarksByDomain(domain, settings.bookmarkFolderId)
           .then(bookmarks => {
             // Filter out the current URL itself
             setRelatedBookmarks(bookmarks.filter(b => b.url !== url))
@@ -33,7 +33,7 @@ export const useRelatedBookmarks = (url: string, contextMenuOpen: boolean) => {
         setRelatedBookmarks([])
       }
     }
-  }, [contextMenuOpen, url, settings.showBookmarksInQuickUrlMenu])
+  }, [contextMenuOpen, url, settings.showBookmarksInQuickUrlMenu, settings.bookmarkFolderId])
 
   return { relatedBookmarks, showBookmarks: settings.showBookmarksInQuickUrlMenu }
 }

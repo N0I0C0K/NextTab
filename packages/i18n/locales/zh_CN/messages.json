@@ -145,6 +145,18 @@
     "description": "Show bookmarks in quick URL context menu setting description",
     "message": "右键快捷链接时显示相关收藏。"
   },
+  "bookmarkFolder": {
+    "description": "Bookmark folder filter setting title",
+    "message": "收藏夹筛选"
+  },
+  "bookmarkFolderDescription": {
+    "description": "Bookmark folder filter setting description",
+    "message": "选择一个特定的收藏夹来筛选右键菜单中显示的收藏。选择「所有收藏」将显示所有文件夹中的收藏。"
+  },
+  "allBookmarks": {
+    "description": "All bookmarks option in folder selector",
+    "message": "所有收藏"
+  },
   "relatedBookmarks": {
     "description": "Related bookmarks section label in context menu",
     "message": "收藏"
