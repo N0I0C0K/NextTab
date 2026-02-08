@@ -39,7 +39,7 @@ export const LinkCardItem = forwardRef<HTMLDivElement, LinkCardProps & CustomGri
     const { relatedTabs, showOpenTabs } = useRelatedTabs(url, contextMenuOpen)
     const handleIconClick = useCallback(
       (ev: React.MouseEvent<HTMLDivElement>) => {
-        if (ev.ctrlKey) {
+        if (ev.ctrlKey || ev.metaKey) {
           chrome.tabs.create({ url: url, active: true })
         } else {
           chrome.tabs.update({ url: url })

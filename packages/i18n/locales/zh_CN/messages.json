@@ -620,5 +620,13 @@
   "commandPluginSettings": {
     "description": "Command plugin settings section title",
     "message": "命令插件设置"
+  },
+  "editQuickItem": {
+    "description": "Edit",
+    "message": "编辑"
+  },
+  "deleteQuickItem": {
+    "description": "Delete",
+    "message": "删除"
   }
 }

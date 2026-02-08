@@ -70,7 +70,7 @@ export const LinkCardContextMenuContent = ({
             'Edit',
           )
         }}>
-        Edit
+        {t('editQuickItem')}
       </ContextMenuItemWitchIcon>
       <ContextMenuItemWitchIcon
         IconType={History}
@@ -89,7 +89,7 @@ export const LinkCardContextMenuContent = ({
             globalDialog.close()
           })
         }}>
-        Delete
+        {t('deleteQuickItem')}
       </ContextMenuItemWitchIcon>
 
       {/* Related Bookmarks Section */}
