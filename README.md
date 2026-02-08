@@ -174,17 +174,13 @@ pnpm e2e
 
 本项目采用 [MIT License](LICENSE) 开源协议。
 
-## 🙏 鸣谢
-
-本项目基于 [chrome-extension-boilerplate-react-vite](https://github.com/Jonghakseo/chrome-extension-boilerplate-react-vite) 构建。
-
 ---
 
 <div align="center">
   
 **如果觉得有帮助，请给个 ⭐️ Star！**
 
-Made with ❤️ by [N0I0C0K](https://github.com/N0I0C0K)
+Made with ❤️ by [N0I0C0K](https://github.com/N0I0C0K). Powered by [chrome-extension-boilerplate-react-vite](https://github.com/Jonghakseo/chrome-extension-boilerplate-react-vite)
 
 </div>
 

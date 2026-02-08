@@ -174,16 +174,12 @@ For more development details, see [copilot-instructions.md](.github/copilot-inst
 
 This project is licensed under the [MIT License](LICENSE).
 
-## 🙏 Acknowledgments
-
-This project is powered by [chrome-extension-boilerplate-react-vite](https://github.com/Jonghakseo/chrome-extension-boilerplate-react-vite).
-
 ---
 
 <div align="center">
   
 **If you find this helpful, please give it a ⭐️ Star!**
 
-Made with ❤️ by [N0I0C0K](https://github.com/N0I0C0K)
+Made with ❤️ by [N0I0C0K](https://github.com/N0I0C0K). Powered by [chrome-extension-boilerplate-react-vite](https://github.com/Jonghakseo/chrome-extension-boilerplate-react-vite)
 
 </div>
