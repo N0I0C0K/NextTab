@@ -620,5 +620,13 @@
   "commandPluginSettings": {
     "description": "Command plugin settings section title",
     "message": "Command Plugin Settings"
+  },
+  "editQuickItem": {
+    "description": "Edit",
+    "message": "Edit"
+  },
+  "deleteQuickItem": {
+    "description": "Delete",
+    "message": "Delete"
   }
 }

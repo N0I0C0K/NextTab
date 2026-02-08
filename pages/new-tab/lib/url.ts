@@ -6,6 +6,7 @@ export function getDefaultIconUrl(u: string): string {
   const url = new URL(chrome.runtime.getURL('/_favicon/'))
   url.searchParams.set('pageUrl', u)
   url.searchParams.set('size', '128')
+  url.searchParams.set('timestamp', Date.now().toString())
   return url.toString()
 }
 
