@@ -1,9 +1,11 @@
 import { getDefaultIconUrl } from '@/lib/url'
-import { ScrollArea, Text } from '@extension/ui'
+import { ScrollArea, Text, Input } from '@extension/ui'
 import { t } from '@extension/i18n'
 import { useMemo, useState, useEffect, type FC } from 'react'
 import { cn } from '@/lib/utils'
+import { useDebounce } from '@extension/shared'
 import moment from 'moment'
+import { Search, X } from 'lucide-react'
 
 interface DomainHistoryItem {
   id: string
@@ -31,14 +33,19 @@ const matchesDomain = (itemDomain: string, targetDomain: string): boolean => {
 export const DomainHistoryDialog: FC<DomainHistoryDialogProps> = ({ domain }) => {
   const [historyItems, setHistoryItems] = useState<DomainHistoryItem[]>([])
   const [loading, setLoading] = useState(true)
+  const [searchQuery, setSearchQuery] = useState('')
+  const debouncedSearchQuery = useDebounce(searchQuery, 300)
 
   useEffect(() => {
     const fetchDomainHistory = async () => {
       try {
         setLoading(true)
+        // Combine domain and search query for Chrome history search
+        const searchText = debouncedSearchQuery ? `${domain} ${debouncedSearchQuery}` : domain
+
         // Search for all history items from this domain
         const allHistory = await chrome.history.search({
-          text: domain,
+          text: searchText,
           maxResults: 100,
           startTime: moment().add(-6, 'month').valueOf(),
         })
@@ -73,10 +80,10 @@ export const DomainHistoryDialog: FC<DomainHistoryDialogProps> = ({ domain }) =>
     }
 
     fetchDomainHistory()
-  }, [domain])
+  }, [domain, debouncedSearchQuery])
 
   return (
-    <div className="flex flex-col gap-3 max-w-[50rem]">
+    <div className="flex flex-col gap-3 w-[50rem] h-[42rem] max-w-full">
       <div className="flex items-center gap-2 min-w-0">
         <Text level="md" className="font-semibold truncate">
           {domain}
@@ -86,21 +93,39 @@ export const DomainHistoryDialog: FC<DomainHistoryDialogProps> = ({ domain }) =>
         </Text>
       </div>
 
+      {/* Search input */}
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+        <Input
+          type="text"
+          placeholder={t('searchInDomain')}
+          value={searchQuery}
+          onChange={e => setSearchQuery(e.target.value)}
+          className="pl-9 pr-9"
+        />
+        {searchQuery && (
+          <button
+            onClick={() => setSearchQuery('')}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground
+              transition-colors">
+            <X className="size-4" />
+          </button>
+        )}
+      </div>
+
       {loading ? (
-        <div className="flex items-center justify-center py-8">
+        <div className="flex items-center justify-center flex-1">
           <Text className="text-muted-foreground">{t('loading')}</Text>
         </div>
       ) : historyItems.length === 0 ? (
-        <div className="flex items-center justify-center py-8">
+        <div className="flex items-center justify-center flex-1">
           <Text className="text-muted-foreground">{t('noHistoryFound')}</Text>
         </div>
       ) : (
-        <ScrollArea className="h-[400px]">
-          <div className="flex flex-col items-center">
-            {historyItems.map(item => (
-              <DomainHistoryItem key={item.id} {...item} />
-            ))}
-          </div>
+        <ScrollArea className="h-[36rem] max-h-[50vh] [&>div>div]:!block">
+          {historyItems.map(item => (
+            <DomainHistoryItem key={item.id} {...item} />
+          ))}
         </ScrollArea>
       )}
     </div>
@@ -135,8 +160,8 @@ const DomainHistoryItem: FC<DomainHistoryItemProps> = ({ title, url, lastVisitTi
       role="button"
       tabIndex={0}
       className={cn(
-        'flex items-center gap-3 py-2.5 px-3 cursor-pointer group w-full',
-        'hover:bg-accent/50 rounded-md transition-colors duration-200',
+        'flex items-center gap-3 py-2.5 px-3 cursor-pointer group',
+        'hover:bg-muted rounded-md transition-colors duration-200',
       )}
       onClick={handleClick}
       onKeyDown={handleKeyDown}>
@@ -148,7 +173,7 @@ const DomainHistoryItem: FC<DomainHistoryItemProps> = ({ title, url, lastVisitTi
           e.currentTarget.style.display = 'none'
         }}
       />
-      <div className="flex flex-col flex-1 min-w-0 gap-0.5 max-w-full">
+      <div className="flex flex-col flex-1 min-w-0 gap-0.5">
         <Text level="s" className="font-medium truncate">
           {title}
         </Text>
