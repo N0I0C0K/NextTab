@@ -197,6 +197,10 @@
     "description": "Visit count suffix",
     "message": "次访问"
   },
+  "searchInDomain": {
+    "description": "Search in domain placeholder",
+    "message": "在此域名下搜索..."
+  },
   "wallpaperUrl": {
     "description": "Wallpaper URL setting title",
     "message": "壁纸 URL"
