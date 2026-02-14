@@ -37,7 +37,7 @@ NextTab is a new tab page extension focused on boosting browser efficiency with 
 
 ## ✨ Key Features
 
-- 🔗 **Smart Quick Links** - Fast access to frequently used websites with drag-and-drop sorting and context menus
+- 🔗 **Efficient Quick Links** - Fast access to frequently used websites with drag-and-drop sorting and a context menu for quick actions
 - 🎨 **Personalized Backgrounds** - Custom wallpapers with integrated [Wallhaven](https://wallhaven.cc/) high-quality wallpapers by default
 - ⚡ **Powerful Command Palette** - Quick search for tabs, bookmarks, history, and more (continuously being developed)
 - ⌨️ **Keyboard First** - Comprehensive keyboard shortcut support for efficient operation
