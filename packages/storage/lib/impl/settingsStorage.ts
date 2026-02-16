@@ -4,7 +4,7 @@ import type { BaseStorage } from '../base/types'
 import deepmerge from 'deepmerge'
 
 export const DEFAULT_WALLPAPER_URL = 'https://w.wallhaven.cc/full/ml/wallhaven-mlpll9.jpg'
-export const DEFAULT_MQTT_BROKER_URL = 'mqtt://broker.emqx.io'
+export const DEFAULT_MQTT_BROKER_URL = 'wss://broker.emqx.io:8084/mqtt'
 
 export type MqttSetting = {
   mqttBrokerUrl: string

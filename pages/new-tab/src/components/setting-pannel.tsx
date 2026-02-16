@@ -27,15 +27,7 @@ import {
   ScrollArea,
 } from '@extension/ui'
 import type { LucideProps } from 'lucide-react'
-import {
-  AlignJustify,
-  CupSoda,
-  KeyRound,
-  ToggleRight,
-  User,
-  Activity,
-  Dot,
-} from 'lucide-react'
+import { AlignJustify, CupSoda, KeyRound, ToggleRight, User, Activity, Dot } from 'lucide-react'
 import React, { type ElementType, type FC, type ReactElement, type ReactNode } from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@extension/ui/lib/components/ui/tabs'
 import { t } from '@extension/i18n'
@@ -264,12 +256,17 @@ const DrinkWaterButton: FC<{ className?: string }> = ({ className }) => {
 }
 
 export const SettingPanel: FC<{ className?: string }> = ({ className }) => {
+  const mqttServerState = useStorage(mqttStateManager)
   return (
     <TooltipProvider>
       <Stack direction={'column'} className={cn('gap-2', className)}>
         <DrawerSettingPanel />
-        <Separator className="bg-gray-600/40" />
-        <DrinkWaterButton />
+        {mqttServerState.connected && (
+          <>
+            <Separator className="bg-gray-600/40" />
+            <DrinkWaterButton />
+          </>
+        )}
       </Stack>
     </TooltipProvider>
   )
