@@ -18,8 +18,12 @@ const manifest = {
   name: '__MSG_extensionName__',
   version: packageJson.version,
   description: '__MSG_extensionDescription__',
-  host_permissions: ['<all_urls>'],
-  permissions: ['storage', 'scripting', 'tabs', 'notifications', 'search', 'history', 'favicon', 'bookmarks', 'alarms'],
+  host_permissions: [
+    'https://api.github.com/*',    // Version check API
+    'https://wallhaven.cc/*',      // Wallpaper search API
+    'wss://broker.emqx.io:8084/*',  // MQTT WebSocket connection
+  ],
+  permissions: ['storage', 'tabs', 'notifications', 'search', 'history', 'favicon', 'bookmarks', 'alarms'],
   // options_page: 'options/index.html',
   background: {
     service_worker: 'background.iife.js',
@@ -50,12 +54,12 @@ const manifest = {
   //   },
   // ],
   // devtools_page: 'devtools/index.html',
-  web_accessible_resources: [
-    {
-      resources: ['*.js', '*.css', '*.svg', 'icon-128.png', 'icon-34.png'],
-      matches: ['*://*/*'],
-    },
-  ],
+  // web_accessible_resources: [
+  //   {
+  //     resources: ['*.js', '*.css', '*.svg', 'icon-128.png', 'icon-34.png'],
+  //     matches: ['*://*/*'],
+  //   },
+  // ],
 };
 
 export default manifest;

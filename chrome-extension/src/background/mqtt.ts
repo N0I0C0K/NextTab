@@ -22,7 +22,7 @@ async function initMqttClientEvent(client: MqttClient) {
   })
 }
 
-const mqttProvider: MqttProvider = new MqttProvider('ws://broker.emqx.io:8083/mqtt')
+const mqttProvider: MqttProvider = new MqttProvider({})
 const payloadBuilder = new MqttPayloadBuilder()
 mqttProvider.on('client-loaded', async client => {
   if (client.connected) {
@@ -43,7 +43,7 @@ async function setupMqtt() {
   console.log('Connecting to MQTT broker...')
   mqttProvider.changeSecretPrefix(settings.mqttSettings.secretKey)
   payloadBuilder.username = settings.mqttSettings.username
-  await mqttProvider.connect({ brokerUrl: settings.mqttSettings.mqttBrokerUrl })
+  await mqttProvider.connect({ brokerUrl: 'wss://broker.emqx.io:8084/mqtt' })
   console.log('MQTT connected')
 }
 

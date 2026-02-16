@@ -57,11 +57,11 @@ export class MqttProvider extends EventEmitter<MqttProviderEventMap> {
   private _clientInner: mqtt.MqttClient | null = null
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private registeredTopics: Map<string, TopicEventHandler<any>> = new Map()
-  private brokerUrl: string
+  private brokerUrl?: string
   private _secretPrefix?: string
   private topicRegisterService: MqttSecretPrefixTopicRegisterService
 
-  constructor(brokerUrl: string) {
+  constructor({ brokerUrl }: { brokerUrl?: string }) {
     super()
     this.brokerUrl = brokerUrl
     this.topicRegisterService = new MqttSecretPrefixTopicRegisterService()
@@ -104,6 +104,7 @@ export class MqttProvider extends EventEmitter<MqttProviderEventMap> {
   }
 
   async connect(options?: MqttConnectionOptions) {
+    console.log('Attempting to connect to MQTT broker with options:', options)
     const { brokerUrl, useReconnect = true } = options || {}
     if (brokerUrl) {
       this.brokerUrl = brokerUrl
@@ -119,10 +120,12 @@ export class MqttProvider extends EventEmitter<MqttProviderEventMap> {
       }
     }
 
+    if (!this.brokerUrl) {
+      throw new Error('MQTT broker URL is not set')
+    }
+
     try {
-      this._clientInner = await mqtt.connectAsync(this.brokerUrl, {
-        protocol: 'ws',
-      })
+      this._clientInner = await mqtt.connectAsync(this.brokerUrl)
     } catch (error) {
       this._clientInner = null
       console.error('Failed to connect to MQTT broker:', error)
