@@ -2,30 +2,72 @@
  * Data export/import functionality for user settings and data
  */
 
-import type { QuickUrlItem } from '../base/types'
-import type { SettingProps } from './settingsStorage'
-import type { CommandSettingsData } from './commandSettingsStorage'
+import { z, prettifyError } from 'zod'
 import { settingStorage } from './settingsStorage'
 import { localWallpaperStorage } from './localWallpaperStorage'
 import { quickUrlItemsStorage } from './quickUrlStorage'
 import { exampleThemeStorage } from './exampleThemeStorage'
 import { commandSettingsStorage } from './commandSettingsStorage'
 
-// Import types from existing implementations
-type Theme = 'light' | 'dark' | 'system'
+// ---- Zod schemas --------------------------------------------------------
 
-export interface ExportedData {
-  version?: string
-  exportDate?: string
-  theme?: Theme
-  settings?: SettingProps
-  quickUrls?: QuickUrlItem[]
-  commandSettings?: CommandSettingsData
-}
+const mqttSettingSchema = z.object({
+  mqttBrokerUrl: z.string(),
+  secretKey: z.string(),
+  enabled: z.boolean(),
+  username: z.string(),
+})
+
+const settingsSchema = z.object({
+  useHistorySuggestion: z.boolean().optional(),
+  autoFocusCommandInput: z.boolean().optional(),
+  doubleClickBackgroundFocusCommand: z.boolean().optional(),
+  showBookmarksInQuickUrlMenu: z.boolean().optional(),
+  showOpenTabsInQuickUrlMenu: z.boolean().optional(),
+  bookmarkFolderId: z.string().nullable().optional(),
+  wallpaperUrl: z.string().nullable().optional(),
+  wallpaperType: z.union([z.literal('url'), z.literal('local')]).optional(),
+  wallhavenSortMode: z.union([z.literal('toplist'), z.literal('random')]).optional(),
+  mqttSettings: mqttSettingSchema.optional(),
+})
+
+const quickUrlItemSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  url: z.string(),
+  iconUrl: z.string().optional(),
+})
+
+const commandPluginSettingsSchema = z.object({
+  priority: z.number(),
+  active: z.boolean(),
+  activeKey: z.string(),
+  includeInGlobal: z.boolean(),
+})
+
+const commandSettingsSchema = z.record(z.string(), commandPluginSettingsSchema)
+
+const themeSchema = z.union([z.literal('light'), z.literal('dark'), z.literal('system')])
+
+const exportedDataSchema = z.object({
+  version: z.string().optional(),
+  exportDate: z.string().optional(),
+  theme: themeSchema.optional(),
+  settings: settingsSchema.optional(),
+  quickUrls: z.array(quickUrlItemSchema).optional(),
+  commandSettings: commandSettingsSchema.optional(),
+})
+
+// ---- Public types -------------------------------------------------------
+
+/** Shape of a full export file produced by {@link exportAllData}. */
+export type ExportedData = z.infer<typeof exportedDataSchema>
 
 export type ImportResult = {
   warnings: string[]
 }
+
+// ---- Export -------------------------------------------------------------
 
 /**
  * Export all user data as JSON and download it
@@ -58,101 +100,102 @@ export async function exportAllData(): Promise<void> {
   URL.revokeObjectURL(url)
 }
 
+// ---- Import -------------------------------------------------------------
+
 /**
  * Import all user data from a JSON file.
  * Supports partial imports — missing fields are skipped and current values are preserved.
- * Returns warnings for any fields that could not be imported due to format incompatibilities.
+ * Each section is validated independently via Zod; invalid sections emit a warning and are skipped.
  */
 export async function importAllData(file: File): Promise<ImportResult> {
-  const { data, warnings } = await parseAndValidateImportFile(file)
+  const { raw, warnings } = await readImportFile(file)
 
   // Import settings via deep-merge so missing fields fall back to current stored values
-  if (data.settings && typeof data.settings === 'object') {
-    const settingsToImport: Partial<SettingProps> = data.settings
+  if (raw.settings !== undefined) {
+    const result = settingsSchema.safeParse(raw.settings)
+    if (result.success) {
+      const settingsToImport = result.data
 
-    // Validate wallpaperType and ensure consistency with local wallpaper data
-    if (settingsToImport.wallpaperType !== undefined) {
-      if (settingsToImport.wallpaperType !== 'url' && settingsToImport.wallpaperType !== 'local') {
-        settingsToImport.wallpaperType = 'url'
-      }
+      // Local wallpaper is not exported.
       if (settingsToImport.wallpaperType === 'local') {
         settingsToImport.wallpaperType = 'url'
       }
-    }
 
-    // update() uses deepmerge, so only provided fields overwrite stored values.
-    // localWallpaperData is never included in settingsToImport (type guarantees this),
-    // so it is always preserved from the current device storage.
-    await settingStorage.update(settingsToImport)
+      // update() uses deepmerge, so only provided fields overwrite stored values.
+      // localWallpaperData is never included in settingsToImport (type guarantees this),
+      // so it is always preserved from the current device storage.
+      await settingStorage.update(settingsToImport)
+    } else {
+      warnings.push(`settings: ${prettifyError(result.error)}`)
+    }
   }
 
   // Import quick URLs
-  if (data.quickUrls !== undefined) {
-    if (Array.isArray(data.quickUrls)) {
-      const validUrls: QuickUrlItem[] = []
-      let skippedCount = 0
-      for (const item of data.quickUrls) {
-        if (item && item.id && item.title && item.url) {
-          validUrls.push(item)
-        } else {
-          skippedCount++
-        }
-      }
-      if (skippedCount > 0) {
-        warnings.push(`Skipped ${skippedCount} invalid quick URL item(s)`)
-      }
-      await quickUrlItemsStorage.set(validUrls)
+  if (raw.quickUrls !== undefined) {
+    const result = z.array(quickUrlItemSchema).safeParse(raw.quickUrls)
+    if (result.success) {
+      await quickUrlItemsStorage.set(result.data)
     } else {
-      warnings.push('quickUrls field has an unrecognised format and was skipped')
+      warnings.push(`quickUrls: ${prettifyError(result.error)}`)
     }
   }
 
   // Import theme if present
-  if (data.theme !== undefined) {
-    if (data.theme === 'light' || data.theme === 'dark' || data.theme === 'system') {
-      await exampleThemeStorage.set(data.theme)
+  if (raw.theme !== undefined) {
+    const result = themeSchema.safeParse(raw.theme)
+    if (result.success) {
+      await exampleThemeStorage.set(result.data)
     } else {
-      warnings.push(`Unknown theme value "${data.theme}", skipped`)
+      warnings.push(`theme: ${prettifyError(result.error)}`)
     }
   }
 
   // Import command settings if present
-  if (data.commandSettings !== undefined) {
-    if (typeof data.commandSettings === 'object' && !Array.isArray(data.commandSettings) && data.commandSettings !== null) {
-      await commandSettingsStorage.set(data.commandSettings)
+  if (raw.commandSettings !== undefined) {
+    const result = commandSettingsSchema.safeParse(raw.commandSettings)
+    if (result.success) {
+      await commandSettingsStorage.set(result.data)
     } else {
-      warnings.push('commandSettings field has an unrecognised format and was skipped')
+      warnings.push(`commandSettings: ${prettifyError(result.error)}`)
     }
   }
 
   return { warnings }
 }
 
+// ---- Helpers ------------------------------------------------------------
+
+// Loose top-level schema: just ensures the JSON is a non-array object so that individual
+// section schemas can validate each field independently and emit per-field warnings.
+const importFileSchema = z.record(z.string(), z.unknown())
+
 /**
- * Parse the imported JSON file and do a minimal sanity check.
- * All field-level validation is deferred to importAllData so partial data is accepted.
+ * Read the JSON file and do a minimal top-level sanity check.
+ * Per-section validation (with Zod) is deferred to {@link importAllData}
+ * so that one invalid section does not prevent other valid sections from being imported.
  */
-function parseAndValidateImportFile(file: File): Promise<{ data: ExportedData; warnings: string[] }> {
+function readImportFile(file: File): Promise<{ raw: Record<string, unknown>; warnings: string[] }> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
 
     reader.onload = (e) => {
       try {
         const content = e.target?.result as string
-        const data = JSON.parse(content) as ExportedData
+        const parsed = JSON.parse(content)
+        const result = importFileSchema.safeParse(parsed)
 
-        if (!data || typeof data !== 'object' || Array.isArray(data)) {
-          throw new Error('Invalid data format: expected a JSON object')
+        if (!result.success) {
+          throw new Error('expected a JSON object')
         }
 
-        // Require at least one known top-level field
-        if (!data.settings && !data.quickUrls && data.theme === undefined && !data.commandSettings) {
-          throw new Error('Invalid data format: no recognisable fields found')
+        const raw = result.data
+        if (!raw.settings && !raw.quickUrls && raw.theme === undefined && !raw.commandSettings) {
+          throw new Error('no recognisable fields found')
         }
 
-        resolve({ data, warnings: [] })
+        resolve({ raw, warnings: [] })
       } catch (error) {
-        reject(new Error('Failed to parse JSON file: ' + (error as Error).message))
+        reject(new Error('Failed to parse import file: ' + (error as Error).message))
       }
     }
 
