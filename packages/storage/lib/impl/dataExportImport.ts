@@ -15,12 +15,16 @@ import { commandSettingsStorage } from './commandSettingsStorage'
 type Theme = 'light' | 'dark' | 'system'
 
 export interface ExportedData {
-  version: string
-  exportDate: string
+  version?: string
+  exportDate?: string
   theme?: Theme
-  settings: SettingProps
-  quickUrls: QuickUrlItem[]
+  settings?: SettingProps
+  quickUrls?: QuickUrlItem[]
   commandSettings?: CommandSettingsData
+}
+
+export type ImportResult = {
+  warnings: string[]
 }
 
 /**
@@ -31,7 +35,7 @@ export async function exportAllData(): Promise<void> {
   const quickUrls = await quickUrlItemsStorage.get()
   const theme = await exampleThemeStorage.get()
   const commandSettings = await commandSettingsStorage.get()
-  
+
   const exportData: ExportedData = {
     version: '1.0.0',
     exportDate: new Date().toISOString(),
@@ -40,11 +44,11 @@ export async function exportAllData(): Promise<void> {
     quickUrls,
     commandSettings,
   }
-  
+
   const jsonString = JSON.stringify(exportData, null, 2)
   const blob = new Blob([jsonString], { type: 'application/json' })
   const url = URL.createObjectURL(blob)
-  
+
   const link = document.createElement('a')
   link.href = url
   link.download = `nexttab-settings-${new Date().toISOString().split('T')[0]}.json`
@@ -55,112 +59,107 @@ export async function exportAllData(): Promise<void> {
 }
 
 /**
- * Import all user data from a JSON file
+ * Import all user data from a JSON file.
+ * Supports partial imports — missing fields are skipped and current values are preserved.
+ * Returns warnings for any fields that could not be imported due to format incompatibilities.
  */
-export async function importAllData(file: File): Promise<void> {
-  const data = await parseAndValidateImportFile(file)
-  
-  /**
-   * We intentionally skip importing local wallpaper data because it is stored
-   * in IndexedDB via `localWallpaperStorage` and is device-specific – it is
-   * never included in exports.  If the imported settings request 'local'
-   * wallpaperType but no IndexedDB-backed local wallpaper exists on this
-   * device, we fall back to 'url' mode.
-   */
-  const currentSettings = await settingStorage.get()
+export async function importAllData(file: File): Promise<ImportResult> {
+  const { data, warnings } = await parseAndValidateImportFile(file)
 
-  // Handle wallpaperType with validation and fallback for backward compatibility
-  let wallpaperType = data.settings.wallpaperType ?? 'url'
-  // Validate wallpaperType: must be 'url' or 'local'
-  if (wallpaperType !== 'url' && wallpaperType !== 'local') {
-    wallpaperType = 'url'
+  // Import settings via deep-merge so missing fields fall back to current stored values
+  if (data.settings && typeof data.settings === 'object') {
+    const settingsToImport: Partial<SettingProps> = data.settings
+
+    // Validate wallpaperType and ensure consistency with local wallpaper data
+    if (settingsToImport.wallpaperType !== undefined) {
+      if (settingsToImport.wallpaperType !== 'url' && settingsToImport.wallpaperType !== 'local') {
+        settingsToImport.wallpaperType = 'url'
+      }
+      if (settingsToImport.wallpaperType === 'local') {
+        settingsToImport.wallpaperType = 'url'
+      }
+    }
+
+    // update() uses deepmerge, so only provided fields overwrite stored values.
+    // localWallpaperData is never included in settingsToImport (type guarantees this),
+    // so it is always preserved from the current device storage.
+    await settingStorage.update(settingsToImport)
   }
-  // If imported settings want local wallpaper but no local data exists on this device, switch to URL mode.
-  // Local wallpaper data is intentionally device-specific and never included in exports.
-  if (wallpaperType === 'local') {
-    const localWallpaper = await localWallpaperStorage.get()
-    if (!localWallpaper.imageData) {
-      wallpaperType = 'url'
+
+  // Import quick URLs
+  if (data.quickUrls !== undefined) {
+    if (Array.isArray(data.quickUrls)) {
+      const validUrls: QuickUrlItem[] = []
+      let skippedCount = 0
+      for (const item of data.quickUrls) {
+        if (item && item.id && item.title && item.url) {
+          validUrls.push(item)
+        } else {
+          skippedCount++
+        }
+      }
+      if (skippedCount > 0) {
+        warnings.push(`Skipped ${skippedCount} invalid quick URL item(s)`)
+      }
+      await quickUrlItemsStorage.set(validUrls)
+    } else {
+      warnings.push('quickUrls field has an unrecognised format and was skipped')
     }
   }
 
-  await settingStorage.set({
-    ...data.settings,
-    wallpaperType,
-    // Preserve user's preferred Wallhaven sort mode if not explicitly set in import
-    wallhavenSortMode: data.settings.wallhavenSortMode ?? currentSettings.wallhavenSortMode ?? 'toplist',
-  })
-  
-  // Import quick URLs
-  await quickUrlItemsStorage.set(data.quickUrls)
-  
   // Import theme if present
-  if (data.theme) {
-    await exampleThemeStorage.set(data.theme)
+  if (data.theme !== undefined) {
+    if (data.theme === 'light' || data.theme === 'dark' || data.theme === 'system') {
+      await exampleThemeStorage.set(data.theme)
+    } else {
+      warnings.push(`Unknown theme value "${data.theme}", skipped`)
+    }
   }
-  
+
   // Import command settings if present
-  if (data.commandSettings) {
-    await commandSettingsStorage.set(data.commandSettings)
+  if (data.commandSettings !== undefined) {
+    if (typeof data.commandSettings === 'object' && !Array.isArray(data.commandSettings) && data.commandSettings !== null) {
+      await commandSettingsStorage.set(data.commandSettings)
+    } else {
+      warnings.push('commandSettings field has an unrecognised format and was skipped')
+    }
   }
+
+  return { warnings }
 }
 
 /**
- * Parse and validate the imported JSON file
+ * Parse the imported JSON file and do a minimal sanity check.
+ * All field-level validation is deferred to importAllData so partial data is accepted.
  */
-function parseAndValidateImportFile(file: File): Promise<ExportedData> {
+function parseAndValidateImportFile(file: File): Promise<{ data: ExportedData; warnings: string[] }> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
-    
+
     reader.onload = (e) => {
       try {
         const content = e.target?.result as string
         const data = JSON.parse(content) as ExportedData
-        
-        // Validate the imported data structure
-        if (!data.settings || !data.quickUrls || !Array.isArray(data.quickUrls)) {
-          throw new Error('Invalid data format: missing required fields (settings or quickUrls)')
+
+        if (!data || typeof data !== 'object' || Array.isArray(data)) {
+          throw new Error('Invalid data format: expected a JSON object')
         }
-        
-        // Validate settings structure
-        if (typeof data.settings.useHistorySuggestion !== 'boolean' ||
-            typeof data.settings.autoFocusCommandInput !== 'boolean' ||
-            !data.settings.mqttSettings) {
-          throw new Error('Invalid settings format')
+
+        // Require at least one known top-level field
+        if (!data.settings && !data.quickUrls && data.theme === undefined && !data.commandSettings) {
+          throw new Error('Invalid data format: no recognisable fields found')
         }
-        
-        // Validate quick URLs
-        for (const item of data.quickUrls) {
-          if (!item.id || !item.title || !item.url) {
-            throw new Error('Invalid quick URL item: missing required fields')
-          }
-        }
-        
-        // Validate command settings if present
-        if (data.commandSettings) {
-          if (typeof data.commandSettings !== 'object' || Array.isArray(data.commandSettings) || data.commandSettings === null) {
-            throw new Error('Invalid command settings format: must be an object')
-          }
-          for (const pluginSettings of Object.values(data.commandSettings)) {
-            if (typeof pluginSettings.priority !== 'number' ||
-                typeof pluginSettings.active !== 'boolean' ||
-                typeof pluginSettings.activeKey !== 'string' ||
-                typeof pluginSettings.includeInGlobal !== 'boolean') {
-              throw new Error('Invalid command settings format')
-            }
-          }
-        }
-        
-        resolve(data)
+
+        resolve({ data, warnings: [] })
       } catch (error) {
         reject(new Error('Failed to parse JSON file: ' + (error as Error).message))
       }
     }
-    
+
     reader.onerror = () => {
       reject(new Error('Failed to read file'))
     }
-    
+
     reader.readAsText(file)
   })
 }
