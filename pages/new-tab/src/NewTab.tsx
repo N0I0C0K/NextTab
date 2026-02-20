@@ -6,7 +6,7 @@ import type { CommandModuleRef } from './components/command'
 
 import '@/src/style/placeholder.css'
 import { HistoryArea } from './components/history-area'
-import { settingStorage, DEFAULT_WALLPAPER_URL } from '@extension/storage'
+import { settingStorage, DEFAULT_WALLPAPER_URL, localWallpaperStorage } from '@extension/storage'
 import { useStorage } from '@extension/shared'
 
 const TimeDisplay = () => {
@@ -50,10 +50,11 @@ const TimeDisplay = () => {
 
 const NewTab = () => {
   const settings = useStorage(settingStorage)
+  const localWallpaper = useStorage(localWallpaperStorage)
   const [wallpaperSrc, setWallpaperSrc] = useState<string>(() => {
     // Initialize wallpaper source from settings
-    if (settings.wallpaperType === 'local' && settings.localWallpaperData) {
-      return settings.localWallpaperData
+    if (settings.wallpaperType === 'local' && localWallpaper.imageData) {
+      return localWallpaper.imageData
     } else {
       return settings.wallpaperUrl ?? DEFAULT_WALLPAPER_URL
     }
@@ -62,12 +63,12 @@ const NewTab = () => {
 
   useEffect(() => {
     // Update wallpaper source when settings change
-    if (settings.wallpaperType === 'local' && settings.localWallpaperData) {
-      setWallpaperSrc(settings.localWallpaperData)
+    if (settings.wallpaperType === 'local' && localWallpaper.imageData) {
+      setWallpaperSrc(localWallpaper.imageData)
     } else {
       setWallpaperSrc(settings.wallpaperUrl ?? DEFAULT_WALLPAPER_URL)
     }
-  }, [settings.wallpaperType, settings.localWallpaperData, settings.wallpaperUrl])
+  }, [settings.wallpaperType, localWallpaper.imageData, settings.wallpaperUrl])
 
   function handleBackgroundDoubleClick() {
     if (settings.doubleClickBackgroundFocusCommand) {

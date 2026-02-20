@@ -6,6 +6,7 @@ import type { QuickUrlItem } from '../base/types'
 import type { SettingProps } from './settingsStorage'
 import type { CommandSettingsData } from './commandSettingsStorage'
 import { settingStorage } from './settingsStorage'
+import { localWallpaperStorage } from './localWallpaperStorage'
 import { quickUrlItemsStorage } from './quickUrlStorage'
 import { exampleThemeStorage } from './exampleThemeStorage'
 import { commandSettingsStorage } from './commandSettingsStorage'
@@ -17,7 +18,7 @@ export interface ExportedData {
   version: string
   exportDate: string
   theme?: Theme
-  settings: Omit<SettingProps, 'localWallpaperData'>
+  settings: SettingProps
   quickUrls: QuickUrlItem[]
   commandSettings?: CommandSettingsData
 }
@@ -31,15 +32,11 @@ export async function exportAllData(): Promise<void> {
   const theme = await exampleThemeStorage.get()
   const commandSettings = await commandSettingsStorage.get()
   
-  // Exclude localWallpaperData from export to reduce file size
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { localWallpaperData, ...settingsToExport } = settings
-  
   const exportData: ExportedData = {
     version: '1.0.0',
     exportDate: new Date().toISOString(),
     theme,
-    settings: settingsToExport,
+    settings,
     quickUrls,
     commandSettings,
   }
@@ -69,25 +66,25 @@ export async function importAllData(file: File): Promise<void> {
    * If the imported settings request 'local' wallpaperType but no local data exists, we switch to 'url' mode.
    */
   const currentSettings = await settingStorage.get()
-  
-  // Preserve local wallpaper data and ensure wallpaperType is consistent
-  const hasLocalWallpaperData = !!currentSettings.localWallpaperData
-  
+
   // Handle wallpaperType with validation and fallback for backward compatibility
   let wallpaperType = data.settings.wallpaperType ?? 'url'
   // Validate wallpaperType: must be 'url' or 'local'
   if (wallpaperType !== 'url' && wallpaperType !== 'local') {
     wallpaperType = 'url'
   }
-  // If imported settings want local wallpaper but we don't have local data, switch to URL mode
-  if (wallpaperType === 'local' && !hasLocalWallpaperData) {
-    wallpaperType = 'url'
+  // If imported settings want local wallpaper but no local data exists on this device, switch to URL mode.
+  // Local wallpaper data is intentionally device-specific and never included in exports.
+  if (wallpaperType === 'local') {
+    const localWallpaper = await localWallpaperStorage.get()
+    if (!localWallpaper.imageData) {
+      wallpaperType = 'url'
+    }
   }
-  
+
   await settingStorage.set({
     ...data.settings,
     wallpaperType,
-    localWallpaperData: currentSettings.localWallpaperData,
     // Preserve user's preferred Wallhaven sort mode if not explicitly set in import
     wallhavenSortMode: data.settings.wallhavenSortMode ?? currentSettings.wallhavenSortMode ?? 'toplist',
   })
