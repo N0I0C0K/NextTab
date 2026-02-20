@@ -68,6 +68,9 @@ importers:
       tailwindcss-animate:
         specifier: ^1.0.7
         version: 1.0.7(tailwindcss@3.4.11(ts-node@10.9.2(@swc/core@1.7.25(@swc/helpers@0.5.13))(@types/node@20.16.10)(typescript@5.5.4)))
+      zod:
+        specifier: ^4.3.6
+        version: 4.3.6
     devDependencies:
       '@types/chrome':
         specifier: ^0.0.270
@@ -249,10 +252,6 @@ importers:
         version: link:../tsconfig
 
   packages/storage:
-    dependencies:
-      zod:
-        specifier: ^4.3.6
-        version: 4.3.6
     devDependencies:
       '@extension/tsconfig':
         specifier: workspace:*
