@@ -47,6 +47,30 @@
     "description": "Settings description",
     "message": "Set your preferences"
   },
+  "noQuickLinks": {
+    "description": "No quick links message",
+    "message": "No quick links"
+  },
+  "popupKeyboardHint": {
+    "description": "Popup keyboard shortcuts hint",
+    "message": "Ctrl/⌘ + Click to open in new tab | Shift + Ctrl/⌘ + Click to open next to current tab"
+  },
+  "addCurrentPage": {
+    "description": "Add current page to quick links",
+    "message": "Add Current Page"
+  },
+  "pageAdded": {
+    "description": "Page added successfully",
+    "message": "Added to quick links"
+  },
+  "pageExists": {
+    "description": "Page already exists",
+    "message": "Page already exists"
+  },
+  "sameHostExists": {
+    "description": "Same host already has pages",
+    "message": "Site already has other pages"
+  },
   "drinkWater": {
     "description": "Drink water button tooltip",
     "message": "Drink Water"
