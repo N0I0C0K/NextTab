@@ -51,6 +51,26 @@
     "description": "Drink water button tooltip",
     "message": "喝水"
   },
+  "noQuickLinks": {
+    "description": "No quick links message",
+    "message": "暂无快捷链接"
+  },
+  "popupKeyboardHint": {
+    "description": "Popup keyboard shortcuts hint",
+    "message": "Ctrl/⌘+点击：新标签页打开 | Shift + Ctrl/⌘ + 点击：在当前 Tab 旁边打开"
+  },
+  "addCurrentPage": {
+    "description": "Add current page to quick links",
+    "message": "添加当前页面"
+  },
+  "pageExists": {
+    "description": "Page already exists",
+    "message": "页面已存在"
+  },
+  "sameHostExists": {
+    "description": "Same host already has pages",
+    "message": "该网站已有其他页面"
+  },
   "drinkWaterNotificationTitle": {
     "description": "Drink water notification title",
     "message": "💧 该喝水啦"

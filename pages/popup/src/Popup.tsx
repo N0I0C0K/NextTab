@@ -1,43 +1,15 @@
 import '@src/Popup.css'
-import { useStorage, withErrorBoundary, withSuspense } from '@extension/shared'
-import { exampleThemeStorage } from '@extension/storage'
-import type { ComponentPropsWithoutRef } from 'react'
+import { withErrorBoundary, withSuspense } from '@extension/shared'
+import { PopupQuickUrlGrid, PopupToolbar } from './components'
 
 const Popup = () => {
-  const theme = useStorage(exampleThemeStorage)
-  const isLight = theme === 'light'
-  const logo = isLight ? 'popup/logo_vertical.svg' : 'popup/logo_vertical_dark.svg'
-  const goGithubSite = () =>
-    chrome.tabs.create({ url: 'https://github.com/Jonghakseo/chrome-extension-boilerplate-react-vite' })
-
   return (
-    <div className={`App ${isLight ? 'bg-slate-50' : 'bg-gray-800'}`}>
-      <header className={`App-header ${isLight ? 'text-gray-900' : 'text-gray-100'}`}>
-        <button onClick={goGithubSite}>
-          <img src={chrome.runtime.getURL(logo)} className="App-logo" alt="logo" />
-        </button>
-        <p>
-          Edit <code>pages/popup/src/Popup.tsx</code>
-        </p>
-        <ToggleButton>Toggle theme</ToggleButton>
-      </header>
+    <div className="popup-container flex flex-col">
+      <div className="flex-1 overflow-hidden">
+        <PopupQuickUrlGrid />
+      </div>
+      <PopupToolbar />
     </div>
-  )
-}
-
-const ToggleButton = (props: ComponentPropsWithoutRef<'button'>) => {
-  const theme = useStorage(exampleThemeStorage)
-  return (
-    <button
-      className={
-        props.className +
-        ' ' +
-        'font-bold mt-4 py-1 px-4 rounded shadow hover:scale-105 ' +
-        (theme === 'light' ? 'bg-white text-black shadow-black' : 'bg-black text-white')
-      }
-      onClick={exampleThemeStorage.toggle}>
-      {props.children}
-    </button>
   )
 }
 
