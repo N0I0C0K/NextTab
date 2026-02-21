@@ -41,7 +41,7 @@ NextTab is a new tab page extension focused on boosting browser efficiency with 
 - ⌨️ **Keyboard First** - Comprehensive keyboard shortcut support for efficient operation
 - 📱 **Responsive Design** - Adapts to various screen sizes for a consistent experience
 - 🔒 **Privacy Focused** - Runs locally, no user data collection
-- 🌐 **Cross-Device Sync** - Sync data across multiple devices via MQTT protocol (optional)
+- 🌐 **Cross-Device Sync** - Sync data across multiple devices via MQTT protocol (optional & WIP)
 
 ## 📸 Feature Showcase
 
