@@ -23,8 +23,11 @@ export const DataSettings: FC = () => {
     if (!file) return
 
     try {
-      await importAllData(file)
+      const result = await importAllData(file)
       toast.success(t('importSettingsSuccess'))
+      for (const warning of result.warnings) {
+        toast.warning(warning)
+      }
       // Reset file input
       if (fileInputRef.current) {
         fileInputRef.current.value = ''
