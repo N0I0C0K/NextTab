@@ -39,13 +39,12 @@ export const PopupQuickUrlItem = memo(({ item }: PopupQuickUrlItemProps) => {
   )
 
   return (
-    <div
+    <button
+      onClick={handleClick}
+      aria-label={title}
       className="flex flex-col items-center justify-center gap-1 p-2 rounded-md transition-colors group border-0
-        hover:bg-muted">
-      <button
-        onClick={handleClick}
-        aria-label={title}
-        className="w-10 h-10 rounded-md overflow-hidden flex items-center justify-center cursor-pointer">
+        hover:bg-muted cursor-pointer">
+      <div className="w-10 h-10 rounded-md overflow-hidden flex items-center justify-center">
         <img
           src={iconUrl}
           alt={title}
@@ -60,11 +59,11 @@ export const PopupQuickUrlItem = memo(({ item }: PopupQuickUrlItemProps) => {
             }
           }}
         />
-      </button>
+      </div>
       <Text level="xs" className="text-center line-clamp-2 max-w-full leading-tight select-none">
         {title}
       </Text>
-    </div>
+    </button>
   )
 })
 
