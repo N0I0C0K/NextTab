@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils'
 import { Loader2, Image as ImageIcon } from 'lucide-react'
-import { useState, type FC } from 'react'
+import { useState, useEffect, type FC } from 'react'
 
 /**
  * Displays a wallpaper image with skeleton loading and error fallback states.
@@ -13,6 +13,11 @@ export const WallpaperImage: FC<{
 }> = ({ src, alt, className }) => {
   const [isLoading, setIsLoading] = useState(true)
   const [hasError, setHasError] = useState(false)
+
+  useEffect(() => {
+    setIsLoading(true)
+    setHasError(false)
+  }, [src])
 
   return (
     <>

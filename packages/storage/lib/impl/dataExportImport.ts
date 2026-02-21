@@ -61,9 +61,11 @@ export async function importAllData(file: File): Promise<void> {
   const data = await parseAndValidateImportFile(file)
   
   /**
-   * We intentionally preserve localWallpaperData from the current settings rather than importing it.
-   * This is because local wallpaper data is stored only on the current device and is not portable across exports/imports.
-   * If the imported settings request 'local' wallpaperType but no local data exists, we switch to 'url' mode.
+   * We intentionally skip importing local wallpaper data because it is stored
+   * in IndexedDB via `localWallpaperStorage` and is device-specific – it is
+   * never included in exports.  If the imported settings request 'local'
+   * wallpaperType but no IndexedDB-backed local wallpaper exists on this
+   * device, we fall back to 'url' mode.
    */
   const currentSettings = await settingStorage.get()
 

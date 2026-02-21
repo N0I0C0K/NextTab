@@ -81,6 +81,11 @@ export function createIndexedDBStorage<D>(
     const next = typeof valueOrUpdate === 'function' ? await (valueOrUpdate as (prev: D) => D | Promise<D>)(prev) : valueOrUpdate
     cache = next
 
+    if (!globalThis.indexedDB) {
+      emitChange()
+      return
+    }
+
     const db = await openDatabase()
     return new Promise<void>((resolve, reject) => {
       const tx = db.transaction(storeName, 'readwrite')
@@ -96,6 +101,12 @@ export function createIndexedDBStorage<D>(
 
   const remove = async () => {
     cache = fallback
+
+    if (!globalThis.indexedDB) {
+      emitChange()
+      return
+    }
+
     const db = await openDatabase()
     return new Promise<void>((resolve, reject) => {
       const tx = db.transaction(storeName, 'readwrite')
