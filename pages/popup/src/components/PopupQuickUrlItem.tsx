@@ -44,6 +44,7 @@ export const PopupQuickUrlItem = memo(({ item }: PopupQuickUrlItemProps) => {
         hover:bg-muted">
       <button
         onClick={handleClick}
+        aria-label={title}
         className="w-10 h-10 rounded-md overflow-hidden flex items-center justify-center cursor-pointer">
         <img
           src={iconUrl}
@@ -54,7 +55,7 @@ export const PopupQuickUrlItem = memo(({ item }: PopupQuickUrlItemProps) => {
             target.style.display = 'none'
             const parent = target.parentElement
             if (parent) {
-              parent.innerHTML = title.charAt(0).toUpperCase()
+              parent.textContent = title.charAt(0).toUpperCase()
               parent.classList.add('text-xl', 'font-semibold', 'text-muted-foreground')
             }
           }}

@@ -16,7 +16,7 @@ export const PopupQuickUrlGrid = () => {
 
   return (
     <div className="w-full h-full overflow-y-auto">
-      <div className="grid gap-1 p-2" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(70px, 1fr))' }}>
+      <div className="quick-url-grid grid gap-1 p-2">
         {quickUrls.map(item => (
           <PopupQuickUrlItem key={item.id} item={item} />
         ))}
