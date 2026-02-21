@@ -49,7 +49,7 @@ const commandPluginSettingsSchema = z.object({
   includeInGlobal: z.boolean(),
 })
 
-const commandSettingsSchema = z.record(commandPluginSettingsSchema)
+const commandSettingsSchema = z.record(z.string(), commandPluginSettingsSchema)
 
 const themeSchema = z.union([z.literal('light'), z.literal('dark'), z.literal('system')])
 
@@ -178,7 +178,7 @@ export async function importAllData(file: File): Promise<ImportResult> {
 
 // Loose top-level schema: just ensures the JSON is a non-array object so that individual
 // section schemas can validate each field independently and emit per-field warnings.
-const importFileSchema = z.record(z.unknown())
+const importFileSchema = z.record(z.string(), z.unknown())
 
 /**
  * Read the JSON file and do a minimal top-level sanity check.
