@@ -3,24 +3,14 @@ import { t } from '@extension/i18n'
 import { quickUrlItemsStorage } from '@extension/storage'
 import { useStorage } from '@extension/shared'
 import { Plus } from 'lucide-react'
-import { useCallback, useState, useEffect, useRef } from 'react'
+import { useCallback, useState, useEffect } from 'react'
 import { nanoid } from 'nanoid'
 
 export const AddCurrentPageButton = () => {
   const [isAdding, setIsAdding] = useState(false)
   const [exactMatch, setExactMatch] = useState(false)
   const [hostMatch, setHostMatch] = useState(false)
-  const [added, setAdded] = useState(false)
-  const addedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const quickUrls = useStorage(quickUrlItemsStorage)
-
-  useEffect(() => {
-    return () => {
-      if (addedTimerRef.current !== null) {
-        clearTimeout(addedTimerRef.current)
-      }
-    }
-  }, [])
 
   useEffect(() => {
     const checkCurrentPage = async () => {
@@ -70,8 +60,6 @@ export const AddCurrentPageButton = () => {
         title: tab.title,
         url: tab.url,
       })
-      setAdded(true)
-      addedTimerRef.current = setTimeout(() => setAdded(false), 2000)
     } finally {
       setIsAdding(false)
     }
@@ -91,9 +79,6 @@ export const AddCurrentPageButton = () => {
       {exactMatch && <p className="text-xs text-yellow-600 dark:text-yellow-500 mt-1">{t('pageExists')}</p>}
       {!exactMatch && hostMatch && (
         <p className="text-xs text-yellow-600 dark:text-yellow-500 mt-1">{t('sameHostExists')}</p>
-      )}
-      {!exactMatch && !hostMatch && added && (
-        <p className="text-xs text-green-600 dark:text-green-500 mt-1">{t('pageAdded')}</p>
       )}
     </div>
   )

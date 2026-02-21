@@ -59,10 +59,6 @@
     "description": "Add current page to quick links",
     "message": "Add Current Page"
   },
-  "pageAdded": {
-    "description": "Page added successfully",
-    "message": "Added to quick links"
-  },
   "pageExists": {
     "description": "Page already exists",
     "message": "Page already exists"
