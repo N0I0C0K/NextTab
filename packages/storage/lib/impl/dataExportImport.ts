@@ -4,7 +4,6 @@
 
 import { z } from 'zod'
 import { settingStorage } from './settingsStorage'
-import { localWallpaperStorage } from './localWallpaperStorage'
 import { quickUrlItemsStorage } from './quickUrlStorage'
 import { exampleThemeStorage } from './exampleThemeStorage'
 import { commandSettingsStorage } from './commandSettingsStorage'
@@ -90,9 +89,10 @@ export async function exportAllData(): Promise<void> {
   const quickUrls = await quickUrlItemsStorage.get()
   const theme = await exampleThemeStorage.get()
   const commandSettings = await commandSettingsStorage.get()
+  const version = chrome.runtime.getManifest().version
 
   const exportData: ExportedData = {
-    version: '1.0.0',
+    version,
     exportDate: new Date().toISOString(),
     theme,
     settings,
@@ -106,7 +106,7 @@ export async function exportAllData(): Promise<void> {
 
   const link = document.createElement('a')
   link.href = url
-  link.download = `nexttab-settings-${new Date().toISOString().split('T')[0]}.json`
+  link.download = `nexttab-settings-${version}-${new Date().toISOString().split('T')[0]}.json`
   document.body.appendChild(link)
   link.click()
   document.body.removeChild(link)
