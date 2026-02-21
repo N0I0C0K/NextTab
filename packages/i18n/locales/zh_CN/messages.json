@@ -63,10 +63,6 @@
     "description": "Add current page to quick links",
     "message": "添加当前页面"
   },
-  "pageAdded": {
-    "description": "Page added successfully",
-    "message": "已添加到快捷列表"
-  },
   "pageExists": {
     "description": "Page already exists",
     "message": "页面已存在"
