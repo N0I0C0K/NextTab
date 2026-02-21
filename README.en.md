@@ -18,16 +18,14 @@ English | [简体中文](README.md)
 ## 📖 Table of Contents
 
 - [Introduction](#introduction)
-- [Key Features](#key-features)
-- [Feature Showcase](#feature-showcase)
+- [Key Features](#-key-features)
+- [Feature Showcase](#-feature-showcase)
   - [Quick Links](#quick-links)
   - [Command Palette](#command-palette)
 - [Installation](#installation)
-- [Keyboard Shortcuts](#keyboard-shortcuts)
 - [Development](#development)
 - [Browser Support](#browser-support)
 - [License](#license)
-- [Acknowledgments](#acknowledgments)
 
 ## Introduction
 
@@ -75,102 +73,58 @@ Press `Cmd/Ctrl + K` to open the command palette for quick search and actions:
 
 ![History Search](doc/images/history-search-demo.gif)
 
-## 🚀 Installation
+### Popup Interface
+![Popup Interface](doc/images/popup.jpg)
 
-### Install from Store (Coming Soon)
+- Quickly access quick links without going to the New Tab page
+- One-click to add the current page to quick links
 
-<!-- - [Chrome Web Store](#) -->
+## Installation
+
+### Install from Store
+
+[Chrome Web Store](https://chromewebstore.google.com/detail/nbeegkbcmmchnnncomjhhmljncmcclfd?utm_source=item-share-cb)
+
 <!-- - [Firefox Add-ons](#) -->
 
 ### Manual Installation (Development Build)
 
-1. **Clone the Repository**
-   ```bash
-   git clone https://github.com/N0I0C0K/NextTab.git
-   cd NextTab
-   ```
+Please refer to the [Development Guide](DEVELOPMENT.en.md#quick-start) for instructions on building and installing from source.
 
-2. **Install Dependencies**
-   ```bash
-   pnpm install
-   ```
+## Development
 
-3. **Build the Extension**
-   ```bash
-   # For Chrome
-   pnpm build
-   
-   # For Firefox
-   pnpm build:firefox
-   ```
+If you want to contribute to development or customize the extension, please see the [Development Guide](DEVELOPMENT.en.md).
 
-4. **Load the Extension**
-   
-   **Chrome/Edge:**
-   - Open `chrome://extensions/`
-   - Enable "Developer mode"
-   - Click "Load unpacked"
-   - Select the `dist` directory
-   
-   **Firefox:**
-   - Open `about:debugging#/runtime/this-firefox`
-   - Click "Load Temporary Add-on"
-   - Select `manifest.json` in the `dist` directory
+The development guide includes:
+- Environment setup
+- Detailed project structure
+- Development workflow
+- Code standards
+- Build and testing
 
-## 💻 Development
-
-### Requirements
-
-- Node.js >= 18.19.1
-- pnpm >= 9.9.0
-
-### Development Mode
+### Quick Start
 
 ```bash
-# Chrome development mode (with hot reload)
+# Clone the project
+git clone https://github.com/N0I0C0K/NextTab.git
+cd NextTab
+
+# Install dependencies
+pnpm install
+
+# Start development mode
 pnpm dev
-
-# Firefox development mode
-pnpm dev:firefox
 ```
 
-### Common Commands
+For more details, please refer to [DEVELOPMENT.en.md](DEVELOPMENT.en.md).
 
-```bash
-# Type checking
-pnpm type-check
-
-# Linting and auto-fix
-pnpm lint
-
-# Code formatting
-pnpm prettier
-
-# Package as zip file
-pnpm zip
-pnpm zip:firefox
-
-# Run E2E tests
-pnpm e2e
-```
-
-### Project Structure
-
-This is a pnpm + Turbo based Monorepo project:
-
-- `chrome-extension/` - Extension core (manifest, background)
-- `pages/` - UI pages (new-tab, popup, options, etc.)
-- `packages/` - Shared packages (UI components, storage, i18n, etc.)
-
-For more development details, see [copilot-instructions.md](.github/copilot-instructions.md)
-
-## 🌐 Browser Support
+## Browser Support
 
 - ✅ Chrome/Edge (Recommended)
 - ✅ Firefox
 - ⚠️ Other Chromium-based browsers (Untested)
 
-## 📄 License
+## License
 
 This project is licensed under the [MIT License](LICENSE).
 
