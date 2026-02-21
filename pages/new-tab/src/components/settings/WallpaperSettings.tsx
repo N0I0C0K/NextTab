@@ -2,16 +2,23 @@ import { cn } from '@/lib/utils'
 import { useStorage } from '@extension/shared'
 import { settingStorage, wallpaperHistoryStorage } from '@extension/storage'
 import type { WallhavenSortMode } from '@extension/storage'
-import { Button, Stack, Text, Separator, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@extension/ui'
-import { Check, Loader2, Image as ImageIcon, RefreshCw, History, Trash2, X, Upload, Link } from 'lucide-react'
+import {
+  Button,
+  Stack,
+  Text,
+  Separator,
+  Input,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@extension/ui'
+import { Check, Loader2, RefreshCw, History, Trash2, X, Link } from 'lucide-react'
 import { type FC, useCallback, useEffect, useState, useRef } from 'react'
 import { t } from '@extension/i18n'
-
-// Maximum file size in bytes (5MB)
-const MAX_FILE_SIZE = 5 * 1024 * 1024
-
-// Allowed image MIME types
-const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
+import { WallpaperImage } from './WallpaperImage'
+import { LocalWallpaperSection } from './LocalWallpaperSection'
 
 // Scroll threshold in pixels to trigger loading more wallpapers
 const SCROLL_THRESHOLD = 100
@@ -41,44 +48,6 @@ interface WallhavenResponse {
     per_page: number
     total: number
   }
-}
-
-/**
- * Shared component for displaying a wallpaper image with loading/error states.
- */
-const WallpaperImage: FC<{
-  src: string
-  alt: string
-  className?: string
-}> = ({ src, alt, className }) => {
-  const [isLoading, setIsLoading] = useState(true)
-  const [hasError, setHasError] = useState(false)
-
-  return (
-    <>
-      {isLoading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-muted">
-          <Loader2 className="size-6 animate-spin text-muted-foreground" />
-        </div>
-      )}
-      {hasError && (
-        <div className="absolute inset-0 flex items-center justify-center bg-muted">
-          <ImageIcon className="size-6 text-muted-foreground" />
-        </div>
-      )}
-      <img
-        src={src}
-        alt={alt}
-        className={cn('aspect-video w-full object-cover', isLoading || hasError ? 'invisible' : 'visible', className)}
-        loading="lazy"
-        onLoad={() => setIsLoading(false)}
-        onError={() => {
-          setIsLoading(false)
-          setHasError(true)
-        }}
-      />
-    </>
-  )
 }
 
 const WallpaperCard: FC<{
@@ -181,7 +150,7 @@ export const WallpaperSettings: FC = () => {
   // Use refs to track loading state and last request time to prevent race conditions
   const isLoadingRef = useRef(false)
   const lastRequestTimeRef = useRef(0)
-  
+
   // Use ref to track current sort mode to avoid stale closures
   const sortModeRef = useRef(settings.wallhavenSortMode)
   sortModeRef.current = settings.wallhavenSortMode
@@ -208,16 +177,16 @@ export const WallpaperSettings: FC = () => {
       // Always use the current sort mode from ref to avoid stale closures in this callback.
       // Accessing sortMode directly from state could result in outdated values if the callback is reused.
       const currentSortMode = sortModeRef.current
-      
+
       // Wallhaven API - supports both toplist and random sorting (SFW only with purity=100)
       let apiUrl = `https://wallhaven.cc/api/v1/search?purity=100&page=${page}`
-      
+
       if (currentSortMode === 'toplist') {
         apiUrl += '&topRange=1M&sorting=toplist'
       } else {
         apiUrl += '&sorting=random'
       }
-      
+
       const response = await fetch(apiUrl)
 
       // Handle rate limiting (429 status)
@@ -286,15 +255,18 @@ export const WallpaperSettings: FC = () => {
     fetchWallpapers(1)
   }, [fetchWallpapers])
 
-  const handleSortModeChange = useCallback(async (mode: WallhavenSortMode) => {
-    await settingStorage.update({ wallhavenSortMode: mode })
-    setCurrentPage(1)
-    setHasMore(true)
-    setWallpapers([])
-    // Update the ref immediately before fetching
-    sortModeRef.current = mode
-    fetchWallpapers(1, false)
-  }, [fetchWallpapers])
+  const handleSortModeChange = useCallback(
+    async (mode: WallhavenSortMode) => {
+      await settingStorage.update({ wallhavenSortMode: mode })
+      setCurrentPage(1)
+      setHasMore(true)
+      setWallpapers([])
+      // Update the ref immediately before fetching
+      sortModeRef.current = mode
+      fetchWallpapers(1, false)
+    },
+    [fetchWallpapers],
+  )
 
   const handleSelectWallpaper = useCallback(async (url: string, thumbnailUrl: string) => {
     // Validate URL format before saving
@@ -312,87 +284,6 @@ export const WallpaperSettings: FC = () => {
     }
     await settingStorage.update({ wallpaperUrl: url, wallpaperType: 'url' })
     await wallpaperHistoryStorage.addToHistory(url, thumbnailUrl)
-  }, [])
-
-  const fileInputRef = useRef<HTMLInputElement>(null)
-
-  const clearFileInput = useCallback(() => {
-    if (fileInputRef.current) {
-      fileInputRef.current.value = ''
-    }
-  }, [])
-
-  const handleLocalFileSelect = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (!file) return
-
-    // Validate file type
-    if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
-      setError(t('localWallpaperInvalidType'))
-      clearFileInput()
-      return
-    }
-
-    // Validate file size
-    if (file.size > MAX_FILE_SIZE) {
-      setError(t('localWallpaperTooLarge'))
-      clearFileInput()
-      return
-    }
-
-    setError(null)
-
-    // Read file as base64
-    const reader = new FileReader()
-    reader.onload = async (e) => {
-      const result = e.target?.result
-      if (result && typeof result === 'string') {
-        try {
-          await settingStorage.update({
-            localWallpaperData: result,
-            wallpaperType: 'local',
-          })
-          // Clear error after successful upload
-          setError(null)
-        } catch (error) {
-          console.error('Failed to save wallpaper:', error)
-          // Check for quota exceeded error for more specific messaging
-          const isQuotaError =
-            error &&
-            typeof error === 'object' &&
-            ('name' in error && error.name === 'QuotaExceededError') ||
-            ('code' in error && error.code === 22) || // DOMException for quota
-            ('message' in error && typeof error.message === 'string' && 
-              (error.message.toLowerCase().includes('quota') || error.message.toLowerCase().includes('exceeded')))
-          setError(isQuotaError ? t('localWallpaperQuotaExceeded') : t('localWallpaperStorageError'))
-          clearFileInput()
-        }
-      }
-    }
-    reader.onerror = () => {
-      setError(t('localWallpaperReadError'))
-      clearFileInput()
-    }
-    reader.readAsDataURL(file)
-  }, [clearFileInput])
-
-  const handleUploadClick = useCallback(() => {
-    // Reset input value to allow selecting the same file again
-    if (fileInputRef.current) {
-      fileInputRef.current.value = ''
-    }
-    fileInputRef.current?.click()
-  }, [])
-
-  const handleSelectLocalWallpaper = useCallback(async () => {
-    await settingStorage.update({ wallpaperType: 'local' })
-  }, [])
-
-  const handleClearLocalWallpaper = useCallback(async () => {
-    await settingStorage.update({
-      localWallpaperData: null,
-      wallpaperType: 'url',
-    })
   }, [])
 
   const handleClearHistory = useCallback(async () => {
@@ -436,7 +327,7 @@ export const WallpaperSettings: FC = () => {
         <Stack direction={'row'} className="items-center gap-2">
           <Select
             value={settings.wallhavenSortMode}
-            onValueChange={(value) => handleSortModeChange(value as WallhavenSortMode)}
+            onValueChange={value => handleSortModeChange(value as WallhavenSortMode)}
             disabled={isLoading}>
             <SelectTrigger className="w-[140px] h-9">
               <SelectValue />
@@ -523,61 +414,7 @@ export const WallpaperSettings: FC = () => {
 
       {/* Local Wallpaper Section */}
       <Separator className="my-2" />
-      <Stack direction={'row'} className="items-center justify-between">
-        <Stack direction={'row'} className="items-center gap-1">
-          <Upload className="size-4 text-muted-foreground" />
-          <Text gray level="s">
-            {t('localWallpaper')}
-          </Text>
-        </Stack>
-        <Stack direction={'row'} className="items-center gap-1">
-          {settings.localWallpaperData && (
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={handleClearLocalWallpaper}
-              aria-label={t('clearLocalWallpaper')}
-            >
-              <Trash2 className="size-4" />
-            </Button>
-          )}
-          <Button variant="outline" size="sm" onClick={handleUploadClick}>
-            <Upload className="size-4 mr-1" />
-            {t('uploadLocalWallpaper')}
-          </Button>
-        </Stack>
-      </Stack>
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept={ALLOWED_IMAGE_TYPES.join(',')}
-        className="hidden"
-        onChange={handleLocalFileSelect}
-      />
-      {settings.localWallpaperData && (
-        <div
-          className={cn(
-            'relative cursor-pointer overflow-hidden rounded-lg border-2 transition-all hover:scale-[1.02] w-full max-w-[200px]',
-            settings.wallpaperType === 'local' ? 'border-primary ring-2 ring-primary/50' : 'border-transparent hover:border-muted-foreground/30',
-          )}
-          role="button"
-          tabIndex={0}
-          aria-label={t('selectLocalWallpaper')}
-          onClick={handleSelectLocalWallpaper}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault()
-              handleSelectLocalWallpaper()
-            }
-          }}>
-          <WallpaperImage src={settings.localWallpaperData} alt="Local wallpaper" />
-          {settings.wallpaperType === 'local' && (
-            <div className="absolute right-1 top-1 rounded-full bg-primary p-1">
-              <Check className="size-3 text-primary-foreground" />
-            </div>
-          )}
-        </div>
-      )}
+      <LocalWallpaperSection />
     </Stack>
   )
 }

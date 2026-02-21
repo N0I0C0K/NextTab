@@ -16,7 +16,7 @@ export type MqttSetting = {
 /**
  * Represents the source type for wallpaper display.
  * - 'url': Uses a remote URL (wallpaperUrl) to fetch the wallpaper image
- * - 'local': Uses a locally uploaded image stored as base64 data (localWallpaperData)
+ * - 'local': Uses a locally uploaded image stored in IndexedDB via localWallpaperStorage
  */
 export type WallpaperType = 'url' | 'local'
 
@@ -38,12 +38,6 @@ export type SettingProps = {
   wallpaperUrl: string | null
   /** The source type for the wallpaper (remote URL or local file) */
   wallpaperType: WallpaperType
-  /** 
-   * Base64-encoded local wallpaper image data.
-   * Note: Base64 encoding increases size by ~33%. A 5MB image becomes ~6.7MB.
-   * Be aware of Chrome's storage.local quota limits (~10MB total).
-   */
-  localWallpaperData: string | null
   /** The sorting mode for Wallhaven gallery (toplist or random) */
   wallhavenSortMode: WallhavenSortMode
   mqttSettings: MqttSetting
@@ -69,7 +63,6 @@ const defaultSetting: SettingProps = {
   bookmarkFolderId: null,
   wallpaperUrl: null,
   wallpaperType: 'url',
-  localWallpaperData: null,
   wallhavenSortMode: 'toplist',
   mqttSettings: {
     enabled: false,
