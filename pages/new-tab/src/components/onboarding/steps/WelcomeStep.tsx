@@ -1,4 +1,4 @@
-import { useState, type FC } from 'react'
+import { useState, useRef, type FC } from 'react'
 import { Button, Stack, Text } from '@extension/ui'
 import { importAllData } from '@extension/storage'
 import { t } from '@extension/i18n'
@@ -14,6 +14,7 @@ interface WelcomeStepProps {
 export const WelcomeStep: FC<WelcomeStepProps> = ({ onNext, onImported, onSkipAll }) => {
   const [importing, setImporting] = useState(false)
   const [importError, setImportError] = useState<string | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -46,24 +47,25 @@ export const WelcomeStep: FC<WelcomeStepProps> = ({ onNext, onImported, onSkipAl
       <Stack direction="column" className="gap-3 w-full">
         <div className="w-full">
           <input
+            ref={fileInputRef}
             type="file"
-            id="import-settings-file"
             accept=".json"
             onChange={handleImport}
             className="hidden"
             disabled={importing}
+            aria-label={t('onboardingImportSettings')}
           />
           <Button
             variant="outline"
             className="w-full gap-2"
-            onClick={() => document.getElementById('import-settings-file')?.click()}
+            onClick={() => fileInputRef.current?.click()}
             disabled={importing}>
-            <Upload className="size-4" />
+            <Upload className="size-4" aria-hidden="true" />
             {importing ? t('loading') : t('onboardingImportSettings')}
           </Button>
         </div>
         {importError && (
-          <Text level="xs" className="text-destructive text-center">
+          <Text level="xs" className="text-destructive text-center" role="alert">
             {importError}
           </Text>
         )}

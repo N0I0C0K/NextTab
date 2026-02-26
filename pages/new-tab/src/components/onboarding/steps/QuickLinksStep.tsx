@@ -8,6 +8,9 @@ import { cn } from '@/lib/utils'
 import type { StepNavigationProps, TopSiteItem } from '../types'
 import { StepHeader, StepContainer, StepNavigationButtons, CheckboxIndicator } from '../components'
 
+/** Maximum number of top sites to display */
+const MAX_TOP_SITES = 10
+
 /**
  * Extract hostname from URL for comparison
  */
@@ -17,6 +20,13 @@ const getHostname = (url: string): string => {
   } catch {
     return ''
   }
+}
+
+/**
+ * Get favicon URL for a given page URL using Chrome's favicon service
+ */
+const getFaviconUrl = (pageUrl: string, size = 32): string => {
+  return `chrome-extension://${chrome.runtime.id}/_favicon/?pageUrl=${encodeURIComponent(pageUrl)}&size=${size}`
 }
 
 export const QuickLinksStep: FC<StepNavigationProps> = ({ onNext, onBack }) => {
@@ -30,7 +40,7 @@ export const QuickLinksStep: FC<StepNavigationProps> = ({ onNext, onBack }) => {
 
     chrome.topSites.get().then(sites => {
       setTopSites(
-        sites.slice(0, 10).map(site => {
+        sites.slice(0, MAX_TOP_SITES).map(site => {
           const hostname = getHostname(site.url)
           const alreadyExists = existingHostnames.has(hostname)
           return {
@@ -86,9 +96,12 @@ export const QuickLinksStep: FC<StepNavigationProps> = ({ onNext, onBack }) => {
             <button
               key={site.url}
               onClick={() => toggleSite(site.url)}
+              role="checkbox"
+              aria-checked={site.selected}
+              aria-label={`${site.title} - ${getHostname(site.url)}`}
               className={cn('flex items-center gap-3 p-3 rounded-lg border transition-colors text-left w-full')}>
               <img
-                src={`chrome-extension://${chrome.runtime.id}/_favicon/?pageUrl=${encodeURIComponent(site.url)}&size=32`}
+                src={getFaviconUrl(site.url)}
                 alt=""
                 className="size-6 rounded shrink-0"
                 onError={e => {

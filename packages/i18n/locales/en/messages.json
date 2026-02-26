@@ -768,5 +768,13 @@
   "onboardingUrlHostAlreadyExists": {
     "description": "Already exists warning for quick links",
     "message": "already exists"
+  },
+  "onboardingWallpaperFetchError": {
+    "description": "Error message when fetching wallpapers fails",
+    "message": "Failed to load wallpapers, showing fallback options"
+  },
+  "onboardingWallpaperOption": {
+    "description": "Wallpaper option aria label prefix",
+    "message": "Wallpaper"
   }
 }
