@@ -652,5 +652,121 @@
   "deleteQuickItem": {
     "description": "Delete",
     "message": "删除"
+  },
+  "onboardingTitle": {
+    "description": "Onboarding dialog title",
+    "message": "欢迎使用 NextTab"
+  },
+  "onboardingDescription": {
+    "description": "Onboarding dialog description",
+    "message": "让我们来设置你的新标签页"
+  },
+  "onboardingWelcomeTitle": {
+    "description": "Welcome step title",
+    "message": "欢迎使用 NextTab"
+  },
+  "onboardingWelcomeDescription": {
+    "description": "Welcome step description",
+    "message": "一个简单且现代的浏览器起始界面。让我们来设置你的偏好。"
+  },
+  "onboardingImportSettings": {
+    "description": "Import settings button",
+    "message": "导入已有设置"
+  },
+  "onboardingStartSetup": {
+    "description": "Start setup button",
+    "message": "开始全新设置"
+  },
+  "onboardingSkipAll": {
+    "description": "Skip all button",
+    "message": "跳过设置"
+  },
+  "onboardingThemeTitle": {
+    "description": "Theme step title",
+    "message": "选择主题"
+  },
+  "onboardingThemeDescription": {
+    "description": "Theme step description",
+    "message": "选择你喜欢的外观。你可以稍后在设置中更改。"
+  },
+  "onboardingThemeLight": {
+    "description": "Light theme option",
+    "message": "浅色"
+  },
+  "onboardingThemeDark": {
+    "description": "Dark theme option",
+    "message": "深色"
+  },
+  "onboardingThemeSystem": {
+    "description": "System theme option",
+    "message": "跟随系统"
+  },
+  "onboardingWallpaperTitle": {
+    "description": "Wallpaper step title",
+    "message": "选择壁纸"
+  },
+  "onboardingWallpaperDescription": {
+    "description": "Wallpaper step description",
+    "message": "选择一张背景壁纸。你可以在设置中进行更多自定义。"
+  },
+  "onboardingQuickLinksTitle": {
+    "description": "Quick links step title",
+    "message": "添加快捷链接"
+  },
+  "onboardingQuickLinksDescription": {
+    "description": "Quick links step description",
+    "message": "导入你最常访问的网站作为快捷链接。取消勾选不需要的。"
+  },
+  "onboardingNoTopSites": {
+    "description": "No top sites message",
+    "message": "没有找到常用网站。你可以稍后手动添加链接。"
+  },
+  "onboardingImportSelected": {
+    "description": "Import selected sites button",
+    "message": "导入所选"
+  },
+  "onboardingSkip": {
+    "description": "Skip button",
+    "message": "跳过"
+  },
+  "onboardingCompleteTitle": {
+    "description": "Complete step title",
+    "message": "设置完成！"
+  },
+  "onboardingCompleteDescription": {
+    "description": "Complete step description",
+    "message": "你的新标签页已准备就绪。享受个性化的浏览体验吧！"
+  },
+  "onboardingCommandTip": {
+    "description": "Command tip message",
+    "message": "小技巧：随时按下此快捷键打开命令面板"
+  },
+  "onboardingGetStarted": {
+    "description": "Get started button",
+    "message": "开始使用"
+  },
+  "onboardingBack": {
+    "description": "Back button",
+    "message": "上一步"
+  },
+  "onboardingNext": {
+    "description": "Next button",
+    "message": "下一步"
+  },
+  "restartOnboarding": {
+    "description": "Restart onboarding button",
+    "message": "重新引导"
+  },
+  "restartOnboardingDescription": {
+    "description": "Restart onboarding description",
+    "message": "重新运行设置向导以重新配置你的偏好。"
+  },
+  "restart": {
+    "description": "Restart button",
+    "message": "重新开始"
+  },
+  "onboardingUrlHostAlreadyExists": {
+    "description": "Already exists warning for quick links",
+    "message": "已存在"
   }
 }

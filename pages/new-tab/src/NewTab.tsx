@@ -1,7 +1,7 @@
 import '@src/NewTab.css'
 import { Center, Text, Heading, Stack } from '@extension/ui'
 import { useEffect, useRef, useState } from 'react'
-import { CommandModule, SettingPanel, ScrollLinkCardPage } from './components'
+import { CommandModule, SettingPanel, ScrollLinkCardPage, OnboardingDialog } from './components'
 import type { CommandModuleRef } from './components/command'
 
 import '@/src/style/placeholder.css'
@@ -126,6 +126,7 @@ const NewTab = () => {
         }}
       />
       <SettingPanel className="fixed top-2 right-2" />
+      <OnboardingDialog />
     </>
   )
 }
