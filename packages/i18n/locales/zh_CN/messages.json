@@ -652,5 +652,129 @@
   "deleteQuickItem": {
     "description": "Delete",
     "message": "删除"
+  },
+  "onboardingTitle": {
+    "description": "Onboarding dialog title",
+    "message": "欢迎使用 NextTab"
+  },
+  "onboardingDescription": {
+    "description": "Onboarding dialog description",
+    "message": "来设置你的新标签页"
+  },
+  "onboardingWelcomeTitle": {
+    "description": "Welcome step title",
+    "message": "欢迎"
+  },
+  "onboardingWelcomeDescription": {
+    "description": "Welcome step description",
+    "message": "简洁现代的浏览器起始页，花一分钟配置一下吧"
+  },
+  "onboardingImportSettings": {
+    "description": "Import settings button",
+    "message": "导入已有设置"
+  },
+  "onboardingStartSetup": {
+    "description": "Start setup button",
+    "message": "从零开始"
+  },
+  "onboardingSkipAll": {
+    "description": "Skip all button",
+    "message": "跳过"
+  },
+  "onboardingThemeTitle": {
+    "description": "Theme step title",
+    "message": "选择主题"
+  },
+  "onboardingThemeDescription": {
+    "description": "Theme step description",
+    "message": "浅色、深色，或是跟随系统"
+  },
+  "onboardingThemeLight": {
+    "description": "Light theme option",
+    "message": "浅色"
+  },
+  "onboardingThemeDark": {
+    "description": "Dark theme option",
+    "message": "深色"
+  },
+  "onboardingThemeSystem": {
+    "description": "System theme option",
+    "message": "跟随系统"
+  },
+  "onboardingWallpaperTitle": {
+    "description": "Wallpaper step title",
+    "message": "挑选壁纸"
+  },
+  "onboardingWallpaperDescription": {
+    "description": "Wallpaper step description",
+    "message": "给标签页选一张背景图"
+  },
+  "onboardingQuickLinksTitle": {
+    "description": "Quick links step title",
+    "message": "快捷链接"
+  },
+  "onboardingQuickLinksDescription": {
+    "description": "Quick links step description",
+    "message": "把常用网站添加为快捷入口"
+  },
+  "onboardingNoTopSites": {
+    "description": "No top sites message",
+    "message": "暂无常用网站，之后可以手动添加"
+  },
+  "onboardingImportSelected": {
+    "description": "Import selected sites button",
+    "message": "导入所选"
+  },
+  "onboardingSkip": {
+    "description": "Skip button",
+    "message": "跳过"
+  },
+  "onboardingCompleteTitle": {
+    "description": "Complete step title",
+    "message": "设置完成"
+  },
+  "onboardingCompleteDescription": {
+    "description": "Complete step description",
+    "message": "新标签页已就绪，开始使用吧"
+  },
+  "onboardingCommandTip": {
+    "description": "Command tip message",
+    "message": "小技巧：按下快捷键可打开命令面板"
+  },
+  "onboardingGetStarted": {
+    "description": "Get started button",
+    "message": "开始使用"
+  },
+  "onboardingBack": {
+    "description": "Back button",
+    "message": "上一步"
+  },
+  "onboardingNext": {
+    "description": "Next button",
+    "message": "下一步"
+  },
+  "restartOnboarding": {
+    "description": "Restart onboarding button",
+    "message": "重新引导"
+  },
+  "restartOnboardingDescription": {
+    "description": "Restart onboarding description",
+    "message": "再走一遍设置流程"
+  },
+  "restart": {
+    "description": "Restart button",
+    "message": "重新开始"
+  },
+  "onboardingUrlHostAlreadyExists": {
+    "description": "Already exists warning for quick links",
+    "message": "已添加"
+  },
+  "onboardingWallpaperFetchError": {
+    "description": "Error message when fetching wallpapers fails",
+    "message": "壁纸加载失败，已切换为备用"
+  },
+  "onboardingWallpaperOption": {
+    "description": "Wallpaper option aria label prefix",
+    "message": "壁纸"
   }
 }

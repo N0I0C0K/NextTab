@@ -652,5 +652,129 @@
   "deleteQuickItem": {
     "description": "Delete",
     "message": "Delete"
+  },
+  "onboardingTitle": {
+    "description": "Onboarding dialog title",
+    "message": "Welcome to NextTab"
+  },
+  "onboardingDescription": {
+    "description": "Onboarding dialog description",
+    "message": "Let's set up your new tab page"
+  },
+  "onboardingWelcomeTitle": {
+    "description": "Welcome step title",
+    "message": "Welcome to NextTab"
+  },
+  "onboardingWelcomeDescription": {
+    "description": "Welcome step description",
+    "message": "A simple and modern start interface for your browser. Let's set up your preferences."
+  },
+  "onboardingImportSettings": {
+    "description": "Import settings button",
+    "message": "Import Existing Settings"
+  },
+  "onboardingStartSetup": {
+    "description": "Start setup button",
+    "message": "Start Fresh Setup"
+  },
+  "onboardingSkipAll": {
+    "description": "Skip all button",
+    "message": "Skip Setup"
+  },
+  "onboardingThemeTitle": {
+    "description": "Theme step title",
+    "message": "Choose Your Theme"
+  },
+  "onboardingThemeDescription": {
+    "description": "Theme step description",
+    "message": "Select your preferred appearance. You can change this later in settings."
+  },
+  "onboardingThemeLight": {
+    "description": "Light theme option",
+    "message": "Light"
+  },
+  "onboardingThemeDark": {
+    "description": "Dark theme option",
+    "message": "Dark"
+  },
+  "onboardingThemeSystem": {
+    "description": "System theme option",
+    "message": "System"
+  },
+  "onboardingWallpaperTitle": {
+    "description": "Wallpaper step title",
+    "message": "Pick a Wallpaper"
+  },
+  "onboardingWallpaperDescription": {
+    "description": "Wallpaper step description",
+    "message": "Choose a background wallpaper. You can customize more options in settings."
+  },
+  "onboardingQuickLinksTitle": {
+    "description": "Quick links step title",
+    "message": "Add Quick Links"
+  },
+  "onboardingQuickLinksDescription": {
+    "description": "Quick links step description",
+    "message": "Import your most visited sites as quick links. Uncheck any you don't want."
+  },
+  "onboardingNoTopSites": {
+    "description": "No top sites message",
+    "message": "No frequently visited sites found. You can add links manually later."
+  },
+  "onboardingImportSelected": {
+    "description": "Import selected sites button",
+    "message": "Import Selected"
+  },
+  "onboardingSkip": {
+    "description": "Skip button",
+    "message": "Skip"
+  },
+  "onboardingCompleteTitle": {
+    "description": "Complete step title",
+    "message": "You're All Set!"
+  },
+  "onboardingCompleteDescription": {
+    "description": "Complete step description",
+    "message": "Your new tab page is ready. Enjoy your personalized browsing experience!"
+  },
+  "onboardingCommandTip": {
+    "description": "Command tip message",
+    "message": "Pro tip: Press this shortcut anytime to open the command palette"
+  },
+  "onboardingGetStarted": {
+    "description": "Get started button",
+    "message": "Get Started"
+  },
+  "onboardingBack": {
+    "description": "Back button",
+    "message": "Back"
+  },
+  "onboardingNext": {
+    "description": "Next button",
+    "message": "Next"
+  },
+  "restartOnboarding": {
+    "description": "Restart onboarding button",
+    "message": "Restart Onboarding"
+  },
+  "restartOnboardingDescription": {
+    "description": "Restart onboarding description",
+    "message": "Run the setup wizard again to reconfigure your preferences."
+  },
+  "restart": {
+    "description": "Restart button",
+    "message": "Restart"
+  },
+  "onboardingUrlHostAlreadyExists": {
+    "description": "Already exists warning for quick links",
+    "message": "already exists"
+  },
+  "onboardingWallpaperFetchError": {
+    "description": "Error message when fetching wallpapers fails",
+    "message": "Failed to load wallpapers, showing fallback options"
+  },
+  "onboardingWallpaperOption": {
+    "description": "Wallpaper option aria label prefix",
+    "message": "Wallpaper"
   }
 }
