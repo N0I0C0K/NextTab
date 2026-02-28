@@ -33,6 +33,9 @@ export const WelcomeStep: FC<WelcomeStepProps> = ({ onNext, onImported, onSkipAl
       setImportError((error as Error).message)
     } finally {
       setImporting(false)
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''
+      }
     }
   }
 

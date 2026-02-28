@@ -23,37 +23,59 @@ const getHostname = (url: string): string => {
 }
 
 /**
- * Get favicon URL for a given page URL using Chrome's favicon service
+ * Get favicon URL for a given page URL using the extension's favicon service
  */
 const getFaviconUrl = (pageUrl: string, size = 32): string => {
-  return `chrome-extension://${chrome.runtime.id}/_favicon/?pageUrl=${encodeURIComponent(pageUrl)}&size=${size}`
+  const baseUrl = chrome.runtime.getURL('_favicon/')
+  return `${baseUrl}?pageUrl=${encodeURIComponent(pageUrl)}&size=${size}`
 }
 
 export const QuickLinksStep: FC<StepNavigationProps> = ({ onNext, onBack }) => {
   const [topSites, setTopSites] = useState<TopSiteItem[]>([])
   const [loading, setLoading] = useState(true)
+  const [importing, setImporting] = useState(false)
   const existingQuickUrls = useStorage(quickUrlItemsStorage)
 
   useEffect(() => {
+    let isMounted = true
+
     // Get existing quick URL hostnames for comparison
     const existingHostnames = new Set(existingQuickUrls.map(item => getHostname(item.url)))
 
-    chrome.topSites.get().then(sites => {
-      setTopSites(
-        sites.slice(0, MAX_TOP_SITES).map(site => {
-          const hostname = getHostname(site.url)
-          const alreadyExists = existingHostnames.has(hostname)
-          return {
-            url: site.url,
-            title: site.title || hostname,
-            // Default to unselected if already exists
-            selected: !alreadyExists,
-            alreadyExists,
-          }
-        }),
-      )
+    // Feature-detect chrome.topSites API
+    if (chrome.topSites && typeof chrome.topSites.get === 'function') {
+      chrome.topSites
+        .get()
+        .then(sites => {
+          if (!isMounted) return
+
+          setTopSites(
+            sites.slice(0, MAX_TOP_SITES).map(site => {
+              const hostname = getHostname(site.url)
+              const alreadyExists = existingHostnames.has(hostname)
+              return {
+                url: site.url,
+                title: site.title || hostname,
+                // Default to unselected if already exists
+                selected: !alreadyExists,
+                alreadyExists,
+              }
+            }),
+          )
+          setLoading(false)
+        })
+        .catch(error => {
+          if (!isMounted) return
+          console.error('Failed to fetch top sites', error)
+          setLoading(false)
+        })
+    } else {
       setLoading(false)
-    })
+    }
+
+    return () => {
+      isMounted = false
+    }
   }, [existingQuickUrls])
 
   const toggleSite = (url: string) => {
@@ -62,14 +84,24 @@ export const QuickLinksStep: FC<StepNavigationProps> = ({ onNext, onBack }) => {
 
   const handleImport = async () => {
     const selectedSites = topSites.filter(site => site.selected)
-    for (const site of selectedSites) {
-      await quickUrlItemsStorage.add({
-        id: crypto.randomUUID(),
-        title: site.title,
-        url: site.url,
-      })
+    if (selectedSites.length === 0) {
+      onNext()
+      return
     }
-    onNext()
+    setImporting(true)
+    try {
+      await quickUrlItemsStorage.set(current => [
+        ...current,
+        ...selectedSites.map(site => ({
+          id: crypto.randomUUID(),
+          title: site.title,
+          url: site.url,
+        })),
+      ])
+      onNext()
+    } finally {
+      setImporting(false)
+    }
   }
 
   const renderContent = () => {
@@ -146,7 +178,7 @@ export const QuickLinksStep: FC<StepNavigationProps> = ({ onNext, onBack }) => {
         onNext={handleImport}
         onSkip={onNext}
         nextLabel={t('onboardingImportSelected')}
-        nextDisabled={!topSites.some(s => s.selected)}
+        nextDisabled={!topSites.some(s => s.selected) || importing}
       />
     </StepContainer>
   )
