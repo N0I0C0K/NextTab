@@ -776,5 +776,9 @@
   "onboardingWallpaperOption": {
     "description": "Wallpaper option aria label prefix",
     "message": "Wallpaper"
+  },
+  "onboardingImportError": {
+    "description": "Error message when importing quick links fails",
+    "message": "Failed to import quick links. Please try again."
   }
 }

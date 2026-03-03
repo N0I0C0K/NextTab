@@ -18,10 +18,12 @@ export const WallpaperStep: FC<StepNavigationProps> = ({ onNext, onBack }) => {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
+    const controller = new AbortController()
+
     const fetchWallpapers = async () => {
       try {
         const apiUrl = 'https://wallhaven.cc/api/v1/search?purity=100&topRange=1M&sorting=toplist'
-        const response = await fetch(apiUrl)
+        const response = await fetch(apiUrl, { signal: controller.signal })
 
         if (!response.ok) {
           throw new Error('Failed to fetch wallpapers')
@@ -37,16 +39,23 @@ export const WallpaperStep: FC<StepNavigationProps> = ({ onNext, onBack }) => {
         setWallpapers(fetchedWallpapers)
         setError(null)
       } catch (err) {
+        if ((err as Error).name === 'AbortError') return
         console.error('Failed to fetch wallpapers from Wallhaven:', err)
         // Use fallback wallpapers if API fails
         setWallpapers(FALLBACK_WALLPAPERS)
         setError(t('onboardingWallpaperFetchError'))
       } finally {
-        setLoading(false)
+        if (!controller.signal.aborted) {
+          setLoading(false)
+        }
       }
     }
 
     fetchWallpapers()
+
+    return () => {
+      controller.abort()
+    }
   }, [])
 
   const handleSelect = (url: string) => {

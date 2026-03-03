@@ -46,6 +46,7 @@ export const OnboardingDialog: FC = () => {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent
         className="w-[50vw] max-w-[40rem] flex flex-col"
+        hideCloseButton
         onPointerDownOutside={e => e.preventDefault()}
         onEscapeKeyDown={e => e.preventDefault()}>
         <DialogHeader className="sr-only">
