@@ -23,7 +23,7 @@ const manifest = {
     'https://wallhaven.cc/*',      // Wallpaper search API
     'wss://broker.emqx.io:8084/*',  // MQTT WebSocket connection
   ],
-  permissions: ['storage', 'tabs', 'notifications', 'search', 'history', 'favicon', 'bookmarks', 'alarms'],
+  permissions: ['storage', 'tabs', 'notifications', 'search', 'history', 'favicon', 'bookmarks', 'alarms', 'topSites'],
   // options_page: 'options/index.html',
   background: {
     service_worker: 'background.iife.js',

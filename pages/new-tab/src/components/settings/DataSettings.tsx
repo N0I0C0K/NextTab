@@ -1,6 +1,6 @@
-import { exportAllData, importAllData } from '@extension/storage'
+import { exportAllData, importAllData, onboardingStorage } from '@extension/storage'
 import { Button, Stack, Text, toast } from '@extension/ui'
-import { Download, Upload } from 'lucide-react'
+import { Download, Upload, RotateCcw } from 'lucide-react'
 import React, { type FC } from 'react'
 import { t } from '@extension/i18n'
 import { SettingItem } from './SettingItem'
@@ -43,6 +43,12 @@ export const DataSettings: FC = () => {
     }
   }
 
+  const handleRestartOnboarding = async () => {
+    await onboardingStorage.reset()
+    // Reload to show the onboarding dialog
+    window.location.reload()
+  }
+
   return (
     <Stack direction={'column'} className={'gap-2 w-full'}>
       <Text gray level="s">
@@ -69,6 +75,16 @@ export const DataSettings: FC = () => {
               {t('import')}
             </Button>
           </>
+        }
+      />
+      <SettingItem
+        IconClass={RotateCcw}
+        title={t('restartOnboarding')}
+        description={t('restartOnboardingDescription')}
+        control={
+          <Button variant={'outline'} onClick={handleRestartOnboarding}>
+            {t('restart')}
+          </Button>
         }
       />
     </Stack>
