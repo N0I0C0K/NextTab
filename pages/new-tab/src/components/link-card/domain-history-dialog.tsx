@@ -1,5 +1,4 @@
-import { getDefaultIconUrl } from '@/lib/url'
-import { ScrollArea, Text, Input } from '@extension/ui'
+import { ScrollArea, Text, Input, WebsiteIcon } from '@extension/ui'
 import { t } from '@extension/i18n'
 import { useMemo, useState, useEffect, type FC } from 'react'
 import { cn } from '@/lib/utils'
@@ -165,14 +164,7 @@ const DomainHistoryItem: FC<DomainHistoryItemProps> = ({ title, url, lastVisitTi
       )}
       onClick={handleClick}
       onKeyDown={handleKeyDown}>
-      <img
-        src={getDefaultIconUrl(url)}
-        alt="favicon"
-        className="size-5 rounded-sm flex-shrink-0"
-        onError={e => {
-          e.currentTarget.style.display = 'none'
-        }}
-      />
+      <WebsiteIcon url={url} title={title} size={20} className="flex-shrink-0" />
       <div className="flex flex-col flex-1 min-w-0 gap-0.5">
         <Text level="s" className="font-medium truncate">
           {title}

@@ -1,4 +1,3 @@
-import { getDefaultIconUrl } from '@/lib/url'
 import { QuickItemEditForm } from '@/src/components/quick-item-edit-form'
 import { quickUrlItemsStorage } from '@extension/storage'
 import {
@@ -7,6 +6,7 @@ import {
   ContextMenuSeparator,
   ContextMenuLabel,
 } from '@extension/ui/lib/components/ui/context-menu'
+import { WebsiteIcon } from '@extension/ui'
 import type { GlobalDialogProps } from '@src/provider'
 import { Pencil, Trash, History } from 'lucide-react'
 import { t } from '@extension/i18n'
@@ -106,15 +106,7 @@ export const LinkCardContextMenuContent = ({
                 }
               }}
               className="flex items-center gap-2">
-              <img
-                src={getDefaultIconUrl(bookmark.url || '')}
-                alt={bookmark.title || bookmark.url || 'Bookmark icon'}
-                className="size-4 rounded-sm flex-shrink-0"
-                onError={e => {
-                  // Fallback to hide broken images
-                  e.currentTarget.style.display = 'none'
-                }}
-              />
+              <WebsiteIcon url={bookmark.url || ''} title={bookmark.title} size={16} className="flex-shrink-0" />
               <span className="truncate flex-1">{bookmark.title || bookmark.url}</span>
             </ContextMenuItem>
           ))}
@@ -138,14 +130,12 @@ export const LinkCardContextMenuContent = ({
                 }
               }}
               className="flex items-center gap-2">
-              <img
-                src={tab.favIconUrl || getDefaultIconUrl(tab.url || '')}
-                alt={tab.title || tab.url || 'Tab icon'}
-                className="size-4 rounded-sm flex-shrink-0"
-                onError={e => {
-                  // Fallback to hide broken images
-                  e.currentTarget.style.display = 'none'
-                }}
+              <WebsiteIcon
+                url={tab.url || ''}
+                title={tab.title}
+                iconUrl={tab.favIconUrl}
+                size={16}
+                className="flex-shrink-0"
               />
               <span className="truncate flex-1">{tab.title || tab.url}</span>
             </ContextMenuItem>

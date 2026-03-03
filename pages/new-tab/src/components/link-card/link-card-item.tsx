@@ -67,7 +67,7 @@ export const LinkCardItem = forwardRef<HTMLDivElement, LinkCardProps & CustomGri
               onTouchEnd={onTouchEnd}>
               <TooltipTrigger asChild>
                 <ContextMenuTrigger>
-                  <LinkCardIcon url={url} onClick={handleIconClick} ref={innerRef} />
+                  <LinkCardIcon url={url} title={title} onClick={handleIconClick} ref={innerRef} />
                 </ContextMenuTrigger>
               </TooltipTrigger>
               <Text level="s" className="select-none line-clamp-1">

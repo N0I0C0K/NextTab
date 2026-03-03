@@ -1,8 +1,7 @@
 import { historySuggestStorage, quickUrlItemsStorage } from '@extension/storage'
-import { Stack, Text } from '@extension/ui'
+import { Stack, Text, WebsiteIcon } from '@extension/ui'
 import { useMemo, type FC } from 'react'
 import { cn } from '@/lib/utils'
-import { getDefaultIconUrl } from '@/lib/url'
 import {
   ContextMenu,
   ContextMenuContent,
@@ -37,7 +36,7 @@ export const HistoryListItem: FC<{
               chrome.tabs.update({ url: url })
             }
           }}>
-          <img src={iconUrl ?? getDefaultIconUrl(url)} className="size-5 rounded-md mx-2" alt="list-icon" />
+          <WebsiteIcon url={url} title={title} iconUrl={iconUrl} size={20} className="mx-2" />
           <Text className="cursor-pointer line-clamp-1">{title}</Text>
           <span className="flex-1" />
           <Text className="invisible group-hover:visible font-thin text-sm">{lastVisitDate.toLocaleDateString()}</Text>
