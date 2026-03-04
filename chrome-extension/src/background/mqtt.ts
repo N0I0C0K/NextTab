@@ -7,6 +7,8 @@ import {
   closeMqttClientMessage,
   openMqttClientMessage,
   sendDrinkWaterReminderMessage,
+  hasPermission,
+  PERMISSION_ORIGINS,
 } from '@extension/shared'
 import type { MqttBasePayload } from '@extension/shared'
 import type { MqttClient } from 'mqtt'
@@ -40,6 +42,14 @@ async function setupMqtt() {
     console.log('MQTT is disabled or not properly configured.')
     return
   }
+
+  // Check if MQTT broker permission is granted
+  const hasMqttPermission = await hasPermission([PERMISSION_ORIGINS.MQTT_BROKER])
+  if (!hasMqttPermission) {
+    console.log('MQTT broker permission not granted, skipping connection.')
+    return
+  }
+
   console.log('Connecting to MQTT broker...')
   mqttProvider.changeSecretPrefix(settings.mqttSettings.secretKey)
   payloadBuilder.username = settings.mqttSettings.username
@@ -52,6 +62,13 @@ closeMqttClientMessage.registerListener(async () => {
 })
 
 openMqttClientMessage.registerListener(async () => {
+  // Check if MQTT broker permission is granted before connecting
+  const hasMqttPermission = await hasPermission([PERMISSION_ORIGINS.MQTT_BROKER])
+  if (!hasMqttPermission) {
+    console.log('MQTT broker permission not granted, cannot connect.')
+    return
+  }
+
   const settings = await settingStorage.get()
   payloadBuilder.username = settings.mqttSettings.username
   await mqttProvider.changeSecretPrefix(settings.mqttSettings.secretKey)

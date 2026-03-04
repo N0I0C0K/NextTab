@@ -18,10 +18,10 @@ const manifest = {
   name: '__MSG_extensionName__',
   version: packageJson.version,
   description: '__MSG_extensionDescription__',
-  host_permissions: [
-    'https://api.github.com/*', // Version check API
-    'https://wallhaven.cc/*', // Wallpaper search API
-    'wss://broker.emqx.io:8084/*', // MQTT WebSocket connection
+  optional_host_permissions: [
+    'https://api.github.com/*',    // Version check API
+    'https://wallhaven.cc/*',      // Wallpaper search API
+    'wss://broker.emqx.io:8084/*',  // MQTT WebSocket connection
   ],
   permissions: ['storage', 'tabs', 'notifications', 'search', 'history', 'favicon', 'bookmarks', 'alarms', 'topSites'],
   // options_page: 'options/index.html',

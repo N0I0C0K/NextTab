@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils'
-import { useStorage } from '@extension/shared'
+import { useStorage, PERMISSION_ORIGINS, usePermission } from '@extension/shared'
 import { settingStorage, wallpaperHistoryStorage } from '@extension/storage'
 import type { WallhavenSortMode } from '@extension/storage'
 import {
@@ -19,6 +19,7 @@ import { type FC, useCallback, useEffect, useState, useRef } from 'react'
 import { t } from '@extension/i18n'
 import { WallpaperImage } from './WallpaperImage'
 import { LocalWallpaperSection } from './LocalWallpaperSection'
+import { PermissionGrant } from './PermissionGrant'
 
 // Scroll threshold in pixels to trigger loading more wallpapers
 const SCROLL_THRESHOLD = 100
@@ -147,6 +148,9 @@ export const WallpaperSettings: FC = () => {
   const [hasMore, setHasMore] = useState(true)
   const scrollContainerRef = useRef<HTMLDivElement>(null)
 
+  // Permission state for Wallhaven API
+  const wallhavenPermission = usePermission([PERMISSION_ORIGINS.WALLHAVEN_API])
+
   // Use refs to track loading state and last request time to prevent race conditions
   const isLoadingRef = useRef(false)
   const lastRequestTimeRef = useRef(0)
@@ -216,9 +220,12 @@ export const WallpaperSettings: FC = () => {
     }
   }, [])
 
+  // Only fetch wallpapers when permission is granted
   useEffect(() => {
-    fetchWallpapers(1)
-  }, [fetchWallpapers])
+    if (wallhavenPermission.isGranted) {
+      fetchWallpapers(1)
+    }
+  }, [fetchWallpapers, wallhavenPermission.isGranted])
 
   // Use ref for current page to avoid recreating scroll handler
   const currentPageRef = useRef(currentPage)
@@ -324,62 +331,79 @@ export const WallpaperSettings: FC = () => {
         <Text gray level="s">
           {t('wallpaperSettingsDescription')}
         </Text>
-        <Stack direction={'row'} className="items-center gap-2">
-          <Select
-            value={settings.wallhavenSortMode}
-            onValueChange={value => handleSortModeChange(value as WallhavenSortMode)}
-            disabled={isLoading}>
-            <SelectTrigger className="w-[140px] h-9">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="toplist">{t('wallhavenToplist')}</SelectItem>
-              <SelectItem value="random">{t('wallhavenRandom')}</SelectItem>
-            </SelectContent>
-          </Select>
-          <Button variant="ghost" size="sm" onClick={handleRefresh} disabled={isLoading}>
-            <RefreshCw className={cn('size-4', isLoading && 'animate-spin')} />
-          </Button>
-        </Stack>
+        {wallhavenPermission.isGranted && (
+          <Stack direction={'row'} className="items-center gap-2">
+            <Select
+              value={settings.wallhavenSortMode}
+              onValueChange={value => handleSortModeChange(value as WallhavenSortMode)}
+              disabled={isLoading}>
+              <SelectTrigger className="w-[140px] h-9">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="toplist">{t('wallhavenToplist')}</SelectItem>
+                <SelectItem value="random">{t('wallhavenRandom')}</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button variant="ghost" size="sm" onClick={handleRefresh} disabled={isLoading}>
+              <RefreshCw className={cn('size-4', isLoading && 'animate-spin')} />
+            </Button>
+          </Stack>
+        )}
       </Stack>
 
-      {error && (
-        <div className="rounded-md bg-destructive/10 p-3 text-center">
-          <Text level="s" className="text-destructive">
-            {error}
-          </Text>
-        </div>
-      )}
+      {/* Permission prompt for Wallhaven API */}
+      <PermissionGrant
+        origins={[PERMISSION_ORIGINS.WALLHAVEN_API]}
+        description={t('wallhavenPermissionDescription')}
+        onPermissionChange={granted => {
+          if (granted) {
+            wallhavenPermission.refresh()
+          }
+        }}
+      />
 
-      {isLoading && wallpapers.length === 0 ? (
-        <div className="flex items-center justify-center py-8">
-          <Loader2 className="size-8 animate-spin text-muted-foreground" />
-        </div>
-      ) : (
-        <div ref={scrollContainerRef} className="h-[300px] overflow-y-auto pr-2">
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-            {wallpapers.map(wallpaper => (
-              <WallpaperCard
-                key={wallpaper.id}
-                wallpaper={wallpaper}
-                isSelected={settings.wallpaperType === 'url' && settings.wallpaperUrl === wallpaper.path}
-                onSelect={handleSelectWallpaper}
-              />
-            ))}
-          </div>
-          {isLoadingMore && (
-            <div className="flex items-center justify-center py-4">
-              <Loader2 className="size-6 animate-spin text-muted-foreground" />
-            </div>
-          )}
-          {!hasMore && wallpapers.length > 0 && (
-            <div className="py-4 text-center">
-              <Text gray level="xs">
-                {t('noMoreWallpapers')}
+      {wallhavenPermission.isGranted && (
+        <>
+          {error && (
+            <div className="rounded-md bg-destructive/10 p-3 text-center">
+              <Text level="s" className="text-destructive">
+                {error}
               </Text>
             </div>
           )}
-        </div>
+
+          {isLoading && wallpapers.length === 0 ? (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="size-8 animate-spin text-muted-foreground" />
+            </div>
+          ) : (
+            <div ref={scrollContainerRef} className="h-[300px] overflow-y-auto pr-2">
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                {wallpapers.map(wallpaper => (
+                  <WallpaperCard
+                    key={wallpaper.id}
+                    wallpaper={wallpaper}
+                    isSelected={settings.wallpaperType === 'url' && settings.wallpaperUrl === wallpaper.path}
+                    onSelect={handleSelectWallpaper}
+                  />
+                ))}
+              </div>
+              {isLoadingMore && (
+                <div className="flex items-center justify-center py-4">
+                  <Loader2 className="size-6 animate-spin text-muted-foreground" />
+                </div>
+              )}
+              {!hasMore && wallpapers.length > 0 && (
+                <div className="py-4 text-center">
+                  <Text gray level="xs">
+                    {t('noMoreWallpapers')}
+                  </Text>
+                </div>
+              )}
+            </div>
+          )}
+        </>
       )}
 
       {/* History Wallpapers Section */}

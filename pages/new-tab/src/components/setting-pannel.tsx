@@ -4,6 +4,7 @@ import {
   openMqttClientMessage,
   useStorage,
   sendDrinkWaterReminderMessage,
+  PERMISSION_ORIGINS,
 } from '@extension/shared'
 import { mqttStateManager, settingStorage } from '@extension/storage'
 import {
@@ -37,6 +38,7 @@ import { DataSettings } from './settings/DataSettings'
 import { CommandSettings } from './settings/CommandSettings'
 import { AboutSettings } from './settings/AboutSettings'
 import { SettingItem } from './settings/SettingItem'
+import { PermissionGrant } from './settings/PermissionGrant'
 
 export { SettingItem }
 
@@ -115,6 +117,8 @@ const MqttSettings: FC = () => {
           {t('configureMqttSettings')}
         </Text>
       </Stack>
+      {/* Permission prompt for MQTT broker */}
+      <PermissionGrant origins={[PERMISSION_ORIGINS.MQTT_BROKER]} description={t('mqttPermissionDescription')} />
       <SettingItem
         IconClass={ToggleRight}
         title={t('enable')}

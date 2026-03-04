@@ -6,6 +6,8 @@ import { SettingItem } from './SettingItem'
 import packageJson from '../../../../../package.json'
 import { useLatestVersion } from '@src/hooks/useLatestVersion'
 import { isUpdateAvailable } from '@src/utils/semver'
+import { PERMISSION_ORIGINS, usePermission } from '@extension/shared'
+import { PermissionGrant } from './PermissionGrant'
 
 const useAboutUrls = () => {
   const repositoryUrl = packageJson.repository?.url || 'https://github.com/N0I0C0K/NextTab'
@@ -16,19 +18,17 @@ const useAboutUrls = () => {
   }
 }
 
-const useVersionStatus = ({
-  currentVersion,
-  latestVersion,
-  isChecking,
-  checkError,
+/**
+ * Component that displays latest version info.
+ * Only rendered when GitHub API permission is granted.
+ */
+const LatestVersionInfo: FC<{ repositoryUrl: string; releasesUrl: string; currentVersion: string }> = ({
+  repositoryUrl,
   releasesUrl,
-}: {
-  currentVersion: string
-  latestVersion: string
-  isChecking: boolean
-  checkError: boolean
-  releasesUrl: string
+  currentVersion,
 }) => {
+  const { latestVersion, isChecking, checkError } = useLatestVersion(repositoryUrl)
+
   const hasUpdate = useMemo(() => {
     return !checkError && isUpdateAvailable(currentVersion, latestVersion)
   }, [checkError, currentVersion, latestVersion])
@@ -56,24 +56,7 @@ const useVersionStatus = ({
     )
   }
 
-  return { hasUpdate, getLatestVersionDisplay, getUpdateStatusDisplay }
-}
-
-export const AboutSettings: FC = () => {
-  const version = chrome.runtime.getManifest().version
-  const { repositoryUrl, issuesUrl, releasesUrl } = useAboutUrls()
-  const { latestVersion, isChecking, checkError } = useLatestVersion(repositoryUrl)
-  const { getLatestVersionDisplay, getUpdateStatusDisplay } = useVersionStatus({
-    currentVersion: version,
-    latestVersion,
-    isChecking,
-    checkError,
-    releasesUrl,
-  })
-
-  const openUrl = (url: string) => chrome.tabs.create({ url })
-
-  const versionAdditionalControl = (
+  return (
     <Stack direction={'row'} center className="absolute bottom-0 end-1 gap-1">
       <Text gray level="xs">
         {t('latestVersion')}:
@@ -84,6 +67,16 @@ export const AboutSettings: FC = () => {
       {getUpdateStatusDisplay()}
     </Stack>
   )
+}
+
+export const AboutSettings: FC = () => {
+  const version = chrome.runtime.getManifest().version
+  const { repositoryUrl, issuesUrl, releasesUrl } = useAboutUrls()
+
+  // Permission state for GitHub API
+  const githubPermission = usePermission([PERMISSION_ORIGINS.GITHUB_API])
+
+  const openUrl = (url: string) => chrome.tabs.create({ url })
 
   return (
     <Stack direction={'column'} className={'gap-2 w-full'}>
@@ -95,7 +88,21 @@ export const AboutSettings: FC = () => {
         title={t('version')}
         description={t('versionDescription')}
         control={<Text className="font-mono text-muted-foreground">{version}</Text>}
-        additionalControl={versionAdditionalControl}
+        additionalControl={
+          githubPermission.isGranted ? (
+            <LatestVersionInfo repositoryUrl={repositoryUrl} releasesUrl={releasesUrl} currentVersion={version} />
+          ) : undefined
+        }
+      />
+      {/* Permission prompt for GitHub API (version check) */}
+      <PermissionGrant
+        origins={[PERMISSION_ORIGINS.GITHUB_API]}
+        description={t('githubPermissionDescription')}
+        onPermissionChange={granted => {
+          if (granted) {
+            githubPermission.refresh()
+          }
+        }}
       />
       <SettingItem
         IconClass={ExternalLink}
