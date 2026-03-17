@@ -67,10 +67,7 @@ export const wallpaperHistoryStorage: WallpaperHistoryStorage = {
     // Remove duplicate if exists (will be re-added at the front)
     const filtered = current.history.filter(item => item.url !== url)
     // Add new item at the beginning with current timestamp
-    const newHistory = [
-      { url, thumbnailUrl, addedAt: Date.now() },
-      ...filtered,
-    ].slice(0, MAX_HISTORY_SIZE)
+    const newHistory = [{ url, thumbnailUrl, addedAt: Date.now() }, ...filtered].slice(0, MAX_HISTORY_SIZE)
     await storage.set({ history: newHistory })
   },
   removeFromHistory: async (url: string) => {

@@ -12,7 +12,10 @@ export const isUpdateAvailable = (current: string, latest: string): boolean => {
 
   // Parse version numbers by splitting on dots and taking first 3 parts
   const parseParts = (version: string) => {
-    const parts = version.split('.').slice(0, 3).map(p => parseInt(p, 10))
+    const parts = version
+      .split('.')
+      .slice(0, 3)
+      .map(p => parseInt(p, 10))
     // Pad with zeros if less than 3 parts
     while (parts.length < 3) {
       parts.push(0)

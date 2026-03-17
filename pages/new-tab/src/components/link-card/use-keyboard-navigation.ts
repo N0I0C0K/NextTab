@@ -162,7 +162,7 @@ export const useKeyboardNavigation = ({ items, enabled, containerRef }: UseKeybo
     chrome.tabs.update({ url: item.url }).catch(error => {
       console.error(
         `Failed to open quick URL "${item.title}" (${item.url}). ` +
-        `This may be due to Chrome API permissions or an invalid URL format.`,
+          `This may be due to Chrome API permissions or an invalid URL format.`,
         error,
       )
     })

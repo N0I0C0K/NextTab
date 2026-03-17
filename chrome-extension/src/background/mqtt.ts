@@ -66,9 +66,10 @@ drinkWaterEvent.subscribe(async payload => {
   console.log('Received drink water reminder from:', payload.senderUserName)
 
   // Validate sender username to prevent malicious content
-  const senderUserName = typeof payload.senderUserName === 'string' && payload.senderUserName.trim()
-    ? payload.senderUserName.trim().substring(0, 50) // Limit length for safety
-    : 'Someone'
+  const senderUserName =
+    typeof payload.senderUserName === 'string' && payload.senderUserName.trim()
+      ? payload.senderUserName.trim().substring(0, 50) // Limit length for safety
+      : 'Someone'
 
   // Create Chrome notification with safe ID generation
   const notificationId = `drink-water-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`

@@ -45,9 +45,9 @@ export type SettingProps = {
 
 type DeepPartial<T> = T extends object
   ? {
-    [K in keyof T]?: DeepPartial<T[K]>;
-  }
-  : T;
+      [K in keyof T]?: DeepPartial<T[K]>
+    }
+  : T
 
 type SettingsStorage = BaseStorage<SettingProps> & {
   update: (data: DeepPartial<SettingProps>) => Promise<void>
@@ -80,7 +80,7 @@ const storage = createStorage<SettingProps>('settings-storage', defaultSetting, 
 export const settingStorage: SettingsStorage = {
   ...storage,
   update: async data => {
-    storage.set(preVal => (deepmerge(preVal, data) as SettingProps))
+    storage.set(preVal => deepmerge(preVal, data) as SettingProps)
   },
   getMqttSettings: async () => {
     const settings = await storage.get()

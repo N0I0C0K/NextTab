@@ -1,6 +1,6 @@
-import type { MqttBasePayload } from "./payload"
-import type { MqttClient } from "mqtt"
-import { nanoid } from "nanoid"
+import type { MqttBasePayload } from './payload'
+import type { MqttClient } from 'mqtt'
+import { nanoid } from 'nanoid'
 
 export class MqttPayloadBuilder {
   private _username?: string
@@ -54,7 +54,7 @@ export class MqttSecretPrefixTopicRegisterService {
 
   /**
    * Joins the secret prefix with the raw topic.
-   * @param rawTopic 
+   * @param rawTopic
    * @throws Error if secret prefix is not set
    * @returns The topic with secret prefix
    */

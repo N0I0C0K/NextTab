@@ -1,30 +1,15 @@
 {
-    "editor.formatOnSave": true,
-    "editor.tabSize": 2,
-    "tailwindCSS.experimental.classRegex": [
-        [
-            "cva\\(([^)]*)\\)",
-            "[\"'`]([^\"'`]*).*?[\"'`]"
-        ],
-        [
-            "cx\\(([^)]*)\\)",
-            "[\"'`]([^\"'`]*).*?[\"'`]"
-        ],
-        [
-            "cn\\(([^)]*)\\)",
-            "[\"'`]([^\"'`]*).*?[\"'`]"
-        ],
-        [
-            "clsx\\(([^)]*)\\)",
-            "[\"'`]([^\"'`]*).*?[\"'`]"
-        ],
-        [
-            "twMerge\\(([^)]*)\\)",
-            "[\"'`]([^\"'`]*).*?[\"'`]"
-        ]
-    ],
-    "tailwindCSS.includeLanguages": {
-        "typescript": "javascript",
-        "typescriptreact": "javascript"
-    },
+  "editor.formatOnSave": true,
+  "editor.tabSize": 2,
+  "tailwindCSS.experimental.classRegex": [
+    ["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"],
+    ["cx\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"],
+    ["cn\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"],
+    ["clsx\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"],
+    ["twMerge\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"]
+  ],
+  "tailwindCSS.includeLanguages": {
+    "typescript": "javascript",
+    "typescriptreact": "javascript"
+  }
 }

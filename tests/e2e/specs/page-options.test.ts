@@ -1,13 +1,13 @@
-import { canSwitchTheme } from '../helpers/theme';
+import { canSwitchTheme } from '../helpers/theme'
 
 describe('Webextension Options Page', () => {
   it('should make options page accessible', async () => {
-    const extensionPath = await browser.getExtensionPath();
-    const optionsUrl = `${extensionPath}/options/index.html`;
+    const extensionPath = await browser.getExtensionPath()
+    const optionsUrl = `${extensionPath}/options/index.html`
 
-    await browser.url(optionsUrl);
+    await browser.url(optionsUrl)
 
-    await expect(browser).toHaveTitle('Options');
-    await canSwitchTheme();
-  });
-});
+    await expect(browser).toHaveTitle('Options')
+    await canSwitchTheme()
+  })
+})

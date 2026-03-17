@@ -189,7 +189,7 @@ function readImportFile(file: File): Promise<{ raw: Record<string, unknown>; war
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
 
-    reader.onload = (e) => {
+    reader.onload = e => {
       try {
         const content = e.target?.result as string
         const parsed = JSON.parse(content)

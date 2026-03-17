@@ -1,12 +1,12 @@
-import { canSwitchTheme } from '../helpers/theme';
+import { canSwitchTheme } from '../helpers/theme'
 
 describe('Webextension Popup', () => {
   it('should open the popup successfully', async () => {
-    const extensionPath = await browser.getExtensionPath();
-    const popupUrl = `${extensionPath}/popup/index.html`;
-    await browser.url(popupUrl);
+    const extensionPath = await browser.getExtensionPath()
+    const popupUrl = `${extensionPath}/popup/index.html`
+    await browser.url(popupUrl)
 
-    await expect(browser).toHaveTitle('Popup');
-    await canSwitchTheme();
-  });
-});
+    await expect(browser).toHaveTitle('Popup')
+    await canSwitchTheme()
+  })
+})
