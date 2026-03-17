@@ -1,6 +1,6 @@
-import fs from 'node:fs';
+import fs from 'node:fs'
 
-const packageJson = JSON.parse(fs.readFileSync('../package.json', 'utf8'));
+const packageJson = JSON.parse(fs.readFileSync('../package.json', 'utf8'))
 
 // const isFirefox = process.env.__FIREFOX__ === 'true';
 
@@ -19,9 +19,9 @@ const manifest = {
   version: packageJson.version,
   description: '__MSG_extensionDescription__',
   host_permissions: [
-    'https://api.github.com/*',    // Version check API
-    'https://wallhaven.cc/*',      // Wallpaper search API
-    'wss://broker.emqx.io:8084/*',  // MQTT WebSocket connection
+    'https://api.github.com/*', // Version check API
+    'https://wallhaven.cc/*', // Wallpaper search API
+    'wss://broker.emqx.io:8084/*', // MQTT WebSocket connection
   ],
   permissions: ['storage', 'tabs', 'notifications', 'search', 'history', 'favicon', 'bookmarks', 'alarms', 'topSites'],
   // options_page: 'options/index.html',
@@ -60,6 +60,6 @@ const manifest = {
   //     matches: ['*://*/*'],
   //   },
   // ],
-};
+}
 
-export default manifest;
+export default manifest

@@ -1,29 +1,29 @@
-import type { ValueOf } from '@extension/shared';
+import type { ValueOf } from '@extension/shared'
 
-type ColorType = 'success' | 'info' | 'error' | 'warning' | keyof typeof COLORS;
+type ColorType = 'success' | 'info' | 'error' | 'warning' | keyof typeof COLORS
 
 export function colorLog(message: string, type: ColorType) {
-  let color: ValueOf<typeof COLORS>;
+  let color: ValueOf<typeof COLORS>
 
   switch (type) {
     case 'success':
-      color = COLORS.FgGreen;
-      break;
+      color = COLORS.FgGreen
+      break
     case 'info':
-      color = COLORS.FgBlue;
-      break;
+      color = COLORS.FgBlue
+      break
     case 'error':
-      color = COLORS.FgRed;
-      break;
+      color = COLORS.FgRed
+      break
     case 'warning':
-      color = COLORS.FgYellow;
-      break;
+      color = COLORS.FgYellow
+      break
     default:
-      color = COLORS[type];
-      break;
+      color = COLORS[type]
+      break
   }
 
-  console.log(color, message);
+  console.log(color, message)
 }
 
 const COLORS = {
@@ -50,4 +50,4 @@ const COLORS = {
   BgMagenta: '\x1b[45m',
   BgCyan: '\x1b[46m',
   BgWhite: '\x1b[47m',
-} as const;
+} as const

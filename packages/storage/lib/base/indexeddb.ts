@@ -30,11 +30,7 @@ export interface IndexedDBConfig {
  * - Not available in all contexts (e.g., Tailwind build process)
  * - No automatic sync across extension contexts (must implement manually if needed)
  */
-export function createIndexedDBStorage<D>(
-  key: string,
-  fallback: D,
-  config: IndexedDBConfig,
-): BaseStorage<D> {
+export function createIndexedDBStorage<D>(key: string, fallback: D, config: IndexedDBConfig): BaseStorage<D> {
   const { dbName, storeName, version = 1 } = config
 
   let cache: D | null = null
@@ -78,7 +74,8 @@ export function createIndexedDBStorage<D>(
 
   const set = async (valueOrUpdate: ValueOrUpdate<D>) => {
     const prev = cache ?? (await get())
-    const next = typeof valueOrUpdate === 'function' ? await (valueOrUpdate as (prev: D) => D | Promise<D>)(prev) : valueOrUpdate
+    const next =
+      typeof valueOrUpdate === 'function' ? await (valueOrUpdate as (prev: D) => D | Promise<D>)(prev) : valueOrUpdate
     cache = next
 
     if (!globalThis.indexedDB) {

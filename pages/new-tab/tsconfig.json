@@ -3,19 +3,10 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@src/*": [
-        "src/*"
-      ],
-      "@/*": [
-        "./*"
-      ]
+      "@src/*": ["src/*"],
+      "@/*": ["./*"]
     },
-    "types": [
-      "chrome",
-      "../../vite-env.d.ts"
-    ]
+    "types": ["chrome", "../../vite-env.d.ts"]
   },
-  "include": [
-    "src"
-  ]
+  "include": ["src"]
 }

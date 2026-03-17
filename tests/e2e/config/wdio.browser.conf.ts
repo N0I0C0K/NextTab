@@ -1,16 +1,16 @@
-import { config as baseConfig } from './wdio.conf';
-import path from 'node:path';
-import url from 'node:url';
-import fs from 'node:fs/promises';
-import { getChromeExtensionPath, getFirefoxExtensionPath } from '../utils/extension-path';
+import { config as baseConfig } from './wdio.conf'
+import path from 'node:path'
+import url from 'node:url'
+import fs from 'node:fs/promises'
+import { getChromeExtensionPath, getFirefoxExtensionPath } from '../utils/extension-path'
 
-const isFirefox = process.env.__FIREFOX__ === 'true';
-const isCI = process.env.CI === 'true';
+const isFirefox = process.env.__FIREFOX__ === 'true'
+const isCI = process.env.CI === 'true'
 
-const archiveName = isFirefox ? 'extension.xpi' : 'extension.zip';
-const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
-const extPath = path.join(__dirname, `../../../dist-zip/${archiveName}`);
-const bundledExtension = (await fs.readFile(extPath)).toString('base64');
+const archiveName = isFirefox ? 'extension.xpi' : 'extension.zip'
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url))
+const extPath = path.join(__dirname, `../../../dist-zip/${archiveName}`)
+const bundledExtension = (await fs.readFile(extPath)).toString('base64')
 
 const chromeCapabilities = {
   browserName: 'chrome',
@@ -26,7 +26,7 @@ const chromeCapabilities = {
     prefs: { 'extensions.ui.developer_mode': true },
     extensions: [bundledExtension],
   },
-};
+}
 
 const firefoxCapabilities = {
   browserName: 'firefox',
@@ -34,7 +34,7 @@ const firefoxCapabilities = {
   'moz:firefoxOptions': {
     args: [...(isCI ? ['--headless'] : [])],
   },
-};
+}
 
 export const config: WebdriverIO.Config = {
   ...baseConfig,
@@ -45,16 +45,16 @@ export const config: WebdriverIO.Config = {
   execArgv: isCI ? [] : ['--inspect'],
   before: async ({ browserName }: WebdriverIO.Capabilities, _specs, browser: WebdriverIO.Browser) => {
     if (browserName === 'firefox') {
-      await browser.installAddOn(bundledExtension, true);
+      await browser.installAddOn(bundledExtension, true)
 
-      browser.addCommand('getExtensionPath', async () => getFirefoxExtensionPath(browser));
+      browser.addCommand('getExtensionPath', async () => getFirefoxExtensionPath(browser))
     } else if (browserName === 'chrome') {
-      browser.addCommand('getExtensionPath', async () => getChromeExtensionPath(browser));
+      browser.addCommand('getExtensionPath', async () => getChromeExtensionPath(browser))
     }
   },
   afterTest: async () => {
     if (!isCI) {
-      await browser.pause(500);
+      await browser.pause(500)
     }
   },
-};
+}

@@ -15,8 +15,8 @@ export const LinkCardIcon = forwardRef<HTMLDivElement, LinkCardIconProps>(({ url
   return (
     <div
       className={cn(
-        `relative flex flex-row items-center justify-center rounded-lg size-[4.5rem] text-primary
-        duration-200 select-none cursor-pointer`,
+        `relative flex flex-row items-center justify-center rounded-lg size-[4.5rem] text-primary duration-200
+        select-none cursor-pointer`,
         'hover:bg-slate-200/40 active:bg-slate-100/70',
         'dark:hover:bg-slate-100/20 dark:active:bg-slate-200/70',
       )}

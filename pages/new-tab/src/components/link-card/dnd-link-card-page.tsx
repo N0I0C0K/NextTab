@@ -44,7 +44,10 @@ export const DndLinkCardPage: FC<{
           }
         }
       }}>
-      <div ref={containerRef} className={cn('grid', className)} style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(6.5rem, 1fr))' }}>
+      <div
+        ref={containerRef}
+        className={cn('grid', className)}
+        style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(6.5rem, 1fr))' }}>
         {userStorageItems.map((val, index) => (
           <SortableLinkCardItem {...val} key={val.id} index={index} selected={selectedIndex === index} />
         ))}
