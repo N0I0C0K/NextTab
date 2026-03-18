@@ -61,7 +61,11 @@ const SUPPORTED_LANGUAGES = {
   zh_TW: 'Chinese (Taiwan)',
 };
 
-const locales = fs.readdirSync('locales');
+const locales = fs.readdirSync('locales').sort((a, b) => {
+  if (a === 'en') return -1;
+  if (b === 'en') return 1;
+  return a.localeCompare(b);
+});
 
 locales.forEach(locale => {
   if (!(locale in SUPPORTED_LANGUAGES)) {
