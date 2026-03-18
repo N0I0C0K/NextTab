@@ -83,7 +83,7 @@ export const DomainHistoryDialog: FC<DomainHistoryDialogProps> = ({ domain }) =>
   }, [domain, debouncedSearchQuery])
 
   return (
-    <div className="flex flex-col gap-3 w-[50rem] h-[42rem] max-w-full">
+    <div className="flex flex-col gap-3 w-[50rem] min-h-[20em] max-h-[46rem] h-[50vh] max-w-full">
       <div className="flex items-center gap-2 min-w-0">
         <Text level="md" className="font-semibold truncate">
           {domain}
@@ -122,7 +122,7 @@ export const DomainHistoryDialog: FC<DomainHistoryDialogProps> = ({ domain }) =>
           <Text className="text-muted-foreground">{t('noHistoryFound')}</Text>
         </div>
       ) : (
-        <ScrollArea className="h-[36rem] max-h-[50vh] [&>div>div]:!block">
+        <ScrollArea className="[&>div>div]:!block">
           {historyItems.map(item => (
             <DomainHistoryItem key={item.id} {...item} />
           ))}
