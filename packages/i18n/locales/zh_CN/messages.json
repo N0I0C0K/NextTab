@@ -141,6 +141,14 @@
     "description": "History suggestion setting description",
     "message": "使用历史记录进行推荐。"
   },
+  "showQuickLinkTitle": {
+    "description": "Show quick link title setting title",
+    "message": "显示快捷链接标题"
+  },
+  "showQuickLinkTitleDescription": {
+    "description": "Show quick link title setting description",
+    "message": "在快捷链接图标下方显示标题文字。"
+  },
   "autoFocusCommandInput": {
     "description": "Auto focus command input setting title",
     "message": "自动聚焦命令输入"
