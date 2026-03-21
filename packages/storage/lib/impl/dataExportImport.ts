@@ -28,6 +28,7 @@ const settingsSchema = z.object({
   showBookmarksInQuickUrlMenu: z.boolean().optional(),
   showOpenTabsInQuickUrlMenu: z.boolean().optional(),
   bookmarkFolderId: z.string().nullable().optional(),
+  showQuickLinkTitle: z.boolean().optional(),
   wallpaperUrl: z.string().nullable().optional(),
   wallpaperType: z.union([z.literal('url'), z.literal('local')]).optional(),
   wallhavenSortMode: z.union([z.literal('toplist'), z.literal('random')]).optional(),

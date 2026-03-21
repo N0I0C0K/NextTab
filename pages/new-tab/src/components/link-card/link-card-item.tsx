@@ -1,6 +1,8 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 import { cn } from '@/lib/utils'
 import type { QuickUrlItem } from '@extension/storage'
+import { settingStorage } from '@extension/storage'
+import { useStorage } from '@extension/shared'
 import { Text, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@extension/ui'
 import { ContextMenu, ContextMenuContent, ContextMenuTrigger } from '@extension/ui/lib/components/ui/context-menu'
 import { useGlobalDialog } from '@src/provider'
@@ -32,6 +34,7 @@ export const LinkCardItem = forwardRef<HTMLDivElement, LinkCardProps & CustomGri
     const [contextMenuOpen, setContextMenuOpen] = useState(false)
     const globalDialog = useGlobalDialog()
     const innerRef = useRef<HTMLDivElement>(null)
+    const { showQuickLinkTitle } = useStorage(settingStorage)
 
     // Fetch related bookmarks when context menu opens
     const { relatedBookmarks, showBookmarks } = useRelatedBookmarks(url, contextMenuOpen)
@@ -49,7 +52,7 @@ export const LinkCardItem = forwardRef<HTMLDivElement, LinkCardProps & CustomGri
     )
 
     return (
-      <TooltipProvider>
+      <TooltipProvider delayDuration={showQuickLinkTitle ? 700 : 300}>
         <Tooltip>
           <ContextMenu onOpenChange={setContextMenuOpen}>
             <div
@@ -67,12 +70,14 @@ export const LinkCardItem = forwardRef<HTMLDivElement, LinkCardProps & CustomGri
               onTouchEnd={onTouchEnd}>
               <TooltipTrigger asChild>
                 <ContextMenuTrigger>
-                  <LinkCardIcon url={url} onClick={handleIconClick} ref={innerRef} />
+                  <LinkCardIcon url={url} onClick={handleIconClick} ref={innerRef} large={!showQuickLinkTitle} />
                 </ContextMenuTrigger>
               </TooltipTrigger>
-              <Text level="s" className="select-none line-clamp-1">
-                {title}
-              </Text>
+              {showQuickLinkTitle && (
+                <Text level="s" className="select-none line-clamp-1">
+                  {title}
+                </Text>
+              )}
             </div>
             <TooltipContent>
               <LinkCardTooltipContent title={title} url={url} id={id} />

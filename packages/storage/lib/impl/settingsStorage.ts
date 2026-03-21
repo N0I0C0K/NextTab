@@ -35,6 +35,8 @@ export type SettingProps = {
   showOpenTabsInQuickUrlMenu: boolean
   /** The specific bookmark folder ID to filter bookmarks in context menu. null means show all bookmarks */
   bookmarkFolderId: string | null
+  /** Whether to show the title text below each quick link icon */
+  showQuickLinkTitle: boolean
   wallpaperUrl: string | null
   /** The source type for the wallpaper (remote URL or local file) */
   wallpaperType: WallpaperType
@@ -61,6 +63,7 @@ const defaultSetting: SettingProps = {
   showBookmarksInQuickUrlMenu: true,
   showOpenTabsInQuickUrlMenu: true,
   bookmarkFolderId: null,
+  showQuickLinkTitle: true,
   wallpaperUrl: null,
   wallpaperType: 'url',
   wallhavenSortMode: 'toplist',
