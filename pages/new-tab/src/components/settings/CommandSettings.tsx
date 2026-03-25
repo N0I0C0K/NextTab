@@ -1,8 +1,9 @@
 import { useStorage } from '@extension/shared'
 import { commandSettingsStorage, defaultCommandSettings, settingStorage } from '@extension/storage'
 import type { CommandPluginSettings } from '@extension/storage'
-import Form from '@rjsf/shadcn'
-import type { IChangeEvent, RJSFSchema } from '@rjsf/utils'
+import type { IChangeEvent } from '@rjsf/core'
+import RjsfForm from '@rjsf/shadcn'
+import type { RJSFSchema } from '@rjsf/utils'
 import validator from '@rjsf/validator-ajv8'
 import {
   Stack,
@@ -51,11 +52,11 @@ const CommandPluginCustomSettingsForm: FC<{
   }
 
   return (
-    <div className="pt-2" onClick={event => event.stopPropagation()}>
+    <div className="pt-2">
       <Text level="s" className="mb-2 font-medium">
         {t('commandPluginCustomSettings')}
       </Text>
-      <Form
+      <RjsfForm
         schema={schema}
         uiSchema={plugin.customSettingsUiSchema}
         formData={formData}
@@ -71,7 +72,7 @@ const CommandPluginCustomSettingsForm: FC<{
           }
         }}>
         <></>
-      </Form>
+      </RjsfForm>
     </div>
   )
 }
