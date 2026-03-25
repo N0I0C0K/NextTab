@@ -174,7 +174,7 @@ class CommandResolverService {
             query: strippedQuery,
           }
 
-          it.resolve(pluginParams)
+          it.resolve.call(it, pluginParams)
             .then(res => {
               if (res === null || res.length === 0) {
                 // If plugin returns null or empty array, still show empty group for non-empty queries

@@ -11,6 +11,7 @@ export interface CommandPluginSettings {
   active: boolean
   activeKey: string
   includeInGlobal: boolean
+  customSettings?: Record<string, unknown>
 }
 
 /**
@@ -53,6 +54,9 @@ export const defaultCommandSettings: CommandSettingsData = {
     active: true,
     activeKey: 'g',
     includeInGlobal: true,
+    customSettings: {
+      searchEngines: [],
+    },
   },
   calculator: {
     priority: -10,
@@ -96,6 +100,7 @@ export const commandSettingsStorage: CommandSettingsStorage = {
         active: true,
         activeKey: '',
         includeInGlobal: true,
+        customSettings: {},
       }
     await storage.set({
       ...currentSettings,
