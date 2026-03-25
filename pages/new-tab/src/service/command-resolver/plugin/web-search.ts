@@ -5,6 +5,7 @@ import type { UiSchema } from '@rjsf/utils'
 import { z } from '@extension/ui/lib/components/ui/form'
 
 const searchEngineTemplatePlaceholder = 'https://www.google.com/search?q=%s'
+const searchEnginePreviewQuery = 'nexttab'
 
 const webSearchCustomSettingsSchema = z.object({
   searchEngines: z
@@ -42,6 +43,7 @@ const webSearchCustomSettingsUiSchema: UiSchema<WebSearchCustomSettings> = {
 function getWebSearchCustomSettings(customSettings: Record<string, unknown> | undefined): WebSearchCustomSettings {
   const parsedSettings = webSearchCustomSettingsSchema.safeParse(customSettings ?? {})
   if (!parsedSettings.success) {
+    console.warn('Invalid web search custom settings, falling back to defaults.', parsedSettings.error)
     return webSearchCustomSettingsSchema.parse({})
   }
   return parsedSettings.data
@@ -53,7 +55,7 @@ function buildSearchUrl(template: string, query: string): string {
 
 function getSearchEngineDescription(template: string): string {
   try {
-    return new URL(buildSearchUrl(template, 'nexttab')).hostname
+    return new URL(buildSearchUrl(template, searchEnginePreviewQuery)).hostname
   } catch {
     return template
   }

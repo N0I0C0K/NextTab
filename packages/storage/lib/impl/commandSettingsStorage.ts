@@ -54,9 +54,7 @@ export const defaultCommandSettings: CommandSettingsData = {
     active: true,
     activeKey: 'g',
     includeInGlobal: true,
-    customSettings: {
-      searchEngines: [],
-    },
+    customSettings: {},
   },
   calculator: {
     priority: -10,

@@ -37,6 +37,7 @@ const CommandPluginCustomSettingsForm: FC<{
     }
 
     const jsonSchema = z.toJSONSchema(plugin.customSettingsSchema) as RJSFSchema
+    // z.toJSONSchema emits a draft-2020-12 $schema marker that RJSF does not need here.
     delete jsonSchema.$schema
     return jsonSchema
   }, [plugin.customSettingsSchema])
@@ -68,10 +69,15 @@ const CommandPluginCustomSettingsForm: FC<{
           setFormData(nextFormData)
 
           if (event.errors.length === 0) {
-            await onUpdate({ customSettings: nextFormData })
+            try {
+              await onUpdate({ customSettings: nextFormData })
+            } catch (error) {
+              console.error('Failed to update command plugin custom settings.', error)
+            }
           }
         }}>
-        <></>
+        {/* Render no children so RJSF does not add its default submit button to this auto-save form. */}
+        {null}
       </RjsfForm>
     </div>
   )
