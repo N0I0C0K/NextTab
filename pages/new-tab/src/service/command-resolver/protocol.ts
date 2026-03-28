@@ -1,3 +1,6 @@
+import type { UiSchema } from '@rjsf/utils'
+import type { ZodTypeAny } from 'zod'
+
 export type CommandQueryParams = {
   query: string // Query with trigger key stripped (what the user actually wants to search)
   rawQuery: string // Original query as typed by the user
@@ -23,6 +26,7 @@ export interface CommandSettings {
   active: boolean
   activeKey: string
   includeInGlobal: boolean
+  customSettings?: Record<string, unknown>
 }
 
 export type PartialCommandSettings = Partial<CommandSettings>
@@ -37,5 +41,7 @@ export interface CommandProperties {
 export interface ICommandResolver {
   properties: CommandProperties
   settings: PartialCommandSettings
-  resolve: (params: CommandQueryParams) => Promise<ICommandResult[] | null>
+  customSettingsSchema?: ZodTypeAny
+  customSettingsUiSchema?: UiSchema
+  resolve: (this: ICommandResolver, params: CommandQueryParams) => Promise<ICommandResult[] | null>
 }

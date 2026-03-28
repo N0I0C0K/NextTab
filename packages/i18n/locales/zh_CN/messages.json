@@ -433,6 +433,26 @@
     "description": "Web Search result title template",
     "message": "搜索「{query}」"
   },
+  "commandPluginWebSearchSearchEngines": {
+    "description": "Web Search custom search engines field title",
+    "message": "自定义搜索引擎"
+  },
+  "commandPluginWebSearchSearchEnginesDescription": {
+    "description": "Web Search custom search engines field description",
+    "message": "可添加多个 URL 模板，并使用 %s 作为搜索词占位符。"
+  },
+  "commandPluginWebSearchSearchEngineTemplate": {
+    "description": "Web Search custom search engine template field title",
+    "message": "搜索引擎 URL 模板"
+  },
+  "commandPluginWebSearchSearchEngineTemplateDescription": {
+    "description": "Web Search custom search engine template field description",
+    "message": "例如：https://www.google.com/search?q=%s"
+  },
+  "commandPluginWebSearchSearchEngineTemplatePlaceholderError": {
+    "description": "Web Search custom search engine template placeholder validation error",
+    "message": "URL 必须包含 %s 占位符。"
+  },
   "commandPluginCalculator": {
     "description": "Calculator command plugin name",
     "message": "计算器"
@@ -644,6 +664,10 @@
   "commandPluginSettings": {
     "description": "Command plugin settings section title",
     "message": "命令插件设置"
+  },
+  "commandPluginCustomSettings": {
+    "description": "Command plugin custom settings section title",
+    "message": "插件专属设置"
   },
   "editQuickItem": {
     "description": "Edit",

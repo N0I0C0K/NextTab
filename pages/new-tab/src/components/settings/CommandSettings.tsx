@@ -1,6 +1,10 @@
 import { useStorage } from '@extension/shared'
 import { commandSettingsStorage, defaultCommandSettings, settingStorage } from '@extension/storage'
 import type { CommandPluginSettings } from '@extension/storage'
+import type { IChangeEvent } from '@rjsf/core'
+import RjsfForm from '@rjsf/shadcn'
+import type { RJSFSchema } from '@rjsf/utils'
+import validator from '@rjsf/validator-ajv8'
 import {
   Stack,
   Text,
@@ -13,13 +17,71 @@ import {
   AccordionTrigger,
   AccordionContent,
 } from '@extension/ui'
+import { z } from '@extension/ui/lib/components/ui/form'
 import { Layers, Pointer, MousePointerClick } from 'lucide-react'
-import { useState, type FC } from 'react'
+import { useEffect, useMemo, useState, type FC } from 'react'
 import { t } from '@extension/i18n'
 import type { ICommandResolver } from '@src/service/command-resolver'
 import { commandResolverService } from '@src/service/command-resolver'
 import { cn } from '@/lib/utils'
 import { SettingItem } from './SettingItem'
+
+const CommandPluginCustomSettingsForm: FC<{
+  plugin: ICommandResolver
+  settings: CommandPluginSettings
+  onUpdate: (settings: Partial<CommandPluginSettings>) => Promise<void>
+}> = ({ plugin, settings, onUpdate }) => {
+  const schema = useMemo(() => {
+    if (!plugin.customSettingsSchema) {
+      return null
+    }
+
+    const jsonSchema = z.toJSONSchema(plugin.customSettingsSchema) as RJSFSchema
+    // z.toJSONSchema emits a draft-2020-12 $schema marker that RJSF does not need here.
+    delete jsonSchema.$schema
+    return jsonSchema
+  }, [plugin.customSettingsSchema])
+
+  const [formData, setFormData] = useState<Record<string, unknown>>(settings.customSettings ?? {})
+
+  useEffect(() => {
+    setFormData(settings.customSettings ?? {})
+  }, [settings.customSettings])
+
+  if (!schema) {
+    return null
+  }
+
+  return (
+    <div className="pt-2">
+      <Text level="s" className="mb-2 font-medium">
+        {t('commandPluginCustomSettings')}
+      </Text>
+      <RjsfForm
+        schema={schema}
+        uiSchema={plugin.customSettingsUiSchema}
+        formData={formData}
+        validator={validator}
+        noHtml5Validate
+        showErrorList={false}
+        onChange={async (event: IChangeEvent<Record<string, unknown>, RJSFSchema>) => {
+          const nextFormData = event.formData ?? {}
+          setFormData(nextFormData)
+
+          if (event.errors.length === 0) {
+            try {
+              await onUpdate({ customSettings: nextFormData })
+            } catch (error) {
+              console.error('Failed to update command plugin custom settings.', error)
+            }
+          }
+        }}>
+        {/* Render no children so RJSF does not add its default submit button to this auto-save form. */}
+        {null}
+      </RjsfForm>
+    </div>
+  )
+}
 
 const CommandPluginSettingItem: FC<{
   plugin: ICommandResolver
@@ -87,6 +149,7 @@ const CommandPluginSettingItem: FC<{
               className="w-24"
             />
           </Stack>
+          <CommandPluginCustomSettingsForm plugin={plugin} settings={settings} onUpdate={onUpdate} />
         </Stack>
       </AccordionContent>
     </AccordionItem>

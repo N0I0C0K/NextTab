@@ -433,6 +433,26 @@
     "description": "Web Search result title template",
     "message": "Search for \"{query}\""
   },
+  "commandPluginWebSearchSearchEngines": {
+    "description": "Web Search custom search engines field title",
+    "message": "Custom search engines"
+  },
+  "commandPluginWebSearchSearchEnginesDescription": {
+    "description": "Web Search custom search engines field description",
+    "message": "Add one or more URL templates. Use %s as the placeholder for the search text."
+  },
+  "commandPluginWebSearchSearchEngineTemplate": {
+    "description": "Web Search custom search engine template field title",
+    "message": "Search engine URL template"
+  },
+  "commandPluginWebSearchSearchEngineTemplateDescription": {
+    "description": "Web Search custom search engine template field description",
+    "message": "Example: https://www.google.com/search?q=%s"
+  },
+  "commandPluginWebSearchSearchEngineTemplatePlaceholderError": {
+    "description": "Web Search custom search engine template placeholder validation error",
+    "message": "The URL must include a %s placeholder."
+  },
   "commandPluginCalculator": {
     "description": "Calculator command plugin name",
     "message": "Calculator"
@@ -644,6 +664,10 @@
   "commandPluginSettings": {
     "description": "Command plugin settings section title",
     "message": "Command Plugin Settings"
+  },
+  "commandPluginCustomSettings": {
+    "description": "Command plugin custom settings section title",
+    "message": "Plugin-specific settings"
   },
   "editQuickItem": {
     "description": "Edit",
