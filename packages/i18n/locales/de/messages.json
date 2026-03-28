@@ -1,0 +1,784 @@
+{
+  "extensionDescription": {
+    "description": "Extension description",
+    "message": "Eine einfache und moderne Startseite für Ihren Browser."
+  },
+  "extensionName": {
+    "description": "Extension name",
+    "message": "NextTab"
+  },
+  "toggleTheme": {
+    "message": "Design wechseln"
+  },
+  "loading": {
+    "message": "Laden..."
+  },
+  "greeting": {
+    "description": "Greeting message",
+    "message": "Hallo, mein Name ist $NAME$",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "John Doe"
+      }
+    }
+  },
+  "hello": {
+    "description": "Placeholder example",
+    "message": "Hallo $1"
+  },
+  "searchPlaceholder": {
+    "description": "Search input placeholder",
+    "message": "Suchen..."
+  },
+  "searchCommandPlaceholder": {
+    "description": "Command search input placeholder",
+    "message": "suchen..."
+  },
+  "submitSearch": {
+    "description": "Submit search button aria label",
+    "message": "Suche abschicken"
+  },
+  "settings": {
+    "description": "Settings label",
+    "message": "Einstellungen"
+  },
+  "setYourPreferences": {
+    "description": "Settings description",
+    "message": "Einstellungen anpassen"
+  },
+  "noQuickLinks": {
+    "description": "No quick links message",
+    "message": "Keine Schnelllinks"
+  },
+  "popupKeyboardHint": {
+    "description": "Popup keyboard shortcuts hint",
+    "message": "Strg/⌘ + Klick zum Öffnen in neuem Tab | Umschalt + Strg/⌘ + Klick zum Öffnen neben dem aktuellen Tab"
+  },
+  "addCurrentPage": {
+    "description": "Add current page to quick links",
+    "message": "Aktuelle Seite hinzufügen"
+  },
+  "pageExists": {
+    "description": "Page already exists",
+    "message": "Seite bereits vorhanden"
+  },
+  "sameHostExists": {
+    "description": "Same host already has pages",
+    "message": "Website hat bereits andere Seiten"
+  },
+  "drinkWater": {
+    "description": "Drink water button tooltip",
+    "message": "Wasser trinken"
+  },
+  "drinkWaterNotificationTitle": {
+    "description": "Drink water notification title",
+    "message": "💧 Zeit zu trinken"
+  },
+  "drinkWaterNotificationMessage": {
+    "description": "Drink water notification message",
+    "message": "$USERNAME$ erinnert Sie, ausreichend Wasser zu trinken!",
+    "placeholders": {
+      "username": {
+        "content": "$1",
+        "example": "John"
+      }
+    }
+  },
+  "drinkWaterConnectionErrorTitle": {
+    "description": "Drink water connection error notification title",
+    "message": "Verbindungsfehler"
+  },
+  "drinkWaterConnectionErrorMessage": {
+    "description": "Drink water connection error notification message",
+    "message": "Erinnerung kann nicht gesendet werden: MQTT nicht verbunden. Bitte überprüfen Sie Ihre Verbindungseinstellungen."
+  },
+  "drinkWaterConfigErrorTitle": {
+    "description": "Drink water configuration error notification title",
+    "message": "Konfigurationsfehler"
+  },
+  "drinkWaterConfigErrorMessage": {
+    "description": "Drink water configuration error notification message",
+    "message": "Erinnerung kann nicht gesendet werden: Bitte geben Sie Ihren Benutzernamen in den MQTT-Einstellungen ein."
+  },
+  "commonTab": {
+    "description": "Common settings tab",
+    "message": "Allgemein"
+  },
+  "appearanceTab": {
+    "description": "Appearance settings tab",
+    "message": "Erscheinungsbild"
+  },
+  "homepageTab": {
+    "description": "Homepage settings tab",
+    "message": "Startseite"
+  },
+  "dataTab": {
+    "description": "Data settings tab",
+    "message": "Daten"
+  },
+  "serverTab": {
+    "description": "Server settings tab",
+    "message": "Server"
+  },
+  "commandTab": {
+    "description": "Command settings tab",
+    "message": "Befehl"
+  },
+  "theme": {
+    "description": "Theme setting title",
+    "message": "Design"
+  },
+  "themeDescription": {
+    "description": "Theme setting description",
+    "message": "Dunkles/helles Design wechseln."
+  },
+  "historySuggestion": {
+    "description": "History suggestion setting title",
+    "message": "Verlaufsvorschläge"
+  },
+  "historySuggestionDescription": {
+    "description": "History suggestion setting description",
+    "message": "Verlauf für Empfehlungen verwenden."
+  },
+  "autoFocusCommandInput": {
+    "description": "Auto focus command input setting title",
+    "message": "Befehlseingabe automatisch fokussieren"
+  },
+  "autoFocusCommandInputDescription": {
+    "description": "Auto focus command input setting description",
+    "message": "Befehlseingabe automatisch fokussieren."
+  },
+  "doubleClickBackgroundFocusCommand": {
+    "description": "Double click background to focus command setting title",
+    "message": "Doppelklick auf Hintergrund zum Fokussieren"
+  },
+  "doubleClickBackgroundFocusCommandDescription": {
+    "description": "Double click background to focus command setting description",
+    "message": "Befehlseingabe beim Doppelklick auf den Hintergrund fokussieren. Tastaturbenutzer können Alt+K (Windows/Linux) oder ⌘+K (Mac) verwenden."
+  },
+  "showBookmarksInQuickUrlMenu": {
+    "description": "Show bookmarks in quick URL context menu setting title",
+    "message": "Lesezeichen im Schnell-URL-Menü anzeigen"
+  },
+  "showBookmarksInQuickUrlMenuDescription": {
+    "description": "Show bookmarks in quick URL context menu setting description",
+    "message": "Zugehörige Lesezeichen beim Rechtsklick auf Schnell-URL-Elemente anzeigen."
+  },
+  "bookmarkFolder": {
+    "description": "Bookmark folder filter setting title",
+    "message": "Lesezeichenordner-Filter"
+  },
+  "bookmarkFolderDescription": {
+    "description": "Bookmark folder filter setting description",
+    "message": "Einen bestimmten Ordner auswählen, um die im Kontextmenü angezeigten Lesezeichen zu filtern. Lassen Sie 'Alle Lesezeichen' eingestellt, um Lesezeichen aus allen Ordnern anzuzeigen."
+  },
+  "allBookmarks": {
+    "description": "All bookmarks option in folder selector",
+    "message": "Alle Lesezeichen"
+  },
+  "relatedBookmarks": {
+    "description": "Related bookmarks section label in context menu",
+    "message": "Lesezeichen"
+  },
+  "showOpenTabsInQuickUrlMenu": {
+    "description": "Show open tabs in quick URL context menu setting title",
+    "message": "Geöffnete Tabs im Schnell-URL-Menü anzeigen"
+  },
+  "showOpenTabsInQuickUrlMenuDescription": {
+    "description": "Show open tabs in quick URL context menu setting description",
+    "message": "Zugehörige geöffnete Tabs beim Rechtsklick auf Schnell-URL-Elemente anzeigen."
+  },
+  "relatedOpenTabs": {
+    "description": "Related open tabs section label in context menu",
+    "message": "Tabs"
+  },
+  "viewRecentHistory": {
+    "description": "View recent history menu item",
+    "message": "Aktuellen Verlauf anzeigen"
+  },
+  "domainHistory": {
+    "description": "Domain history dialog title",
+    "message": "Domainverlauf"
+  },
+  "noHistoryFound": {
+    "description": "No history found message",
+    "message": "Kein Verlauf gefunden"
+  },
+  "historyItem": {
+    "description": "Singular history item",
+    "message": "Eintrag"
+  },
+  "historyItems": {
+    "description": "Plural history items",
+    "message": "Einträge"
+  },
+  "visits": {
+    "description": "Visit count suffix",
+    "message": "Besuche"
+  },
+  "searchInDomain": {
+    "description": "Search in domain placeholder",
+    "message": "In dieser Domain suchen..."
+  },
+  "wallpaperUrl": {
+    "description": "Wallpaper URL setting title",
+    "message": "Hintergrundbild-URL"
+  },
+  "wallpaperUrlDescription": {
+    "description": "Wallpaper URL setting description",
+    "message": "Eine benutzerdefinierte Hintergrundbild-URL festlegen."
+  },
+  "enterWallpaperUrl": {
+    "description": "Wallpaper URL input placeholder",
+    "message": "Hintergrundbild-URL eingeben"
+  },
+  "configureMqttSettings": {
+    "description": "MQTT settings description",
+    "message": "MQTT-Servereinstellungen konfigurieren, um die Kleinsignal-Funktion zu aktivieren."
+  },
+  "configureGeneralSettings": {
+    "description": "General settings description",
+    "message": "Allgemeine Einstellungen konfigurieren."
+  },
+  "configureAppearanceSettings": {
+    "description": "Appearance settings description",
+    "message": "Erscheinungsbild-Einstellungen konfigurieren."
+  },
+  "configureHomepageSettings": {
+    "description": "Homepage settings description",
+    "message": "Startseiten-Einstellungen konfigurieren."
+  },
+  "configureDataSettings": {
+    "description": "Data settings description",
+    "message": "Datenimport und -export verwalten."
+  },
+  "configureCommandSettings": {
+    "description": "Command settings description",
+    "message": "Befehls-Plugins und ihre Einstellungen konfigurieren."
+  },
+  "enable": {
+    "description": "Enable setting title",
+    "message": "Aktivieren"
+  },
+  "enableMqttDescription": {
+    "description": "Enable MQTT setting description",
+    "message": "MQTT-Kleinsignal-Funktion aktivieren oder deaktivieren."
+  },
+  "refreshConnection": {
+    "description": "Refresh connection setting title",
+    "message": "Verbindung aktualisieren"
+  },
+  "refreshConnectionDescription": {
+    "description": "Refresh connection setting description",
+    "message": "Mit dem MQTT-Server erneut verbinden."
+  },
+  "secretKey": {
+    "description": "Secret key setting title",
+    "message": "Geheimer Schlüssel"
+  },
+  "secretKeyDescription": {
+    "description": "Secret key setting description",
+    "message": "Kleinsignale kommunizieren unter demselben Schlüssel. Bitte stellen Sie sicher, dass Ihr Schlüssel komplex ist und nur mit vertrauenswürdigen Personen geteilt wird."
+  },
+  "enterSecretKey": {
+    "description": "Secret key input placeholder",
+    "message": "Geheimen Schlüssel eingeben"
+  },
+  "username": {
+    "description": "Username setting title",
+    "message": "Benutzername"
+  },
+  "usernameDescription": {
+    "description": "Username setting description",
+    "message": "Spitzname für Kleinsignal."
+  },
+  "enterUsername": {
+    "description": "Username input placeholder",
+    "message": "Benutzernamen eingeben"
+  },
+  "connected": {
+    "description": "Connected status",
+    "message": "Verbunden"
+  },
+  "disconnected": {
+    "description": "Disconnected status",
+    "message": "Getrennt"
+  },
+  "connect": {
+    "description": "Connect button",
+    "message": "Verbinden"
+  },
+  "disconnect": {
+    "description": "Disconnect button",
+    "message": "Trennen"
+  },
+  "disconnectToModify": {
+    "description": "Warning message when trying to modify MQTT settings while connected",
+    "message": "Bitte zuerst trennen, um Änderungen vorzunehmen"
+  },
+  "noResultsFound": {
+    "description": "No results found message",
+    "message": "Keine Ergebnisse gefunden."
+  },
+  "calculator": {
+    "description": "Calculator plugin name",
+    "message": "Rechner"
+  },
+  "calculatorClickToCopy": {
+    "description": "Calculator click to copy hint",
+    "message": "Klicken, um das Ergebnis zu kopieren"
+  },
+  "calculatorCopyResult": {
+    "description": "Calculator copy result description",
+    "message": "Ergebnis in die Zwischenablage kopieren"
+  },
+  "calculatorClearHistory": {
+    "description": "Calculator clear history title",
+    "message": "Verlauf löschen"
+  },
+  "calculatorClearHistoryDesc": {
+    "description": "Calculator clear history description",
+    "message": "Gesamten Berechnungsverlauf löschen"
+  },
+  "wallpaperTab": {
+    "description": "Wallpaper settings tab",
+    "message": "Hintergrundbild"
+  },
+  "wallpaperSettingsDescription": {
+    "description": "Wallpaper settings description",
+    "message": "Ein Hintergrundbild aus der Wallhaven-Topliste auswählen."
+  },
+  "wallpaperFetchError": {
+    "description": "Wallpaper fetch error message",
+    "message": "Hintergrundbilder konnten nicht geladen werden. Bitte versuchen Sie es erneut."
+  },
+  "historyWallpapers": {
+    "description": "History wallpapers section title",
+    "message": "Verlauf Hintergrundbilder"
+  },
+  "noMoreWallpapers": {
+    "description": "No more wallpapers message",
+    "message": "Keine weiteren Hintergrundbilder."
+  },
+  "wallpaperRateLimitError": {
+    "description": "Wallpaper rate limit error message",
+    "message": "Zu viele Anfragen. Bitte warten Sie einen Moment und versuchen Sie es erneut."
+  },
+  "wallpaperInvalidUrlError": {
+    "description": "Wallpaper invalid URL error message",
+    "message": "Ungültige Hintergrundbild-URL. Bitte wählen Sie ein anderes Hintergrundbild."
+  },
+  "commandPluginActive": {
+    "description": "Command plugin active setting title",
+    "message": "Aktiv"
+  },
+  "commandPluginActiveDescription": {
+    "description": "Command plugin active setting description",
+    "message": "Dieses Befehls-Plugin aktivieren oder deaktivieren."
+  },
+  "commandPluginActiveKey": {
+    "description": "Command plugin active key setting title",
+    "message": "Auslösetaste"
+  },
+  "commandPluginActiveKeyDescription": {
+    "description": "Command plugin active key setting description",
+    "message": "Präfixtaste, um dieses Plugin direkt auszulösen."
+  },
+  "commandPluginActiveKeyPlaceholder": {
+    "description": "Command plugin active key input placeholder",
+    "message": "z.B. h, g, ="
+  },
+  "commandPluginPriority": {
+    "description": "Command plugin priority setting title",
+    "message": "Priorität"
+  },
+  "commandPluginPriorityDescription": {
+    "description": "Command plugin priority setting description",
+    "message": "Niedrigere Zahl = höhere Priorität."
+  },
+  "commandPluginIncludeInGlobal": {
+    "description": "Command plugin include in global setting title",
+    "message": "In globale Suche einschließen"
+  },
+  "commandPluginIncludeInGlobalDescription": {
+    "description": "Command plugin include in global setting description",
+    "message": "Ergebnisse in der globalen Suche anzeigen."
+  },
+  "commandPluginHistory": {
+    "description": "History command plugin name",
+    "message": "Verlauf"
+  },
+  "commandPluginHistoryDescription": {
+    "description": "History command plugin description",
+    "message": "Browserverlauf durchsuchen."
+  },
+  "commandPluginTabs": {
+    "description": "Tabs command plugin name",
+    "message": "Tabs"
+  },
+  "commandPluginTabsDescription": {
+    "description": "Tabs command plugin description",
+    "message": "Geöffnete Tabs durchsuchen."
+  },
+  "commandPluginWebSearch": {
+    "description": "Web Search command plugin name",
+    "message": "Websuche"
+  },
+  "commandPluginWebSearchDescription": {
+    "description": "Web Search command plugin description",
+    "message": "Das Web mit der Standard-Suchmaschine durchsuchen."
+  },
+  "commandPluginWebSearchTitle": {
+    "description": "Web Search result title template",
+    "message": "Nach \"{query}\" suchen"
+  },
+  "commandPluginCalculator": {
+    "description": "Calculator command plugin name",
+    "message": "Rechner"
+  },
+  "commandPluginCalculatorDescription": {
+    "description": "Calculator command plugin description",
+    "message": "Mathematische Berechnungen durchführen."
+  },
+  "commandPluginNumberToRmb": {
+    "description": "Number to RMB command plugin name",
+    "message": "Zahl zu RMB"
+  },
+  "commandPluginNumberToRmbDescription": {
+    "description": "Number to RMB command plugin description",
+    "message": "Zahlen in chinesische Großbuchstaben-Währung umrechnen."
+  },
+  "numberToRmb": {
+    "description": "Number to RMB plugin name",
+    "message": "RMB Großbuchstaben"
+  },
+  "numberToRmbLabel": {
+    "description": "Number to RMB plugin label",
+    "message": "RMB Großbuchstaben"
+  },
+  "numberToRmbClickToCopy": {
+    "description": "Number to RMB click to copy hint",
+    "message": "Klicken, um das Ergebnis zu kopieren"
+  },
+  "exportSettings": {
+    "description": "Export settings button title",
+    "message": "Einstellungen exportieren"
+  },
+  "exportSettingsDescription": {
+    "description": "Export settings description",
+    "message": "Alle Einstellungen und Schnell-URLs als JSON exportieren."
+  },
+  "export": {
+    "description": "Export button text",
+    "message": "Exportieren"
+  },
+  "importSettings": {
+    "description": "Import settings button title",
+    "message": "Einstellungen importieren"
+  },
+  "importSettingsDescription": {
+    "description": "Import settings description",
+    "message": "Einstellungen und Schnell-URLs aus JSON-Datei importieren."
+  },
+  "import": {
+    "description": "Import button text",
+    "message": "Importieren"
+  },
+  "exportSettingsSuccess": {
+    "description": "Export settings success message",
+    "message": "Einstellungen erfolgreich exportiert!"
+  },
+  "exportSettingsError": {
+    "description": "Export settings error message",
+    "message": "Einstellungen konnten nicht exportiert werden. Bitte versuchen Sie es erneut."
+  },
+  "importSettingsSuccess": {
+    "description": "Import settings success message",
+    "message": "Einstellungen erfolgreich importiert!"
+  },
+  "importSettingsError": {
+    "description": "Import settings error message",
+    "message": "Einstellungen konnten nicht importiert werden: {error}"
+  },
+  "commandPluginBookmarks": {
+    "description": "Bookmarks command plugin name",
+    "message": "Lesezeichen"
+  },
+  "commandPluginBookmarksDescription": {
+    "description": "Bookmarks command plugin description",
+    "message": "Browser-Lesezeichen durchsuchen."
+  },
+  "localWallpaper": {
+    "description": "Local wallpaper section title",
+    "message": "Lokales Hintergrundbild"
+  },
+  "uploadLocalWallpaper": {
+    "description": "Upload local wallpaper button",
+    "message": "Hochladen"
+  },
+  "localWallpaperInvalidType": {
+    "description": "Local wallpaper invalid file type error",
+    "message": "Ungültiger Dateityp. Bitte wählen Sie ein JPEG-, PNG-, GIF- oder WebP-Bild."
+  },
+  "localWallpaperTooLarge": {
+    "description": "Local wallpaper file too large error",
+    "message": "Datei zu groß. Bitte wählen Sie ein Bild unter 5 MB."
+  },
+  "localWallpaperReadError": {
+    "description": "Local wallpaper read error",
+    "message": "Bilddatei konnte nicht gelesen werden. Bitte versuchen Sie es erneut."
+  },
+  "localWallpaperStorageError": {
+    "description": "Local wallpaper storage error",
+    "message": "Hintergrundbild konnte nicht gespeichert werden. Bitte versuchen Sie es erneut."
+  },
+  "localWallpaperQuotaExceeded": {
+    "description": "Local wallpaper storage quota exceeded error",
+    "message": "Speicherkontingent überschritten. Bitte versuchen Sie es mit einem kleineren Bild oder geben Sie Speicherplatz frei."
+  },
+  "clearLocalWallpaper": {
+    "description": "Clear local wallpaper button aria label",
+    "message": "Lokales Hintergrundbild löschen"
+  },
+  "selectLocalWallpaper": {
+    "description": "Select local wallpaper button aria label",
+    "message": "Lokales Hintergrundbild auswählen"
+  },
+  "customWallpaperUrl": {
+    "description": "Custom wallpaper URL section title",
+    "message": "Benutzerdefinierte Hintergrundbild-URL"
+  },
+  "wallhavenToplist": {
+    "description": "Wallhaven toplist mode button",
+    "message": "Topliste"
+  },
+  "wallhavenRandom": {
+    "description": "Wallhaven random mode button",
+    "message": "Zufällig"
+  },
+  "availablePlugins": {
+    "description": "Available plugins section title",
+    "message": "Verfügbare Plugins"
+  },
+  "availablePluginsDescription": {
+    "description": "Available plugins description",
+    "message": "Tippen zum Suchen oder Auslösetasten verwenden, um Plugins zu aktivieren"
+  },
+  "noResultsForPlugin": {
+    "description": "No results found for plugin message",
+    "message": "Keine Ergebnisse für diese Anfrage gefunden"
+  },
+  "aboutTab": {
+    "description": "About settings tab",
+    "message": "Über"
+  },
+  "aboutDescription": {
+    "description": "About settings description",
+    "message": "Informationen über die NextTab-Erweiterung"
+  },
+  "version": {
+    "description": "Version label",
+    "message": "Version"
+  },
+  "repository": {
+    "description": "Repository label",
+    "message": "Repository"
+  },
+  "viewOnGithub": {
+    "description": "View on GitHub button",
+    "message": "Auf GitHub ansehen"
+  },
+  "reportIssue": {
+    "description": "Report issue button",
+    "message": "Problem melden"
+  },
+  "reportIssueDescription": {
+    "description": "Report issue description",
+    "message": "Einen Fehler gefunden oder einen Vorschlag? Lassen Sie es uns wissen!"
+  },
+  "updates": {
+    "description": "Updates label",
+    "message": "Updates"
+  },
+  "checkForUpdates": {
+    "description": "Check for updates button",
+    "message": "Updates abrufen"
+  },
+  "checkForUpdatesDescription": {
+    "description": "Check for updates description",
+    "message": "Die Releases-Seite besuchen, um die neuesten Updates zu sehen."
+  },
+  "versionDescription": {
+    "description": "Version description",
+    "message": "Aktuelle Erweiterungsversion"
+  },
+  "repositoryDescription": {
+    "description": "Repository description",
+    "message": "GitHub-Repository für NextTab"
+  },
+  "latestVersion": {
+    "description": "Latest version label",
+    "message": "Neueste Version"
+  },
+  "latestVersionDescription": {
+    "description": "Latest version description",
+    "message": "Die neueste verfügbare Version auf GitHub"
+  },
+  "checkingForUpdates": {
+    "description": "Checking for updates message",
+    "message": "Überprüfen..."
+  },
+  "updateAvailable": {
+    "description": "Update available message",
+    "message": "Update verfügbar"
+  },
+  "upToDate": {
+    "description": "Up to date message",
+    "message": "Aktuell"
+  },
+  "failedToCheckUpdates": {
+    "description": "Failed to check for updates message",
+    "message": "Überprüfung fehlgeschlagen"
+  },
+  "commandPluginSettings": {
+    "description": "Command plugin settings section title",
+    "message": "Befehls-Plugin-Einstellungen"
+  },
+  "editQuickItem": {
+    "description": "Edit",
+    "message": "Bearbeiten"
+  },
+  "deleteQuickItem": {
+    "description": "Delete",
+    "message": "Löschen"
+  },
+  "onboardingTitle": {
+    "description": "Onboarding dialog title",
+    "message": "Willkommen bei NextTab"
+  },
+  "onboardingDescription": {
+    "description": "Onboarding dialog description",
+    "message": "Lassen Sie uns Ihre neue Tab-Seite einrichten"
+  },
+  "onboardingWelcomeTitle": {
+    "description": "Welcome step title",
+    "message": "Willkommen bei NextTab"
+  },
+  "onboardingWelcomeDescription": {
+    "description": "Welcome step description",
+    "message": "Eine einfache und moderne Startseite für Ihren Browser. Lassen Sie uns Ihre Einstellungen konfigurieren."
+  },
+  "onboardingImportSettings": {
+    "description": "Import settings button",
+    "message": "Vorhandene Einstellungen importieren"
+  },
+  "onboardingStartSetup": {
+    "description": "Start setup button",
+    "message": "Neue Einrichtung starten"
+  },
+  "onboardingSkipAll": {
+    "description": "Skip all button",
+    "message": "Einrichtung überspringen"
+  },
+  "onboardingThemeTitle": {
+    "description": "Theme step title",
+    "message": "Design wählen"
+  },
+  "onboardingThemeDescription": {
+    "description": "Theme step description",
+    "message": "Wählen Sie Ihr bevorzugtes Erscheinungsbild. Sie können dies später in den Einstellungen ändern."
+  },
+  "onboardingThemeLight": {
+    "description": "Light theme option",
+    "message": "Hell"
+  },
+  "onboardingThemeDark": {
+    "description": "Dark theme option",
+    "message": "Dunkel"
+  },
+  "onboardingThemeSystem": {
+    "description": "System theme option",
+    "message": "System"
+  },
+  "onboardingWallpaperTitle": {
+    "description": "Wallpaper step title",
+    "message": "Hintergrundbild wählen"
+  },
+  "onboardingWallpaperDescription": {
+    "description": "Wallpaper step description",
+    "message": "Wählen Sie ein Hintergrundbild. Weitere Optionen können Sie in den Einstellungen anpassen."
+  },
+  "onboardingQuickLinksTitle": {
+    "description": "Quick links step title",
+    "message": "Schnelllinks hinzufügen"
+  },
+  "onboardingQuickLinksDescription": {
+    "description": "Quick links step description",
+    "message": "Importieren Sie Ihre meistbesuchten Seiten als Schnelllinks. Deaktivieren Sie die, die Sie nicht möchten."
+  },
+  "onboardingNoTopSites": {
+    "description": "No top sites message",
+    "message": "Keine häufig besuchten Seiten gefunden. Sie können Links später manuell hinzufügen."
+  },
+  "onboardingImportSelected": {
+    "description": "Import selected sites button",
+    "message": "Ausgewählte importieren"
+  },
+  "onboardingSkip": {
+    "description": "Skip button",
+    "message": "Überspringen"
+  },
+  "onboardingCompleteTitle": {
+    "description": "Complete step title",
+    "message": "Alles bereit!"
+  },
+  "onboardingCompleteDescription": {
+    "description": "Complete step description",
+    "message": "Ihre neue Tab-Seite ist fertig. Genießen Sie Ihr personalisiertes Browsererlebnis!"
+  },
+  "onboardingCommandTip": {
+    "description": "Command tip message",
+    "message": "Profi-Tipp: Drücken Sie diese Tastenkombination jederzeit, um die Befehlspalette zu öffnen"
+  },
+  "onboardingGetStarted": {
+    "description": "Get started button",
+    "message": "Loslegen"
+  },
+  "onboardingBack": {
+    "description": "Back button",
+    "message": "Zurück"
+  },
+  "onboardingNext": {
+    "description": "Next button",
+    "message": "Weiter"
+  },
+  "restartOnboarding": {
+    "description": "Restart onboarding button",
+    "message": "Einrichtung neu starten"
+  },
+  "restartOnboardingDescription": {
+    "description": "Restart onboarding description",
+    "message": "Den Einrichtungsassistenten erneut ausführen, um Ihre Einstellungen neu zu konfigurieren."
+  },
+  "restart": {
+    "description": "Restart button",
+    "message": "Neu starten"
+  },
+  "onboardingUrlHostAlreadyExists": {
+    "description": "Already exists warning for quick links",
+    "message": "existiert bereits"
+  },
+  "onboardingWallpaperFetchError": {
+    "description": "Error message when fetching wallpapers fails",
+    "message": "Hintergrundbilder konnten nicht geladen werden, Fallback-Optionen werden angezeigt"
+  },
+  "onboardingWallpaperOption": {
+    "description": "Wallpaper option aria label prefix",
+    "message": "Hintergrundbild"
+  },
+  "onboardingImportError": {
+    "description": "Error message when importing quick links fails",
+    "message": "Schnelllinks konnten nicht importiert werden. Bitte versuchen Sie es erneut."
+  }
+}

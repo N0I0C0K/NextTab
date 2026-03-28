@@ -122,7 +122,7 @@ export const DomainHistoryDialog: FC<DomainHistoryDialogProps> = ({ domain }) =>
           <Text className="text-muted-foreground">{t('noHistoryFound')}</Text>
         </div>
       ) : (
-        <ScrollArea className="[&>div>div]:!block">
+        <ScrollArea className="flex-1 min-h-0 [&>div>div]:!block">
           {historyItems.map(item => (
             <DomainHistoryItem key={item.id} {...item} />
           ))}
