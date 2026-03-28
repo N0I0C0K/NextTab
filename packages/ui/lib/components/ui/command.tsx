@@ -13,7 +13,7 @@ const Command = React.forwardRef<
   <CommandPrimitive
     ref={ref}
     className={cn(
-      'flex h-full w-full flex-col overflow-hidden rounded-md bg-popover text-popover-foreground',
+      'flex h-full w-full flex-col overflow-hidden rounded-md backdrop-blur-2xl bg-slate-50/20 dark:bg-slate-700/20 dark:backdrop-brightness-75 text-popover-foreground shadow-md',
       className,
     )}
     {...props}
@@ -44,7 +44,7 @@ const CommandInput = React.forwardRef<
     keyBindings?: string
   }
 >(({ className, keyBindings, ...props }, ref) => (
-  <div className="flex items-center border-b px-3" cmdk-input-wrapper="">
+  <div className="flex items-center border-b border-border/30 px-3" cmdk-input-wrapper="">
     <Search className="mr-2 h-6 w-6 shrink-0 opacity-50" />
     <CommandPrimitive.Input
       ref={ref}
@@ -55,7 +55,7 @@ const CommandInput = React.forwardRef<
       )}
       {...props}
     />
-    {keyBindings && <CommandShortcut className="border rounded-sm p-0.5">{keyBindings}</CommandShortcut>}
+    {keyBindings && <CommandShortcut className="border border-border/40 rounded-sm p-0.5">{keyBindings}</CommandShortcut>}
   </div>
 ))
 
@@ -111,7 +111,7 @@ const CommandItem = React.forwardRef<
     ref={ref}
     className={cn(
       `relative flex cursor-default gap-2 select-none items-center rounded-sm text-sm outline-none
-      data-[disabled=true]:pointer-events-none data-[selected='true']:bg-accent
+      data-[disabled=true]:pointer-events-none data-[selected='true']:bg-slate-200/40 dark:data-[selected='true']:bg-slate-600/40
       data-[selected=true]:text-accent-foreground data-[disabled=true]:opacity-50 [&_svg]:pointer-events-none
       [&_svg]:size-4 [&_svg]:shrink-0`,
       className,
