@@ -1,11 +1,12 @@
-import { Stack, Text, ThemeToggle, Separator } from '@extension/ui'
-import { SunMoon } from 'lucide-react'
+import { Stack, Text, ThemeToggle, Separator, Button } from '@extension/ui'
+import { SunMoon, Image as WallpaperIcon } from 'lucide-react'
 import type { FC } from 'react'
 import { t } from '@extension/i18n'
 import { SettingItem } from './SettingItem'
-import { WallpaperSettings } from './WallpaperSettings'
+import { useWallpaperPanel } from '@src/provider'
 
 export const AppearanceSettings: FC = () => {
+  const { open } = useWallpaperPanel()
   return (
     <Stack direction={'column'} className={'gap-2 w-full'}>
       <Text gray level="s">
@@ -18,7 +19,17 @@ export const AppearanceSettings: FC = () => {
         control={<ThemeToggle />}
       />
       <Separator className="my-2" />
-      <WallpaperSettings />
+      <SettingItem
+        IconClass={WallpaperIcon}
+        title={t('wallpaperTab')}
+        description={t('wallpaperSettingsDescription')}
+        control={
+          <Button variant="outline" size="sm" onClick={open}>
+            {t('openWallpaperPanel')}
+          </Button>
+        }
+      />
     </Stack>
   )
 }
+

@@ -6,8 +6,10 @@ import type { CommandModuleRef } from './components/command'
 
 import '@/src/style/placeholder.css'
 import { HistoryArea } from './components/history-area'
+import { WallpaperPanel } from './components/wallpaper-panel'
 import { settingStorage, DEFAULT_WALLPAPER_URL, localWallpaperStorage } from '@extension/storage'
 import { useStorage } from '@extension/shared'
+import { WallpaperPanelProvider } from './provider'
 
 const TimeDisplay = () => {
   const [time, setTime] = useState<Date>(new Date())
@@ -127,8 +129,17 @@ const NewTab = () => {
       />
       <SettingPanel className="fixed top-2 right-2" />
       <OnboardingDialog />
+      <WallpaperPanel />
     </>
   )
 }
 
-export default NewTab
+const NewTabWithProviders = () => {
+  return (
+    <WallpaperPanelProvider>
+      <NewTab />
+    </WallpaperPanelProvider>
+  )
+}
+
+export default NewTabWithProviders

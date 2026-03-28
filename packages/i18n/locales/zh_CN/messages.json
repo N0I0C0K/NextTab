@@ -557,6 +557,22 @@
     "description": "Wallhaven random mode button",
     "message": "随机壁纸"
   },
+  "openWallpaperPanel": {
+    "description": "Button to open the wallpaper selection panel",
+    "message": "更换壁纸"
+  },
+  "wallpaperKeepOrUndo": {
+    "description": "Toast message asking whether to keep the new wallpaper",
+    "message": "是否保留当前壁纸？"
+  },
+  "wallpaperKeep": {
+    "description": "Keep wallpaper confirmation action button",
+    "message": "保留"
+  },
+  "wallpaperUndo": {
+    "description": "Undo wallpaper change action button",
+    "message": "回滚"
+  },
   "availablePlugins": {
     "description": "Available plugins section title",
     "message": "可用插件"
