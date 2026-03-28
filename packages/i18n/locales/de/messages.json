@@ -251,7 +251,7 @@
   },
   "configureDataSettings": {
     "description": "Data settings description",
-    "message": "Datenim- und -export verwalten."
+    "message": "Datenimport und -export verwalten."
   },
   "configureCommandSettings": {
     "description": "Command settings description",
