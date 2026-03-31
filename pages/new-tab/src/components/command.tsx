@@ -3,7 +3,7 @@ import { useDebounce, useStorage } from '@extension/shared'
 import { settingStorage } from '@extension/storage'
 import { command, Stack, Text } from '@extension/ui'
 import { commandResolverService } from '@src/service/command-resolver'
-import type { CommandQueryParams, ICommandResultGroup } from '@src/service/command-resolver'
+import type { CommandQueryPayload, ICommandResultGroup } from '@src/service/command-resolver'
 import { useEffect, useRef, useState, forwardRef, useImperativeHandle, type FC } from 'react'
 import { t } from '@extension/i18n'
 
@@ -37,7 +37,7 @@ export const CommandModule = forwardRef<
   const keyBindings = isWindows ? 'Alt+K' : '⌘+K'
 
   useEffect(() => {
-    const query: CommandQueryParams = {
+    const query: CommandQueryPayload = {
       query: inputDelay,
       rawQuery: inputDelay,
       changeQuery: (newQuery: string) => {

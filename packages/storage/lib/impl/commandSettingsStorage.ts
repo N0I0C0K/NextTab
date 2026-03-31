@@ -6,7 +6,7 @@ import deepmerge from 'deepmerge'
 /**
  * Settings for a single command plugin
  */
-export interface CommandPluginSettings {
+export interface CommandPluginStorageSettings {
   priority: number // The lower the number, the higher the priority
   active: boolean
   activeKey: string
@@ -15,28 +15,9 @@ export interface CommandPluginSettings {
 }
 
 /**
- * All command plugin settings keyed by plugin name
- */
-export type CommandSettingsData = {
-  [pluginName: string]: CommandPluginSettings
-}
-
-type DeepPartial<T> = T extends object
-  ? {
-      [K in keyof T]?: DeepPartial<T[K]>
-    }
-  : T
-
-type CommandSettingsStorage = BaseStorage<CommandSettingsData> & {
-  update: (data: DeepPartial<CommandSettingsData>) => Promise<void>
-  getPluginSettings: (pluginName: string) => Promise<CommandPluginSettings | undefined>
-  setPluginSettings: (pluginName: string, settings: Partial<CommandPluginSettings>) => Promise<void>
-}
-
-/**
  * Default settings for built-in command plugins
  */
-export const defaultCommandSettings: CommandSettingsData = {
+const defaultCommandSettingsDefinition = {
   history: {
     priority: 0,
     active: true,
@@ -74,9 +55,38 @@ export const defaultCommandSettings: CommandSettingsData = {
     activeKey: 'b',
     includeInGlobal: true,
   },
+  __internal_plugin_list__: {
+    priority: 1000,
+    active: true,
+    activeKey: '',
+    includeInGlobal: false,
+  },
+} as const satisfies Record<string, CommandPluginStorageSettings>
+
+export const defaultCommandSettings: CommandSettingsMapping = defaultCommandSettingsDefinition
+
+export type CommandPluginName = keyof typeof defaultCommandSettingsDefinition
+
+/**
+ * All command plugin settings keyed by plugin name
+ */
+export type CommandSettingsMapping = {
+  [pluginName in CommandPluginName]?: CommandPluginStorageSettings
 }
 
-const storage = createStorage<CommandSettingsData>('command-settings-storage', defaultCommandSettings, {
+type DeepPartial<T> = T extends object
+  ? {
+      [K in keyof T]?: DeepPartial<T[K]>
+    }
+  : T
+
+type CommandSettingsStorage = BaseStorage<CommandSettingsMapping> & {
+  update: (data: DeepPartial<CommandSettingsMapping>) => Promise<void>
+  getPluginSettings: (pluginName: CommandPluginName) => Promise<CommandPluginStorageSettings | undefined>
+  setPluginSettings: (pluginName: CommandPluginName, settings: Partial<CommandPluginStorageSettings>) => Promise<void>
+}
+
+const storage = createStorage<CommandSettingsMapping>('command-settings-storage', defaultCommandSettings, {
   storageEnum: StorageEnum.Local,
   liveUpdate: true,
 })
@@ -84,7 +94,7 @@ const storage = createStorage<CommandSettingsData>('command-settings-storage', d
 export const commandSettingsStorage: CommandSettingsStorage = {
   ...storage,
   update: async data => {
-    await storage.set(preVal => deepmerge(preVal, data) as CommandSettingsData)
+    await storage.set(preVal => deepmerge(preVal, data) as CommandSettingsMapping)
   },
   getPluginSettings: async pluginName => {
     const settings = await storage.get()

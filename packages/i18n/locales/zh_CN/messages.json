@@ -433,6 +433,18 @@
     "description": "Web Search result title template",
     "message": "搜索「{query}」"
   },
+  "commandPluginWebSearchTitleWithEngine": {
+    "description": "Web Search result title template with engine name",
+    "message": "用 {engine} 搜索「{query}」"
+  },
+  "commandPluginWebSearchDefaultEngine": {
+    "description": "Default search engine label",
+    "message": "默认搜索引擎"
+  },
+  "commandPluginWebSearchDefaultEngineDescription": {
+    "description": "Default search engine result description",
+    "message": "使用浏览器默认搜索引擎。"
+  },
   "commandPluginWebSearchSearchEngines": {
     "description": "Web Search custom search engines field title",
     "message": "自定义搜索引擎"
@@ -452,6 +464,30 @@
   "commandPluginWebSearchSearchEngineTemplatePlaceholderError": {
     "description": "Web Search custom search engine template placeholder validation error",
     "message": "URL 必须包含 %s 占位符。"
+  },
+  "commandPluginWebSearchSearchEngineTitle": {
+    "description": "Web Search custom search engine title label",
+    "message": "标题"
+  },
+  "commandPluginWebSearchSearchEngineTitleDescription": {
+    "description": "Web Search custom search engine title description",
+    "message": "搜索引擎的可选显示名称。"
+  },
+  "commandPluginWebSearchSearchEngineItemTitle": {
+    "description": "Web Search custom search engine item title",
+    "message": "搜索引擎"
+  },
+  "commandPluginWebSearchSearchEngineTitlePlaceholder": {
+    "description": "Placeholder for custom search engine title field",
+    "message": "例如：Google、DuckDuckGo、Perplexity"
+  },
+  "commandPluginWebSearchSearchEngineTemplatePlaceholder": {
+    "description": "Placeholder for custom search engine template field",
+    "message": "https://www.google.com/search?q=%s"
+  },
+  "commandPluginWebSearchCustomEngineFallback": {
+    "description": "Fallback label for unnamed custom search engine",
+    "message": "自定义搜索引擎"
   },
   "commandPluginCalculator": {
     "description": "Calculator command plugin name",
@@ -668,6 +704,22 @@
   "commandPluginCustomSettings": {
     "description": "Command plugin custom settings section title",
     "message": "插件专属设置"
+  },
+  "commandPluginCustomSettingsSaveButton": {
+    "description": "Save button for command plugin custom settings",
+    "message": "保存"
+  },
+  "commandPluginCustomSettingsSaved": {
+    "description": "Toast message when custom settings saved successfully",
+    "message": "设置已保存。"
+  },
+  "commandPluginCustomSettingsSaveError": {
+    "description": "Toast message when custom settings save failed",
+    "message": "保存设置失败。"
+  },
+  "commandPluginCustomSettingsValidationError": {
+    "description": "Toast message when custom settings validation fails",
+    "message": "校验失败"
   },
   "editQuickItem": {
     "description": "Edit",

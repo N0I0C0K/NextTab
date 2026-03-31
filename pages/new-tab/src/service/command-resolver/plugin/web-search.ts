@@ -1,23 +1,34 @@
 import type { ICommandResolver } from '../protocol'
+import type { UiSchema } from '@rjsf/utils'
 import { Search } from 'lucide-react'
 import { t } from '@extension/i18n'
-import type { UiSchema } from '@rjsf/utils'
-import { z } from '@extension/ui/lib/components/ui/form'
-
-const searchEngineTemplatePlaceholder = 'https://www.google.com/search?q=%s'
-const searchEnginePreviewQuery = 'nexttab'
+import { z } from 'zod'
 
 const webSearchCustomSettingsSchema = z.object({
   searchEngines: z
     .array(
-      z.string()
-        .url()
-        .refine(value => value.includes('%s'), {
-          message: t('commandPluginWebSearchSearchEngineTemplatePlaceholderError'),
+      z
+        .object({
+          title: z
+            .string()
+            .trim()
+            .optional()
+            .meta({
+              title: t('commandPluginWebSearchSearchEngineTitle'),
+              description: t('commandPluginWebSearchSearchEngineTitleDescription'),
+            }),
+          url: z
+            .url()
+            .refine(value => value.includes('%s'), {
+              message: t('commandPluginWebSearchSearchEngineTemplatePlaceholderError'),
+            })
+            .meta({
+              title: t('commandPluginWebSearchSearchEngineTemplate'),
+              description: t('commandPluginWebSearchSearchEngineTemplateDescription'),
+            }),
         })
         .meta({
-          title: t('commandPluginWebSearchSearchEngineTemplate'),
-          description: t('commandPluginWebSearchSearchEngineTemplateDescription'),
+          title: t('commandPluginWebSearchSearchEngineItemTitle'),
         }),
     )
     .default([])
@@ -35,40 +46,40 @@ const webSearchCustomSettingsUiSchema: UiSchema<WebSearchCustomSettings> = {
       orderable: false,
     },
     items: {
-      'ui:placeholder': searchEngineTemplatePlaceholder,
+      'ui:options': {
+        label: false,
+      },
+      title: {
+        'ui:placeholder': t('commandPluginWebSearchSearchEngineTitlePlaceholder'),
+      },
+      url: {
+        'ui:placeholder': t('commandPluginWebSearchSearchEngineTemplatePlaceholder'),
+      },
     },
   },
-}
-
-function getWebSearchCustomSettings(customSettings: Record<string, unknown> | undefined): WebSearchCustomSettings {
-  const parsedSettings = webSearchCustomSettingsSchema.safeParse(customSettings ?? {})
-  if (!parsedSettings.success) {
-    console.warn('Invalid web search custom settings, falling back to defaults.', parsedSettings.error)
-    return webSearchCustomSettingsSchema.parse({})
-  }
-  return parsedSettings.data
 }
 
 function buildSearchUrl(template: string, query: string): string {
   return template.replaceAll('%s', encodeURIComponent(query))
 }
 
-function getSearchEngineDescription(template: string): string {
+function getSearchEngineDisplayName(searchEngine: WebSearchCustomSettings['searchEngines'][number]): string {
+  if (searchEngine.title && searchEngine.title.length > 0) {
+    return searchEngine.title
+  }
+
   try {
-    return new URL(buildSearchUrl(template, searchEnginePreviewQuery)).hostname
+    return new URL(searchEngine.url).hostname
   } catch {
-    return template
+    return t('commandPluginWebSearchCustomEngineFallback')
   }
 }
 
-export const webSearchResolver: ICommandResolver = {
-  settings: {
-    priority: 100,
-    active: true,
-    includeInGlobal: true,
-    activeKey: 'g',
-    customSettings: webSearchCustomSettingsSchema.parse({}),
-  },
+function createSearchResultTitle(query: string, engineName: string): string {
+  return t('commandPluginWebSearchTitleWithEngine').replace('{query}', query).replace('{engine}', engineName)
+}
+
+export const webSearchResolver: ICommandResolver<typeof webSearchCustomSettingsSchema> = {
   customSettingsSchema: webSearchCustomSettingsSchema,
   customSettingsUiSchema: webSearchCustomSettingsUiSchema,
   properties: {
@@ -80,32 +91,42 @@ export const webSearchResolver: ICommandResolver = {
   async resolve(params) {
     if (params.query.length === 0) return null
 
-    const { searchEngines } = getWebSearchCustomSettings(this.settings.customSettings)
-    if (searchEngines.length > 0) {
-      return searchEngines.map((searchEngine, index) => ({
-        id: `search-engine-${index}`,
-        title: t('commandPluginWebSearchTitle').replace('{query}', params.query),
-        description: getSearchEngineDescription(searchEngine),
-        IconType: Search,
-        onSelect: () => {
-          chrome.tabs.create({
-            url: buildSearchUrl(searchEngine, params.query),
-            active: true,
-          })
-        },
-      }))
-    }
-
-    return [
+    const results = [
       {
-        id: `search-unique-key`,
-        title: t('commandPluginWebSearchTitle').replace('{query}', params.query),
-        description: t('commandPluginWebSearchDescription'),
+        id: 'search-default-engine',
+        title: createSearchResultTitle(params.query, t('commandPluginWebSearchDefaultEngine')),
+        description: t('commandPluginWebSearchDefaultEngineDescription'),
         IconType: Search,
         onSelect: () => {
           chrome.search.query({ text: params.query, disposition: 'NEW_TAB' })
         },
       },
     ]
+
+    if (!params.settings.customSettings) return results
+
+    const { searchEngines } = params.settings.customSettings
+    if (searchEngines.length > 0) {
+      return [
+        ...results,
+        ...searchEngines.map((searchEngine, index) => {
+          const engineName = getSearchEngineDisplayName(searchEngine)
+          return {
+            id: `search-engine-${index}`,
+            title: createSearchResultTitle(params.query, engineName),
+            description: buildSearchUrl(searchEngine.url, params.query),
+            IconType: Search,
+            onSelect: () => {
+              chrome.tabs.create({
+                url: buildSearchUrl(searchEngine.url, params.query),
+                active: true,
+              })
+            },
+          }
+        }),
+      ]
+    }
+
+    return results
   },
 }

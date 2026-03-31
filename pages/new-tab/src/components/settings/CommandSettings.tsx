@@ -1,10 +1,8 @@
 import { useStorage } from '@extension/shared'
 import { commandSettingsStorage, defaultCommandSettings, settingStorage } from '@extension/storage'
-import type { CommandPluginSettings } from '@extension/storage'
-import type { IChangeEvent } from '@rjsf/core'
+import type { CommandPluginStorageSettings, CommandPluginName } from '@extension/storage'
 import RjsfForm from '@rjsf/shadcn'
-import type { RJSFSchema } from '@rjsf/utils'
-import validator from '@rjsf/validator-ajv8'
+import type { RJSFSchema, ValidatorType } from '@rjsf/utils'
 import {
   Stack,
   Text,
@@ -16,20 +14,33 @@ import {
   AccordionItem,
   AccordionTrigger,
   AccordionContent,
+  Button,
+  toast,
 } from '@extension/ui'
 import { z } from '@extension/ui/lib/components/ui/form'
 import { Layers, Pointer, MousePointerClick } from 'lucide-react'
-import { useEffect, useMemo, useState, type FC } from 'react'
+import { useCallback, useEffect, useMemo, useState, type FC } from 'react'
 import { t } from '@extension/i18n'
 import type { ICommandResolver } from '@src/service/command-resolver'
 import { commandResolverService } from '@src/service/command-resolver'
 import { cn } from '@/lib/utils'
 import { SettingItem } from './SettingItem'
 
+/**
+ * No-op validator that satisfies the RJSF ValidatorType interface.
+ * Avoids the CSP `unsafe-eval` violation caused by @rjsf/validator-ajv8 (which uses `new Function()`).
+ * Actual validation is handled by zod schemas on save.
+ */
+const noopValidator: ValidatorType = {
+  validateFormData: () => ({ errors: [], errorSchema: {} }),
+  isValid: () => true,
+  rawValidation: () => ({}),
+}
+
 const CommandPluginCustomSettingsForm: FC<{
   plugin: ICommandResolver
-  settings: CommandPluginSettings
-  onUpdate: (settings: Partial<CommandPluginSettings>) => Promise<void>
+  settings: CommandPluginStorageSettings
+  onUpdate: (settings: Partial<CommandPluginStorageSettings>) => Promise<void>
 }> = ({ plugin, settings, onUpdate }) => {
   const schema = useMemo(() => {
     if (!plugin.customSettingsSchema) {
@@ -48,6 +59,23 @@ const CommandPluginCustomSettingsForm: FC<{
     setFormData(settings.customSettings ?? {})
   }, [settings.customSettings])
 
+  const handleSave = useCallback(async () => {
+    if (!plugin.customSettingsSchema) return
+    const result = plugin.customSettingsSchema.safeParse(formData)
+    if (!result.success) {
+      const messages = result.error.issues.map(issue => issue.message).join('\n')
+      toast.error(t('commandPluginCustomSettingsValidationError'), { description: messages })
+      return
+    }
+    try {
+      await onUpdate({ customSettings: result.data as Record<string, unknown> })
+      toast.success(t('commandPluginCustomSettingsSaved'))
+    } catch (error) {
+      console.error('Failed to update command plugin custom settings.', error)
+      toast.error(t('commandPluginCustomSettingsSaveError'))
+    }
+  }, [formData, plugin.customSettingsSchema, onUpdate])
+
   if (!schema) {
     return null
   }
@@ -61,23 +89,14 @@ const CommandPluginCustomSettingsForm: FC<{
         schema={schema}
         uiSchema={plugin.customSettingsUiSchema}
         formData={formData}
-        validator={validator}
+        validator={noopValidator}
+        noValidate
         noHtml5Validate
         showErrorList={false}
-        onChange={async (event: IChangeEvent<Record<string, unknown>, RJSFSchema>) => {
-          const nextFormData = event.formData ?? {}
-          setFormData(nextFormData)
-
-          if (event.errors.length === 0) {
-            try {
-              await onUpdate({ customSettings: nextFormData })
-            } catch (error) {
-              console.error('Failed to update command plugin custom settings.', error)
-            }
-          }
-        }}>
-        {/* Render no children so RJSF does not add its default submit button to this auto-save form. */}
-        {null}
+        onChange={event => setFormData(event.formData ?? {})}>
+        <Button type="button" size="sm" className="mt-2" onClick={handleSave}>
+          {t('commandPluginCustomSettingsSaveButton')}
+        </Button>
       </RjsfForm>
     </div>
   )
@@ -85,8 +104,8 @@ const CommandPluginCustomSettingsForm: FC<{
 
 const CommandPluginSettingItem: FC<{
   plugin: ICommandResolver
-  settings: CommandPluginSettings
-  onUpdate: (settings: Partial<CommandPluginSettings>) => Promise<void>
+  settings: CommandPluginStorageSettings
+  onUpdate: (settings: Partial<CommandPluginStorageSettings>) => Promise<void>
 }> = ({ plugin, settings, onUpdate }) => {
   const IconType = plugin.properties.icon ?? Layers
   return (
@@ -161,7 +180,7 @@ export const CommandSettings: FC = () => {
   const settings = useStorage(settingStorage)
 
   const [plugins] = useState(commandResolverService.registeredResolvers)
-  const handlePluginUpdate = async (pluginName: string, updates: Partial<CommandPluginSettings>) => {
+  const handlePluginUpdate = async (pluginName: CommandPluginName, updates: Partial<CommandPluginStorageSettings>) => {
     await commandSettingsStorage.setPluginSettings(pluginName, updates)
   }
 

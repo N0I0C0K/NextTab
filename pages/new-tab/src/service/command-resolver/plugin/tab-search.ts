@@ -3,10 +3,6 @@ import { t } from '@extension/i18n'
 import { Columns } from 'lucide-react'
 
 export const tabSearchResolver: ICommandResolver = {
-  settings: {
-    priority: 0,
-    active: true,
-  },
   properties: {
     name: 'tabs',
     displayName: t('commandPluginTabs'),
