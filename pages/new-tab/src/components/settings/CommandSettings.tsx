@@ -1,7 +1,7 @@
 import { useStorage } from '@extension/shared'
 import { commandSettingsStorage, defaultCommandSettings, settingStorage } from '@extension/storage'
 import type { CommandPluginStorageSettings, CommandPluginName } from '@extension/storage'
-import RjsfForm from '@rjsf/shadcn'
+import Form from '@rjsf/core'
 import type { RJSFSchema, ValidatorType } from '@rjsf/utils'
 import {
   Stack,
@@ -25,6 +25,7 @@ import type { ICommandResolver } from '@src/service/command-resolver'
 import { commandResolverService } from '@src/service/command-resolver'
 import { cn } from '@/lib/utils'
 import { SettingItem } from './SettingItem'
+import { rjsfTemplates, rjsfWidgets } from './rjsf-theme'
 
 /**
  * No-op validator that satisfies the RJSF ValidatorType interface.
@@ -35,6 +36,7 @@ const noopValidator: ValidatorType = {
   validateFormData: () => ({ errors: [], errorSchema: {} }),
   isValid: () => true,
   rawValidation: () => ({}),
+  toErrorList: (): ReturnType<ValidatorType['toErrorList']> => [],
 }
 
 const CommandPluginCustomSettingsForm: FC<{
@@ -85,11 +87,13 @@ const CommandPluginCustomSettingsForm: FC<{
       <Text level="s" className="mb-2 font-medium">
         {t('commandPluginCustomSettings')}
       </Text>
-      <RjsfForm
+      <Form
         schema={schema}
         uiSchema={plugin.customSettingsUiSchema}
         formData={formData}
         validator={noopValidator}
+        templates={rjsfTemplates}
+        widgets={rjsfWidgets}
         noValidate
         noHtml5Validate
         showErrorList={false}
@@ -97,7 +101,7 @@ const CommandPluginCustomSettingsForm: FC<{
         <Button type="button" size="sm" className="mt-2" onClick={handleSave}>
           {t('commandPluginCustomSettingsSaveButton')}
         </Button>
-      </RjsfForm>
+      </Form>
     </div>
   )
 }

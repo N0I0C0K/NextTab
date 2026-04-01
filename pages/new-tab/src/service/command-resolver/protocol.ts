@@ -1,6 +1,6 @@
 import type { CommandPluginName } from '@extension/storage'
 import type { UiSchema } from '@rjsf/utils'
-import type { ZodType, z } from 'zod'
+import type { ZodType } from 'zod'
 
 export type CommandQueryPayload = {
   query: string // Query with trigger key stripped (what the user actually wants to search)
@@ -43,13 +43,15 @@ export interface CommandResolveParams<T> extends CommandQueryPayload {
   settings: CommandSettings<T>
 }
 
-export interface ICommandResolver<T extends ZodType = ZodType> {
+export interface ICommandResolver<T extends ZodType<Record<string, unknown>> = ZodType<Record<string, unknown>>> {
   properties: CommandProperties
   customSettingsSchema?: T
   customSettingsUiSchema?: UiSchema
-  resolve: (this: ICommandResolver<T>, params: CommandResolveParams<z.infer<T>>) => Promise<ICommandResult[] | null>
+  resolve: (this: ICommandResolver<T>, params: CommandResolveParams<T['_output']>) => Promise<ICommandResult[] | null>
 }
 
-export interface ICommandResolverWithSettings<T extends ZodType = ZodType> extends ICommandResolver<T> {
-  readonly settings: CommandSettings<z.infer<T>>
+export interface ICommandResolverWithSettings<
+  T extends ZodType<Record<string, unknown>> = ZodType<Record<string, unknown>>,
+> extends ICommandResolver<T> {
+  readonly settings: CommandSettings<T['_output']>
 }

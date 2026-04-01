@@ -85,8 +85,13 @@
       "prettier --write"
     ]
   },
-  "packageManager": "pnpm@10.33.0",
+  "packageManager": "pnpm@9.9.0",
   "engines": {
     "node": ">=18.19.1"
+  },
+  "pnpm": {
+    "overrides": {
+      "basic-ftp": "5.2.0"
+    }
   }
 }

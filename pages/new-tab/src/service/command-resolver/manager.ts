@@ -21,7 +21,7 @@ import { commandSettingsStorage, defaultCommandSettings } from '@extension/stora
 import type { CommandSettingsMapping, CommandPluginStorageSettings } from '@extension/storage'
 import { stripTriggerKeyForPlugin } from './utils'
 import { filter } from 'lodash'
-import type { z } from 'zod'
+import type { ZodType } from 'zod'
 
 export type IDisposable = {
   dispose: () => void
@@ -34,16 +34,16 @@ const fallbackSettings: CommandPluginStorageSettings = {
   activeKey: '',
 }
 
-function createResolverWithSettings<T extends z.ZodType>(
+function createResolverWithSettings<T extends ZodType<Record<string, unknown>>>(
   resolver: ICommandResolver<T>,
   settingProxy: () => CommandPluginStorageSettings,
 ): ICommandResolverWithSettings<T> {
   let cachedRawSettings: CommandPluginStorageSettings | null = null
-  let cachedSettings: CommandSettings<z.infer<T>> | null = null
+  let cachedSettings: CommandSettings<T['_output']> | null = null
 
   return {
     ...resolver,
-    get settings(): CommandSettings<z.infer<T>> {
+    get settings(): CommandSettings<T['_output']> {
       const rawSettings = settingProxy()
       if (cachedRawSettings === rawSettings && cachedSettings) {
         return cachedSettings
@@ -100,7 +100,7 @@ class CommandResolverService {
     return this._storageSettings
   }
 
-  private generateResolverSettingProxy<T extends z.ZodType>(
+  private generateResolverSettingProxy<T extends ZodType<Record<string, unknown>>>(
     resolver: ICommandResolver<T>,
   ): () => CommandPluginStorageSettings {
     return () => {
@@ -114,7 +114,7 @@ class CommandResolverService {
     }
   }
 
-  register<T extends z.ZodType>(resolver: ICommandResolver<T>) {
+  register<T extends ZodType<Record<string, unknown>>>(resolver: ICommandResolver<T>) {
     this.resolvers.push(createResolverWithSettings(resolver, this.generateResolverSettingProxy(resolver)))
     this.sortResolvers()
   }
@@ -190,7 +190,7 @@ class CommandResolverService {
           const strippedQuery = stripTriggerKeyForPlugin(params.rawQuery, settings.activeKey)
 
           // Create params with plugin-specific stripped query
-          const pluginParams: CommandResolveParams<z.infer<typeof it.customSettingsSchema>> = {
+          const pluginParams: CommandResolveParams<Record<string, unknown>> = {
             ...baseParams,
             query: strippedQuery,
             settings,
