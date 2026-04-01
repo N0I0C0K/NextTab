@@ -2,19 +2,7 @@ import { cn } from '@/lib/utils'
 import { useStorage } from '@extension/shared'
 import { localWallpaperStorage, settingStorage, wallpaperHistoryStorage } from '@extension/storage'
 import type { WallhavenSortMode, WallpaperType } from '@extension/storage'
-import {
-  Button,
-  Stack,
-  Text,
-  Separator,
-  Input,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  toast,
-} from '@extension/ui'
+import { Button, Stack, Text, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, toast } from '@extension/ui'
 import { Check, Loader2, RefreshCw, History, Trash2, X, Link, Image as WallpaperIcon } from 'lucide-react'
 import { type FC, useCallback, useEffect, useRef, useState } from 'react'
 import { t } from '@extension/i18n'
@@ -265,7 +253,8 @@ const WallpaperPanelContent: FC = () => {
     [fetchWallpapers],
   )
 
-  const showConfirmationToast = useCallback((url: string, thumbnailUrl: string, prevUrl: string | null, prevType: WallpaperType) => {
+  const showConfirmationToast = useCallback(
+    (url: string, thumbnailUrl: string, previousWallpaperUrl: string | null, previousWallpaperType: WallpaperType) => {
     // Dismiss any existing confirmation toast
     if (pendingToastRef.current !== null) {
       toast.dismiss(pendingToastRef.current)
@@ -276,7 +265,7 @@ const WallpaperPanelContent: FC = () => {
       wallpaperHistoryStorage.addToHistory(url, thumbnailUrl)
     }
     const revert = () => {
-      settingStorage.update({ wallpaperUrl: prevUrl, wallpaperType: prevType })
+      settingStorage.update({ wallpaperUrl: previousWallpaperUrl, wallpaperType: previousWallpaperType })
     }
 
     const toastId = toast(t('wallpaperKeepOrUndo'), {
@@ -313,7 +302,9 @@ const WallpaperPanelContent: FC = () => {
     })
 
     pendingToastRef.current = toastId
-  }, [])
+    },
+    [],
+  )
 
   const handleSelectWallpaper = useCallback(
     async (url: string, thumbnailUrl: string) => {
@@ -347,96 +338,97 @@ const WallpaperPanelContent: FC = () => {
   }, [])
 
   return (
-    <Stack direction={'column'} className={'gap-2 w-full'}>
-      {/* Custom Wallpaper URL Section */}
-      <Stack direction={'row'} className="items-center gap-2">
-        <Link className="size-4 text-muted-foreground" />
-        <Text gray level="s">
-          {t('customWallpaperUrl')}
-        </Text>
-      </Stack>
-      <Input
-        placeholder={t('enterWallpaperUrl')}
-        value={settings.wallpaperUrl || ''}
-        onChange={e => {
-          const newUrl = e.target.value
-          if (newUrl && settings.wallpaperType === 'local') {
-            settingStorage.update({ wallpaperUrl: newUrl, wallpaperType: 'url' })
-          } else {
-            settingStorage.update({ wallpaperUrl: newUrl })
-          }
-        }}
-      />
-
-      <Separator className="my-2" />
-
-      {/* Wallhaven Gallery Section */}
-      <Stack direction={'row'} className="items-center justify-between">
-        <Text gray level="s">
-          {t('wallpaperSettingsDescription')}
-        </Text>
+    <Stack direction={'column'} className={'gap-4 w-full pb-2'}>
+      <div className="rounded-2xl border border-border/60 bg-background/95 p-4 shadow-sm">
         <Stack direction={'row'} className="items-center gap-2">
-          <Select
-            value={settings.wallhavenSortMode}
-            onValueChange={value => handleSortModeChange(value as WallhavenSortMode)}
-            disabled={isLoading}>
-            <SelectTrigger className="w-[140px] h-9">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="toplist">{t('wallhavenToplist')}</SelectItem>
-              <SelectItem value="random">{t('wallhavenRandom')}</SelectItem>
-            </SelectContent>
-          </Select>
-          <Button variant="ghost" size="sm" onClick={handleRefresh} disabled={isLoading}>
-            <RefreshCw className={cn('size-4', isLoading && 'animate-spin')} />
-          </Button>
-        </Stack>
-      </Stack>
-
-      {error && (
-        <div className="rounded-md bg-destructive/10 p-3 text-center">
-          <Text level="s" className="text-destructive">
-            {error}
+          <Link className="size-4 text-muted-foreground" />
+          <Text gray level="s">
+            {t('customWallpaperUrl')}
           </Text>
-        </div>
-      )}
+        </Stack>
+        <Input
+          className="mt-3"
+          placeholder={t('enterWallpaperUrl')}
+          value={settings.wallpaperUrl || ''}
+          onChange={e => {
+            const newUrl = e.target.value
+            if (newUrl && settings.wallpaperType === 'local') {
+              settingStorage.update({ wallpaperUrl: newUrl, wallpaperType: 'url' })
+            } else {
+              settingStorage.update({ wallpaperUrl: newUrl })
+            }
+          }}
+        />
+      </div>
 
-      {isLoading && wallpapers.length === 0 ? (
-        <div className="flex items-center justify-center py-8">
-          <Loader2 className="size-8 animate-spin text-muted-foreground" />
-        </div>
-      ) : (
-        <div ref={scrollContainerRef} className="h-[280px] overflow-y-auto pr-2">
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
-            {wallpapers.map(wallpaper => (
-              <WallpaperCard
-                key={wallpaper.id}
-                wallpaper={wallpaper}
-                isSelected={settings.wallpaperType === 'url' && settings.wallpaperUrl === wallpaper.path}
-                onSelect={handleSelectWallpaper}
-              />
-            ))}
+      <div className="rounded-2xl border border-border/60 bg-background/95 p-4 shadow-sm">
+        <Stack direction={'row'} className="items-start justify-between gap-3">
+          <div>
+            <Text gray level="s">
+              {t('wallpaperSettingsDescription')}
+            </Text>
           </div>
-          {isLoadingMore && (
-            <div className="flex items-center justify-center py-4">
-              <Loader2 className="size-6 animate-spin text-muted-foreground" />
-            </div>
-          )}
-          {!hasMore && wallpapers.length > 0 && (
-            <div className="py-4 text-center">
-              <Text gray level="xs">
-                {t('noMoreWallpapers')}
-              </Text>
-            </div>
-          )}
-        </div>
-      )}
+          <Stack direction={'row'} className="items-center gap-2">
+            <Select
+              value={settings.wallhavenSortMode}
+              onValueChange={value => handleSortModeChange(value as WallhavenSortMode)}
+              disabled={isLoading}>
+              <SelectTrigger className="h-9 w-[128px] bg-background">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="toplist">{t('wallhavenToplist')}</SelectItem>
+                <SelectItem value="random">{t('wallhavenRandom')}</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button variant="outline" size="sm" onClick={handleRefresh} disabled={isLoading} className="bg-background">
+              <RefreshCw className={cn('size-4', isLoading && 'animate-spin')} />
+            </Button>
+          </Stack>
+        </Stack>
 
-      {/* History Wallpapers Section */}
+        {error && (
+          <div className="mt-3 rounded-xl bg-destructive/10 p-3 text-center">
+            <Text level="s" className="text-destructive">
+              {error}
+            </Text>
+          </div>
+        )}
+
+        {isLoading && wallpapers.length === 0 ? (
+          <div className="flex items-center justify-center py-8">
+            <Loader2 className="size-8 animate-spin text-muted-foreground" />
+          </div>
+        ) : (
+          <div ref={scrollContainerRef} className="mt-4 h-[240px] overflow-y-auto pr-2">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+              {wallpapers.map(wallpaper => (
+                <WallpaperCard
+                  key={wallpaper.id}
+                  wallpaper={wallpaper}
+                  isSelected={settings.wallpaperType === 'url' && settings.wallpaperUrl === wallpaper.path}
+                  onSelect={handleSelectWallpaper}
+                />
+              ))}
+            </div>
+            {isLoadingMore && (
+              <div className="flex items-center justify-center py-4">
+                <Loader2 className="size-6 animate-spin text-muted-foreground" />
+              </div>
+            )}
+            {!hasMore && wallpapers.length > 0 && (
+              <div className="py-4 text-center">
+                <Text gray level="xs">
+                  {t('noMoreWallpapers')}
+                </Text>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
       {historyData.history.length > 0 && (
-        <>
-          <Separator className="my-2" />
+        <div className="rounded-2xl border border-border/60 bg-background/95 p-4 shadow-sm">
           <Stack direction={'row'} className="items-center justify-between">
             <Stack direction={'row'} className="items-center gap-1">
               <History className="size-4 text-muted-foreground" />
@@ -448,7 +440,7 @@ const WallpaperPanelContent: FC = () => {
               <Trash2 className="size-4" />
             </Button>
           </Stack>
-          <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5">
+          <div className="mt-3 grid grid-cols-3 gap-3 sm:grid-cols-4">
             {historyData.history.map(item => (
               <HistoryWallpaperCard
                 key={item.url}
@@ -460,12 +452,12 @@ const WallpaperPanelContent: FC = () => {
               />
             ))}
           </div>
-        </>
+        </div>
       )}
 
-      {/* Local Wallpaper Section */}
-      <Separator className="my-2" />
-      <LocalWallpaperSection />
+      <div className="rounded-2xl border border-border/60 bg-background/95 p-4 shadow-sm">
+        <LocalWallpaperSection />
+      </div>
     </Stack>
   )
 }
@@ -478,38 +470,58 @@ export const WallpaperPanel: FC = () => {
   const currentThumbnail =
     settings.wallpaperType === 'local' && localWallpaper.imageData ? localWallpaper.imageData : settings.wallpaperUrl
 
+  useEffect(() => {
+    if (!isOpen) return
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        close()
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [close, isOpen])
+
   return (
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Backdrop */}
           <motion.div
             key="wallpaper-panel-backdrop"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm"
+            transition={{ duration: 0.16 }}
+            className="fixed inset-0 z-40 bg-transparent"
+            aria-label="Close wallpaper panel"
             onClick={close}
           />
 
-          {/* Panel */}
           <motion.div
             key="wallpaper-panel"
-            initial={{ y: '100%' }}
+            initial={{ y: 36, opacity: 0 }}
             animate={{ y: 0 }}
-            exit={{ y: '100%' }}
-            transition={{ type: 'spring', damping: 28, stiffness: 280 }}
-            className="fixed bottom-0 left-0 right-0 z-50 flex flex-col bg-background/95 backdrop-blur-xl
-              rounded-t-2xl shadow-2xl max-h-[80vh]">
-            {/* Panel Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-border/50 flex-shrink-0">
+            exit={{ y: 36, opacity: 0 }}
+            transition={{ type: 'spring', damping: 26, stiffness: 320 }}
+            className="fixed inset-x-0 bottom-4 z-50 mx-auto flex max-h-[68vh] w-[min(42rem,calc(100vw-1.5rem))]
+              flex-col overflow-hidden rounded-3xl border border-border/70 bg-background/96 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-border/50 px-5 py-4">
               <Stack direction={'row'} className="items-center gap-3">
-                <WallpaperIcon className="size-5 text-muted-foreground" />
-                <Text className="font-semibold text-base">{t('wallpaperTab')}</Text>
+                <div className="flex size-9 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                  <WallpaperIcon className="size-4" />
+                </div>
+                <div className="min-w-0">
+                  <Text className="font-semibold text-base">{t('wallpaperTab')}</Text>
+                  <Text gray level="xs" className="mt-0.5">
+                    {t('wallpaperPreviewHint')}
+                  </Text>
+                </div>
                 {currentThumbnail && (
-                  <div className="w-8 h-5 rounded overflow-hidden border border-border/50">
-                    <img src={currentThumbnail} alt="current wallpaper" className="w-full h-full object-cover" />
+                  <div className="hidden h-10 w-16 overflow-hidden rounded-xl border border-border/50 sm:block">
+                    <img src={currentThumbnail} alt="current wallpaper" className="h-full w-full object-cover" />
                   </div>
                 )}
               </Stack>
@@ -518,8 +530,7 @@ export const WallpaperPanel: FC = () => {
               </Button>
             </div>
 
-            {/* Panel Content */}
-            <div className="flex-1 overflow-y-auto px-6 py-4">
+            <div className="flex-1 overflow-y-auto bg-gradient-to-b from-background to-muted/20 px-4 py-4 sm:px-5">
               <WallpaperPanelContent />
             </div>
           </motion.div>

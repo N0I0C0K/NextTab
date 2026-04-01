@@ -573,6 +573,10 @@
     "description": "Undo wallpaper change action button",
     "message": "Rückgängig"
   },
+  "wallpaperPreviewHint": {
+    "description": "Hint text explaining wallpaper selection previews on the home page",
+    "message": "Die Vorschau wird direkt auf dem Hintergrund der Startseite angezeigt"
+  },
   "availablePlugins": {
     "description": "Available plugins section title",
     "message": "Verfügbare Plugins"

@@ -1,4 +1,4 @@
-import { Stack, Text, ThemeToggle, Separator, Button } from '@extension/ui'
+import { Stack, Text, ThemeToggle, Separator, Button, DialogClose } from '@extension/ui'
 import { SunMoon, Image as WallpaperIcon } from 'lucide-react'
 import type { FC } from 'react'
 import { t } from '@extension/i18n'
@@ -24,12 +24,13 @@ export const AppearanceSettings: FC = () => {
         title={t('wallpaperTab')}
         description={t('wallpaperSettingsDescription')}
         control={
-          <Button variant="outline" size="sm" onClick={open}>
-            {t('openWallpaperPanel')}
-          </Button>
+          <DialogClose asChild>
+            <Button variant="outline" size="sm" onClick={open}>
+              {t('openWallpaperPanel')}
+            </Button>
+          </DialogClose>
         }
       />
     </Stack>
   )
 }
-

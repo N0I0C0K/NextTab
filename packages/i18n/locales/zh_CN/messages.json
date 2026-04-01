@@ -573,6 +573,10 @@
     "description": "Undo wallpaper change action button",
     "message": "回滚"
   },
+  "wallpaperPreviewHint": {
+    "description": "Hint text explaining wallpaper selection previews on the home page",
+    "message": "预览会直接应用到主页背景"
+  },
   "availablePlugins": {
     "description": "Available plugins section title",
     "message": "可用插件"
