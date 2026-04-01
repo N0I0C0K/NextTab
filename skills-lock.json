@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "skills": {
+    "building-components": {
+      "source": "vercel/components.build",
+      "sourceType": "github",
+      "computedHash": "cb71f9b5e9cf87c2e0a69384347818ddbbf50dd372cf7e7f90877b397de87e83"
+    },
+    "web-design-guidelines": {
+      "source": "vercel-labs/agent-skills",
+      "sourceType": "github",
+      "computedHash": "d8e7d3afe37dcc8a97b99ffb5afdb4d0919ae0092ea8b68f44eb201f035e33ac"
+    }
+  }
+}
