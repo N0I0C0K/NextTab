@@ -11,7 +11,7 @@ function App() {
     <div>
       <GlobalDialog>
         <NewTab />
-        <Toaster invert={theme.realTheme === 'light'} />
+        <Toaster invert={theme.realTheme === 'light'} style={{ zIndex: 100 }} />
       </GlobalDialog>
     </div>
   )
