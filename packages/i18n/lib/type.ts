@@ -5,7 +5,8 @@
 import type enMessage from '../locales/en/messages.json'
 import type deMessage from '../locales/de/messages.json'
 import type zh_CNMessage from '../locales/zh_CN/messages.json'
+import type zh_TWMessage from '../locales/zh_TW/messages.json'
 
-export type MessageKey = keyof typeof enMessage & keyof typeof deMessage & keyof typeof zh_CNMessage
+export type MessageKey = keyof typeof enMessage & keyof typeof deMessage & keyof typeof zh_CNMessage & keyof typeof zh_TWMessage
 
-export type DevLocale = 'en' | 'de' | 'zh_CN'
+export type DevLocale = 'en' | 'de' | 'zh_CN' | 'zh_TW'

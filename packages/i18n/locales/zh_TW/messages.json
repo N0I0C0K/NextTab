@@ -1,0 +1,784 @@
+{
+  "extensionDescription": {
+    "description": "Extension description",
+    "message": "一個簡單且現代的瀏覽器起始介面。"
+  },
+  "extensionName": {
+    "description": "Extension name",
+    "message": "NextTab"
+  },
+  "toggleTheme": {
+    "message": "切換主題"
+  },
+  "loading": {
+    "message": "載入中..."
+  },
+  "greeting": {
+    "description": "Greeting message",
+    "message": "你好，我的名字是 $NAME$",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "張三"
+      }
+    }
+  },
+  "hello": {
+    "description": "Placeholder example",
+    "message": "你好 $1"
+  },
+  "searchPlaceholder": {
+    "description": "Search input placeholder",
+    "message": "搜尋..."
+  },
+  "searchCommandPlaceholder": {
+    "description": "Command search input placeholder",
+    "message": "搜尋..."
+  },
+  "submitSearch": {
+    "description": "Submit search button aria label",
+    "message": "提交搜尋"
+  },
+  "settings": {
+    "description": "Settings label",
+    "message": "設定"
+  },
+  "setYourPreferences": {
+    "description": "Settings description",
+    "message": "設定您的偏好"
+  },
+  "drinkWater": {
+    "description": "Drink water button tooltip",
+    "message": "喝水"
+  },
+  "noQuickLinks": {
+    "description": "No quick links message",
+    "message": "暫無快捷連結"
+  },
+  "popupKeyboardHint": {
+    "description": "Popup keyboard shortcuts hint",
+    "message": "Ctrl/⌘+點選：新標籤頁開啟 | Shift + Ctrl/⌘ + 點選：在當前 Tab 旁邊開啟"
+  },
+  "addCurrentPage": {
+    "description": "Add current page to quick links",
+    "message": "新增當前頁面"
+  },
+  "pageExists": {
+    "description": "Page already exists",
+    "message": "頁面已存在"
+  },
+  "sameHostExists": {
+    "description": "Same host already has pages",
+    "message": "該網站已有其他頁面"
+  },
+  "drinkWaterNotificationTitle": {
+    "description": "Drink water notification title",
+    "message": "💧 該喝水啦"
+  },
+  "drinkWaterNotificationMessage": {
+    "description": "Drink water notification message",
+    "message": "$USERNAME$ 提醒你要多喝水哦！",
+    "placeholders": {
+      "username": {
+        "content": "$1",
+        "example": "張三"
+      }
+    }
+  },
+  "drinkWaterConnectionErrorTitle": {
+    "description": "Drink water connection error notification title",
+    "message": "連線錯誤"
+  },
+  "drinkWaterConnectionErrorMessage": {
+    "description": "Drink water connection error notification message",
+    "message": "無法傳送提醒：MQTT 未連線。請檢查您的連線設定。"
+  },
+  "drinkWaterConfigErrorTitle": {
+    "description": "Drink water configuration error notification title",
+    "message": "配置錯誤"
+  },
+  "drinkWaterConfigErrorMessage": {
+    "description": "Drink water configuration error notification message",
+    "message": "無法傳送提醒：請在 MQTT 設定中設定您的使用者名稱。"
+  },
+  "commonTab": {
+    "description": "Common settings tab",
+    "message": "通用"
+  },
+  "appearanceTab": {
+    "description": "Appearance settings tab",
+    "message": "外觀"
+  },
+  "homepageTab": {
+    "description": "Homepage settings tab",
+    "message": "主頁"
+  },
+  "dataTab": {
+    "description": "Data settings tab",
+    "message": "資料"
+  },
+  "serverTab": {
+    "description": "Server settings tab",
+    "message": "伺服器"
+  },
+  "commandTab": {
+    "description": "Command settings tab",
+    "message": "命令"
+  },
+  "theme": {
+    "description": "Theme setting title",
+    "message": "主題"
+  },
+  "themeDescription": {
+    "description": "Theme setting description",
+    "message": "切換深色/淺色主題。"
+  },
+  "historySuggestion": {
+    "description": "History suggestion setting title",
+    "message": "歷史建議"
+  },
+  "historySuggestionDescription": {
+    "description": "History suggestion setting description",
+    "message": "使用歷史記錄進行推薦。"
+  },
+  "autoFocusCommandInput": {
+    "description": "Auto focus command input setting title",
+    "message": "自動聚焦命令輸入"
+  },
+  "autoFocusCommandInputDescription": {
+    "description": "Auto focus command input setting description",
+    "message": "自動聚焦命令輸入框。"
+  },
+  "doubleClickBackgroundFocusCommand": {
+    "description": "Double click background to focus command setting title",
+    "message": "雙擊背景聚焦命令"
+  },
+  "doubleClickBackgroundFocusCommandDescription": {
+    "description": "Double click background to focus command setting description",
+    "message": "雙擊背景時聚焦命令輸入框。鍵盤使用者可以使用 Alt+K (Windows/Linux) 或 ⌘+K (Mac)。"
+  },
+  "showBookmarksInQuickUrlMenu": {
+    "description": "Show bookmarks in quick URL context menu setting title",
+    "message": "在快捷連結選單中顯示收藏"
+  },
+  "showBookmarksInQuickUrlMenuDescription": {
+    "description": "Show bookmarks in quick URL context menu setting description",
+    "message": "右鍵快捷連結時顯示相關收藏。"
+  },
+  "bookmarkFolder": {
+    "description": "Bookmark folder filter setting title",
+    "message": "收藏夾篩選"
+  },
+  "bookmarkFolderDescription": {
+    "description": "Bookmark folder filter setting description",
+    "message": "選擇特定的收藏夾來篩選右鍵選單中顯示的收藏。預設為「所有收藏」以顯示所有資料夾中的收藏。"
+  },
+  "allBookmarks": {
+    "description": "All bookmarks option in folder selector",
+    "message": "所有收藏"
+  },
+  "relatedBookmarks": {
+    "description": "Related bookmarks section label in context menu",
+    "message": "收藏"
+  },
+  "showOpenTabsInQuickUrlMenu": {
+    "description": "Show open tabs in quick URL context menu setting title",
+    "message": "在快捷連結選單中顯示開啟的頁面"
+  },
+  "showOpenTabsInQuickUrlMenuDescription": {
+    "description": "Show open tabs in quick URL context menu setting description",
+    "message": "右鍵快捷連結時顯示相關開啟的標籤頁。"
+  },
+  "relatedOpenTabs": {
+    "description": "Related open tabs section label in context menu",
+    "message": "標籤頁"
+  },
+  "viewRecentHistory": {
+    "description": "View recent history menu item",
+    "message": "檢視最近歷史記錄"
+  },
+  "domainHistory": {
+    "description": "Domain history dialog title",
+    "message": "域名歷史記錄"
+  },
+  "noHistoryFound": {
+    "description": "No history found message",
+    "message": "未找到歷史記錄"
+  },
+  "historyItem": {
+    "description": "Singular history item",
+    "message": "條記錄"
+  },
+  "historyItems": {
+    "description": "Plural history items",
+    "message": "條記錄"
+  },
+  "visits": {
+    "description": "Visit count suffix",
+    "message": "次訪問"
+  },
+  "searchInDomain": {
+    "description": "Search in domain placeholder",
+    "message": "在此域名下搜尋..."
+  },
+  "wallpaperUrl": {
+    "description": "Wallpaper URL setting title",
+    "message": "桌布 URL"
+  },
+  "wallpaperUrlDescription": {
+    "description": "Wallpaper URL setting description",
+    "message": "設定自定義桌布 URL。"
+  },
+  "enterWallpaperUrl": {
+    "description": "Wallpaper URL input placeholder",
+    "message": "輸入桌布 URL"
+  },
+  "configureMqttSettings": {
+    "description": "MQTT settings description",
+    "message": "配置您的 MQTT 伺服器設定以啟用小訊號功能。"
+  },
+  "configureGeneralSettings": {
+    "description": "General settings description",
+    "message": "配置您的通用設定。"
+  },
+  "configureAppearanceSettings": {
+    "description": "Appearance settings description",
+    "message": "配置外觀設定。"
+  },
+  "configureHomepageSettings": {
+    "description": "Homepage settings description",
+    "message": "配置主頁功能設定。"
+  },
+  "configureDataSettings": {
+    "description": "Data settings description",
+    "message": "管理您的資料匯入匯出。"
+  },
+  "configureCommandSettings": {
+    "description": "Command settings description",
+    "message": "配置命令外掛及其設定。"
+  },
+  "enable": {
+    "description": "Enable setting title",
+    "message": "啟用"
+  },
+  "enableMqttDescription": {
+    "description": "Enable MQTT setting description",
+    "message": "啟用或禁用 MQTT 小訊號功能。"
+  },
+  "refreshConnection": {
+    "description": "Refresh connection setting title",
+    "message": "重新整理連線"
+  },
+  "refreshConnectionDescription": {
+    "description": "Refresh connection setting description",
+    "message": "重新連線到 MQTT 伺服器。"
+  },
+  "secretKey": {
+    "description": "Secret key setting title",
+    "message": "金鑰"
+  },
+  "secretKeyDescription": {
+    "description": "Secret key setting description",
+    "message": "小訊號將會在同一個金鑰下進行通訊，請確保您的金鑰複雜且僅與信任的人共享。"
+  },
+  "enterSecretKey": {
+    "description": "Secret key input placeholder",
+    "message": "輸入金鑰"
+  },
+  "username": {
+    "description": "Username setting title",
+    "message": "使用者名稱"
+  },
+  "usernameDescription": {
+    "description": "Username setting description",
+    "message": "小訊號的暱稱。"
+  },
+  "enterUsername": {
+    "description": "Username input placeholder",
+    "message": "輸入使用者名稱"
+  },
+  "connected": {
+    "description": "Connected status",
+    "message": "已連線"
+  },
+  "disconnected": {
+    "description": "Disconnected status",
+    "message": "未連線"
+  },
+  "connect": {
+    "description": "Connect button",
+    "message": "連線"
+  },
+  "disconnect": {
+    "description": "Disconnect button",
+    "message": "斷開"
+  },
+  "disconnectToModify": {
+    "description": "Warning message when trying to modify MQTT settings while connected",
+    "message": "請先斷開連線再修改"
+  },
+  "noResultsFound": {
+    "description": "No results found message",
+    "message": "未找到結果。"
+  },
+  "calculator": {
+    "description": "Calculator plugin name",
+    "message": "計算器"
+  },
+  "calculatorClickToCopy": {
+    "description": "Calculator click to copy hint",
+    "message": "點選複製結果"
+  },
+  "calculatorCopyResult": {
+    "description": "Calculator copy result description",
+    "message": "複製結果到剪貼簿"
+  },
+  "calculatorClearHistory": {
+    "description": "Calculator clear history title",
+    "message": "清除歷史"
+  },
+  "calculatorClearHistoryDesc": {
+    "description": "Calculator clear history description",
+    "message": "清除所有計算歷史"
+  },
+  "wallpaperTab": {
+    "description": "Wallpaper settings tab",
+    "message": "桌布"
+  },
+  "wallpaperSettingsDescription": {
+    "description": "Wallpaper settings description",
+    "message": "從 Wallhaven 熱門榜單中選擇桌布。"
+  },
+  "wallpaperFetchError": {
+    "description": "Wallpaper fetch error message",
+    "message": "載入桌布失敗，請重試。"
+  },
+  "historyWallpapers": {
+    "description": "History wallpapers section title",
+    "message": "歷史桌布"
+  },
+  "noMoreWallpapers": {
+    "description": "No more wallpapers message",
+    "message": "沒有更多桌布了。"
+  },
+  "wallpaperRateLimitError": {
+    "description": "Wallpaper rate limit error message",
+    "message": "請求過於頻繁，請稍後再試。"
+  },
+  "wallpaperInvalidUrlError": {
+    "description": "Wallpaper invalid URL error message",
+    "message": "無效的桌布連結，請選擇其他桌布。"
+  },
+  "commandPluginActive": {
+    "description": "Command plugin active setting title",
+    "message": "啟用"
+  },
+  "commandPluginActiveDescription": {
+    "description": "Command plugin active setting description",
+    "message": "啟用或禁用此命令外掛。"
+  },
+  "commandPluginActiveKey": {
+    "description": "Command plugin active key setting title",
+    "message": "觸發鍵"
+  },
+  "commandPluginActiveKeyDescription": {
+    "description": "Command plugin active key setting description",
+    "message": "直接觸發此外掛的字首鍵。"
+  },
+  "commandPluginActiveKeyPlaceholder": {
+    "description": "Command plugin active key input placeholder",
+    "message": "例如：h, g, ="
+  },
+  "commandPluginPriority": {
+    "description": "Command plugin priority setting title",
+    "message": "優先順序"
+  },
+  "commandPluginPriorityDescription": {
+    "description": "Command plugin priority setting description",
+    "message": "數字越小優先順序越高。"
+  },
+  "commandPluginIncludeInGlobal": {
+    "description": "Command plugin include in global setting title",
+    "message": "全域性搜尋中顯示"
+  },
+  "commandPluginIncludeInGlobalDescription": {
+    "description": "Command plugin include in global setting description",
+    "message": "在全域性搜尋結果中顯示。"
+  },
+  "commandPluginHistory": {
+    "description": "History command plugin name",
+    "message": "歷史記錄"
+  },
+  "commandPluginHistoryDescription": {
+    "description": "History command plugin description",
+    "message": "搜尋瀏覽器歷史記錄。"
+  },
+  "commandPluginTabs": {
+    "description": "Tabs command plugin name",
+    "message": "標籤頁"
+  },
+  "commandPluginTabsDescription": {
+    "description": "Tabs command plugin description",
+    "message": "搜尋開啟的標籤頁。"
+  },
+  "commandPluginWebSearch": {
+    "description": "Web Search command plugin name",
+    "message": "網頁搜尋"
+  },
+  "commandPluginWebSearchDescription": {
+    "description": "Web Search command plugin description",
+    "message": "使用預設搜尋引擎搜尋網頁。"
+  },
+  "commandPluginWebSearchTitle": {
+    "description": "Web Search result title template",
+    "message": "搜尋「{query}」"
+  },
+  "commandPluginCalculator": {
+    "description": "Calculator command plugin name",
+    "message": "計算器"
+  },
+  "commandPluginCalculatorDescription": {
+    "description": "Calculator command plugin description",
+    "message": "執行數學計算。"
+  },
+  "commandPluginNumberToRmb": {
+    "description": "Number to RMB command plugin name",
+    "message": "人民幣大寫轉換"
+  },
+  "commandPluginNumberToRmbDescription": {
+    "description": "Number to RMB command plugin description",
+    "message": "將數字轉換為人民幣大寫格式。"
+  },
+  "numberToRmb": {
+    "description": "Number to RMB plugin name",
+    "message": "人民幣大寫"
+  },
+  "numberToRmbLabel": {
+    "description": "Number to RMB plugin label",
+    "message": "人民幣大寫"
+  },
+  "numberToRmbClickToCopy": {
+    "description": "Number to RMB click to copy hint",
+    "message": "點選複製結果"
+  },
+  "exportSettings": {
+    "description": "Export settings button title",
+    "message": "匯出設定"
+  },
+  "exportSettingsDescription": {
+    "description": "Export settings description",
+    "message": "將所有設定和快捷連結匯出為 JSON 檔案。"
+  },
+  "export": {
+    "description": "Export button text",
+    "message": "匯出"
+  },
+  "importSettings": {
+    "description": "Import settings button title",
+    "message": "匯入設定"
+  },
+  "importSettingsDescription": {
+    "description": "Import settings description",
+    "message": "從 JSON 檔案匯入設定和快捷連結。"
+  },
+  "import": {
+    "description": "Import button text",
+    "message": "匯入"
+  },
+  "exportSettingsSuccess": {
+    "description": "Export settings success message",
+    "message": "設定匯出成功！"
+  },
+  "exportSettingsError": {
+    "description": "Export settings error message",
+    "message": "匯出設定失敗，請重試。"
+  },
+  "importSettingsSuccess": {
+    "description": "Import settings success message",
+    "message": "設定匯入成功！"
+  },
+  "importSettingsError": {
+    "description": "Import settings error message",
+    "message": "匯入設定失敗：{error}"
+  },
+  "commandPluginBookmarks": {
+    "description": "Bookmarks command plugin name",
+    "message": "收藏夾"
+  },
+  "commandPluginBookmarksDescription": {
+    "description": "Bookmarks command plugin description",
+    "message": "搜尋瀏覽器收藏夾。"
+  },
+  "localWallpaper": {
+    "description": "Local wallpaper section title",
+    "message": "本地桌布"
+  },
+  "uploadLocalWallpaper": {
+    "description": "Upload local wallpaper button",
+    "message": "上傳"
+  },
+  "localWallpaperInvalidType": {
+    "description": "Local wallpaper invalid file type error",
+    "message": "無效的檔案型別。請選擇 JPEG、PNG、GIF 或 WebP 圖片。"
+  },
+  "localWallpaperTooLarge": {
+    "description": "Local wallpaper file too large error",
+    "message": "檔案過大。請選擇小於 5MB 的圖片。"
+  },
+  "localWallpaperReadError": {
+    "description": "Local wallpaper read error",
+    "message": "讀取圖片檔案失敗，請重試。"
+  },
+  "localWallpaperStorageError": {
+    "description": "Local wallpaper storage error",
+    "message": "儲存桌布失敗，請重試。"
+  },
+  "localWallpaperQuotaExceeded": {
+    "description": "Local wallpaper storage quota exceeded error",
+    "message": "儲存配額已滿。請嘗試更小的圖片或釋放空間。"
+  },
+  "clearLocalWallpaper": {
+    "description": "Clear local wallpaper button aria label",
+    "message": "清除本地桌布"
+  },
+  "selectLocalWallpaper": {
+    "description": "Select local wallpaper button aria label",
+    "message": "選擇本地桌布"
+  },
+  "customWallpaperUrl": {
+    "description": "Custom wallpaper URL section title",
+    "message": "自定義桌布 URL"
+  },
+  "wallhavenToplist": {
+    "description": "Wallhaven toplist mode button",
+    "message": "熱門榜單"
+  },
+  "wallhavenRandom": {
+    "description": "Wallhaven random mode button",
+    "message": "隨機桌布"
+  },
+  "availablePlugins": {
+    "description": "Available plugins section title",
+    "message": "可用外掛"
+  },
+  "availablePluginsDescription": {
+    "description": "Available plugins description",
+    "message": "輸入搜尋或使用觸發鍵來啟用外掛"
+  },
+  "noResultsForPlugin": {
+    "description": "No results found for plugin message",
+    "message": "未找到此查詢的結果"
+  },
+  "aboutTab": {
+    "description": "About settings tab",
+    "message": "關於"
+  },
+  "aboutDescription": {
+    "description": "About settings description",
+    "message": "關於 NextTab 擴充套件的資訊"
+  },
+  "version": {
+    "description": "Version label",
+    "message": "版本"
+  },
+  "repository": {
+    "description": "Repository label",
+    "message": "程式碼倉庫"
+  },
+  "viewOnGithub": {
+    "description": "View on GitHub button",
+    "message": "在 GitHub 上檢視"
+  },
+  "reportIssue": {
+    "description": "Report issue button",
+    "message": "報告問題"
+  },
+  "reportIssueDescription": {
+    "description": "Report issue description",
+    "message": "發現問題或有建議？歡迎反饋！"
+  },
+  "updates": {
+    "description": "Updates label",
+    "message": "更新"
+  },
+  "checkForUpdates": {
+    "description": "Check for updates button",
+    "message": "獲取更新"
+  },
+  "checkForUpdatesDescription": {
+    "description": "Check for updates description",
+    "message": "訪問釋出頁面檢視最新更新。"
+  },
+  "versionDescription": {
+    "description": "Version description",
+    "message": "當前擴充套件版本"
+  },
+  "repositoryDescription": {
+    "description": "Repository description",
+    "message": "NextTab 的 GitHub 程式碼倉庫"
+  },
+  "latestVersion": {
+    "description": "Latest version label",
+    "message": "最新版本"
+  },
+  "latestVersionDescription": {
+    "description": "Latest version description",
+    "message": "GitHub 上的最新可用版本"
+  },
+  "checkingForUpdates": {
+    "description": "Checking for updates message",
+    "message": "檢查中..."
+  },
+  "updateAvailable": {
+    "description": "Update available message",
+    "message": "有新版本"
+  },
+  "upToDate": {
+    "description": "Up to date message",
+    "message": "已是最新"
+  },
+  "failedToCheckUpdates": {
+    "description": "Failed to check for updates message",
+    "message": "檢查失敗"
+  },
+  "commandPluginSettings": {
+    "description": "Command plugin settings section title",
+    "message": "命令外掛設定"
+  },
+  "editQuickItem": {
+    "description": "Edit",
+    "message": "編輯"
+  },
+  "deleteQuickItem": {
+    "description": "Delete",
+    "message": "刪除"
+  },
+  "onboardingTitle": {
+    "description": "Onboarding dialog title",
+    "message": "歡迎使用 NextTab"
+  },
+  "onboardingDescription": {
+    "description": "Onboarding dialog description",
+    "message": "來設定你的新標籤頁"
+  },
+  "onboardingWelcomeTitle": {
+    "description": "Welcome step title",
+    "message": "歡迎"
+  },
+  "onboardingWelcomeDescription": {
+    "description": "Welcome step description",
+    "message": "簡潔現代的瀏覽器起始頁，花一分鐘配置一下吧"
+  },
+  "onboardingImportSettings": {
+    "description": "Import settings button",
+    "message": "匯入已有設定"
+  },
+  "onboardingStartSetup": {
+    "description": "Start setup button",
+    "message": "從零開始"
+  },
+  "onboardingSkipAll": {
+    "description": "Skip all button",
+    "message": "跳過"
+  },
+  "onboardingThemeTitle": {
+    "description": "Theme step title",
+    "message": "選擇主題"
+  },
+  "onboardingThemeDescription": {
+    "description": "Theme step description",
+    "message": "淺色、深色，或是跟隨系統"
+  },
+  "onboardingThemeLight": {
+    "description": "Light theme option",
+    "message": "淺色"
+  },
+  "onboardingThemeDark": {
+    "description": "Dark theme option",
+    "message": "深色"
+  },
+  "onboardingThemeSystem": {
+    "description": "System theme option",
+    "message": "跟隨系統"
+  },
+  "onboardingWallpaperTitle": {
+    "description": "Wallpaper step title",
+    "message": "挑選桌布"
+  },
+  "onboardingWallpaperDescription": {
+    "description": "Wallpaper step description",
+    "message": "給標籤頁選一張背景圖"
+  },
+  "onboardingQuickLinksTitle": {
+    "description": "Quick links step title",
+    "message": "快捷連結"
+  },
+  "onboardingQuickLinksDescription": {
+    "description": "Quick links step description",
+    "message": "把常用網站新增為快捷入口"
+  },
+  "onboardingNoTopSites": {
+    "description": "No top sites message",
+    "message": "暫無常用網站，之後可以手動新增"
+  },
+  "onboardingImportSelected": {
+    "description": "Import selected sites button",
+    "message": "匯入所選"
+  },
+  "onboardingSkip": {
+    "description": "Skip button",
+    "message": "跳過"
+  },
+  "onboardingCompleteTitle": {
+    "description": "Complete step title",
+    "message": "設定完成"
+  },
+  "onboardingCompleteDescription": {
+    "description": "Complete step description",
+    "message": "新標籤頁已就緒，開始使用吧"
+  },
+  "onboardingCommandTip": {
+    "description": "Command tip message",
+    "message": "小技巧：按下快捷鍵可開啟命令面板"
+  },
+  "onboardingGetStarted": {
+    "description": "Get started button",
+    "message": "開始使用"
+  },
+  "onboardingBack": {
+    "description": "Back button",
+    "message": "上一步"
+  },
+  "onboardingNext": {
+    "description": "Next button",
+    "message": "下一步"
+  },
+  "restartOnboarding": {
+    "description": "Restart onboarding button",
+    "message": "重新引導"
+  },
+  "restartOnboardingDescription": {
+    "description": "Restart onboarding description",
+    "message": "再走一遍設定流程"
+  },
+  "restart": {
+    "description": "Restart button",
+    "message": "重新開始"
+  },
+  "onboardingUrlHostAlreadyExists": {
+    "description": "Already exists warning for quick links",
+    "message": "已新增"
+  },
+  "onboardingWallpaperFetchError": {
+    "description": "Error message when fetching wallpapers fails",
+    "message": "桌布載入失敗，已切換為備用"
+  },
+  "onboardingWallpaperOption": {
+    "description": "Wallpaper option aria label prefix",
+    "message": "桌布"
+  },
+  "onboardingImportError": {
+    "description": "Error message when importing quick links fails",
+    "message": "匯入快捷連結失敗，請重試。"
+  }
+}
