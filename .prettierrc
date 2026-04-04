@@ -6,7 +6,6 @@
   "printWidth": 120,
   "bracketSameLine": true,
   "htmlWhitespaceSensitivity": "strict",
-  "plugins": [
-    "prettier-plugin-classnames"
-  ]
+  "endOfLine": "lf",
+  "plugins": ["prettier-plugin-classnames"]
 }
