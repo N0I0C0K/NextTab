@@ -55,9 +55,9 @@ type SettingsStorage = BaseStorage<SettingProps> & {
 }
 
 const defaultSetting: SettingProps = {
-  useHistorySuggestion: true,
-  autoFocusCommandInput: true,
-  doubleClickBackgroundFocusCommand: true,
+  useHistorySuggestion: false,
+  autoFocusCommandInput: false,
+  doubleClickBackgroundFocusCommand: false,
   showBookmarksInQuickUrlMenu: true,
   showOpenTabsInQuickUrlMenu: true,
   bookmarkFolderId: null,
