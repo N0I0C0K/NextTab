@@ -4,6 +4,8 @@ import {
   openMqttClientMessage,
   useStorage,
   sendDrinkWaterReminderMessage,
+  PERMISSION_ORIGINS,
+  usePermission,
 } from '@extension/shared'
 import { mqttStateManager, settingStorage } from '@extension/storage'
 import {
@@ -37,8 +39,11 @@ import { DataSettings } from './settings/DataSettings'
 import { CommandSettings } from './settings/CommandSettings'
 import { AboutSettings } from './settings/AboutSettings'
 import { SettingItem } from './settings/SettingItem'
+import { PermissionGrant } from './settings/PermissionGrant'
 
 export { SettingItem }
+
+const MQTT_PERMISSION_ORIGINS = [PERMISSION_ORIGINS.MQTT_BROKER]
 
 /**
  * Wrapper component that disables input fields and shows a tooltip when MQTT is connected.
@@ -69,7 +74,7 @@ const DisableWhenConnectedWrapper: FC<{ isConnected: boolean; children: ReactEle
   )
 }
 
-const ConnectSettingItem: FC = () => {
+const ConnectSettingItem: FC<{ canConnect: boolean }> = ({ canConnect }) => {
   const mqttServerState = useStorage(mqttStateManager)
   return (
     <SettingItem
@@ -79,6 +84,7 @@ const ConnectSettingItem: FC = () => {
       control={
         <Button
           variant={'link'}
+          disabled={!mqttServerState.connected && !canConnect}
           onClick={async () => {
             if (mqttServerState.connected) {
               await closeMqttClientMessage.emit()
@@ -106,6 +112,7 @@ const ConnectSettingItem: FC = () => {
 const MqttSettings: FC = () => {
   const settings = useStorage(settingStorage)
   const mqttServerState = useStorage(mqttStateManager)
+  const mqttPermission = usePermission(MQTT_PERMISSION_ORIGINS)
   const isConnected = mqttServerState.connected
 
   return (
@@ -115,6 +122,8 @@ const MqttSettings: FC = () => {
           {t('configureMqttSettings')}
         </Text>
       </Stack>
+      {/* Permission prompt for MQTT broker */}
+      <PermissionGrant permission={mqttPermission} description={t('mqttPermissionDescription')} />
       <SettingItem
         IconClass={ToggleRight}
         title={t('enable')}
@@ -128,7 +137,7 @@ const MqttSettings: FC = () => {
           />
         }
       />
-      <ConnectSettingItem />
+      <ConnectSettingItem canConnect={mqttPermission.isGranted === true} />
       <DisableWhenConnectedWrapper isConnected={isConnected}>
         <SettingItem
           IconClass={KeyRound}

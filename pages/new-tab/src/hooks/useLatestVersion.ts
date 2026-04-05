@@ -82,5 +82,5 @@ export const useLatestVersion = (repositoryUrl: string) => {
     fetchLatestVersion()
   }, [fetchLatestVersion])
 
-  return { latestVersion, isChecking, checkError }
+  return { latestVersion, isChecking, checkError, refetch: fetchLatestVersion }
 }
