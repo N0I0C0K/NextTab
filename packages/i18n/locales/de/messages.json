@@ -780,5 +780,25 @@
   "onboardingImportError": {
     "description": "Error message when importing quick links fails",
     "message": "Schnelllinks konnten nicht importiert werden. Bitte versuchen Sie es erneut."
+  },
+  "grantPermission": {
+    "description": "Grant permission button text",
+    "message": "Zugriff erlauben"
+  },
+  "permissionGranted": {
+    "description": "Permission granted indicator text",
+    "message": "Autorisiert"
+  },
+  "wallhavenPermissionDescription": {
+    "description": "Description for Wallhaven API permission",
+    "message": "Autorisierung erforderlich, um Wallhaven-Hintergründe zu durchsuchen"
+  },
+  "githubPermissionDescription": {
+    "description": "Description for GitHub API permission",
+    "message": "Autorisierung erforderlich, um nach Updates zu suchen"
+  },
+  "mqttPermissionDescription": {
+    "description": "Description for MQTT broker permission",
+    "message": "Autorisierung erforderlich, um eine Verbindung zum MQTT-Server herzustellen"
   }
 }

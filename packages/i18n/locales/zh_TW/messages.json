@@ -780,5 +780,25 @@
   "onboardingImportError": {
     "description": "Error message when importing quick links fails",
     "message": "匯入快捷連結失敗，請重試。"
+  },
+  "grantPermission": {
+    "description": "Grant permission button text",
+    "message": "授權存取"
+  },
+  "permissionGranted": {
+    "description": "Permission granted indicator text",
+    "message": "已授權"
+  },
+  "wallhavenPermissionDescription": {
+    "description": "Description for Wallhaven API permission",
+    "message": "需要授權才能瀏覽 Wallhaven 線上桌布"
+  },
+  "githubPermissionDescription": {
+    "description": "Description for GitHub API permission",
+    "message": "需要授權才能檢查版本更新"
+  },
+  "mqttPermissionDescription": {
+    "description": "Description for MQTT broker permission",
+    "message": "需要授權才能連線到 MQTT 伺服器"
   }
 }

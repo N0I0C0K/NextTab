@@ -21,6 +21,8 @@ import { WallpaperImage } from './WallpaperImage'
 import { LocalWallpaperSection } from './LocalWallpaperSection'
 import { PermissionGrant } from './PermissionGrant'
 
+const WALLHAVEN_PERMISSION_ORIGINS = [PERMISSION_ORIGINS.WALLHAVEN_API]
+
 // Scroll threshold in pixels to trigger loading more wallpapers
 const SCROLL_THRESHOLD = 100
 
@@ -149,7 +151,7 @@ export const WallpaperSettings: FC = () => {
   const scrollContainerRef = useRef<HTMLDivElement>(null)
 
   // Permission state for Wallhaven API
-  const wallhavenPermission = usePermission([PERMISSION_ORIGINS.WALLHAVEN_API])
+  const wallhavenPermission = usePermission(WALLHAVEN_PERMISSION_ORIGINS)
 
   // Use refs to track loading state and last request time to prevent race conditions
   const isLoadingRef = useRef(false)
@@ -353,15 +355,7 @@ export const WallpaperSettings: FC = () => {
       </Stack>
 
       {/* Permission prompt for Wallhaven API */}
-      <PermissionGrant
-        origins={[PERMISSION_ORIGINS.WALLHAVEN_API]}
-        description={t('wallhavenPermissionDescription')}
-        onPermissionChange={granted => {
-          if (granted) {
-            wallhavenPermission.refresh()
-          }
-        }}
-      />
+      <PermissionGrant permission={wallhavenPermission} description={t('wallhavenPermissionDescription')} />
 
       {wallhavenPermission.isGranted && (
         <>

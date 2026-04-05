@@ -1,16 +1,14 @@
-import { hasPermission, requestPermission } from '@extension/shared'
+import type { PermissionState } from '@extension/shared'
 import { Button, Stack, Text } from '@extension/ui'
 import { ShieldAlert, ShieldCheck } from 'lucide-react'
-import { type FC, useCallback, useEffect, useState } from 'react'
+import { type FC, useCallback } from 'react'
 import { t } from '@extension/i18n'
 
 interface PermissionGrantProps {
-  /** Permission origins to check and request */
-  origins: string[]
+  /** Shared permission state */
+  permission: PermissionState
   /** Description text for the permission */
   description: string
-  /** Callback when permission status changes */
-  onPermissionChange?: (granted: boolean) => void
   /** Optional className for styling */
   className?: string
 }
@@ -19,28 +17,12 @@ interface PermissionGrantProps {
  * A component that displays a permission grant prompt when permission is not granted.
  * When permission is already granted, it renders nothing (or children if provided).
  */
-export const PermissionGrant: FC<PermissionGrantProps> = ({ origins, description, onPermissionChange, className }) => {
-  const [isGranted, setIsGranted] = useState<boolean | null>(null)
-  const [isRequesting, setIsRequesting] = useState(false)
-
-  // Check permission status on mount
-  useEffect(() => {
-    hasPermission(origins).then(granted => {
-      setIsGranted(granted)
-      onPermissionChange?.(granted)
-    })
-  }, [origins, onPermissionChange])
+export const PermissionGrant: FC<PermissionGrantProps> = ({ permission, description, className }) => {
+  const { isGranted, isRequesting, request } = permission
 
   const handleRequestPermission = useCallback(async () => {
-    setIsRequesting(true)
-    try {
-      const granted = await requestPermission(origins)
-      setIsGranted(granted)
-      onPermissionChange?.(granted)
-    } finally {
-      setIsRequesting(false)
-    }
-  }, [origins, onPermissionChange])
+    await request()
+  }, [request])
 
   // Still checking permission status
   if (isGranted === null) {

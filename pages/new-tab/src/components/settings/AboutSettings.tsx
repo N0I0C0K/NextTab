@@ -9,6 +9,8 @@ import { isUpdateAvailable } from '@src/utils/semver'
 import { PERMISSION_ORIGINS, usePermission } from '@extension/shared'
 import { PermissionGrant } from './PermissionGrant'
 
+const GITHUB_PERMISSION_ORIGINS = [PERMISSION_ORIGINS.GITHUB_API]
+
 const useAboutUrls = () => {
   const repositoryUrl = packageJson.repository?.url || 'https://github.com/N0I0C0K/NextTab'
   return {
@@ -74,7 +76,7 @@ export const AboutSettings: FC = () => {
   const { repositoryUrl, issuesUrl, releasesUrl } = useAboutUrls()
 
   // Permission state for GitHub API
-  const githubPermission = usePermission([PERMISSION_ORIGINS.GITHUB_API])
+  const githubPermission = usePermission(GITHUB_PERMISSION_ORIGINS)
 
   const openUrl = (url: string) => chrome.tabs.create({ url })
 
@@ -95,15 +97,7 @@ export const AboutSettings: FC = () => {
         }
       />
       {/* Permission prompt for GitHub API (version check) */}
-      <PermissionGrant
-        origins={[PERMISSION_ORIGINS.GITHUB_API]}
-        description={t('githubPermissionDescription')}
-        onPermissionChange={granted => {
-          if (granted) {
-            githubPermission.refresh()
-          }
-        }}
-      />
+      <PermissionGrant permission={githubPermission} description={t('githubPermissionDescription')} />
       <SettingItem
         IconClass={ExternalLink}
         title={t('repository')}

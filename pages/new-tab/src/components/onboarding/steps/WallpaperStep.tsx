@@ -2,25 +2,39 @@ import { useState, useEffect, type FC } from 'react'
 import { Text } from '@extension/ui'
 import { settingStorage } from '@extension/storage'
 import { t } from '@extension/i18n'
+import { PERMISSION_ORIGINS, usePermission } from '@extension/shared'
 import { Image, Check, AlertCircle } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { StepNavigationProps, PresetWallpaper, WallhavenResponse } from '../types'
 import { FALLBACK_WALLPAPERS } from '../types'
 import { StepHeader, StepContainer, StepNavigationButtons } from '../components'
+import { PermissionGrant } from '../../settings/PermissionGrant'
 
 /** Number of wallpapers to display in the selection grid */
 const WALLPAPER_COUNT = 6
+const WALLHAVEN_PERMISSION_ORIGINS = [PERMISSION_ORIGINS.WALLHAVEN_API]
 
 export const WallpaperStep: FC<StepNavigationProps> = ({ onNext, onBack }) => {
-  const [wallpapers, setWallpapers] = useState<PresetWallpaper[]>([])
+  const wallhavenPermission = usePermission(WALLHAVEN_PERMISSION_ORIGINS)
+  const [wallpapers, setWallpapers] = useState<PresetWallpaper[]>(FALLBACK_WALLPAPERS)
   const [selectedWallpaper, setSelectedWallpaper] = useState<string | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     const controller = new AbortController()
 
+    if (wallhavenPermission.isGranted !== true) {
+      setWallpapers(FALLBACK_WALLPAPERS)
+      setLoading(false)
+      setError(null)
+      return () => {
+        controller.abort()
+      }
+    }
+
     const fetchWallpapers = async () => {
+      setLoading(true)
       try {
         const apiUrl = 'https://wallhaven.cc/api/v1/search?purity=100&topRange=1M&sorting=toplist'
         const response = await fetch(apiUrl, { signal: controller.signal })
@@ -56,7 +70,7 @@ export const WallpaperStep: FC<StepNavigationProps> = ({ onNext, onBack }) => {
     return () => {
       controller.abort()
     }
-  }, [])
+  }, [wallhavenPermission.isGranted])
 
   const handleSelect = (url: string) => {
     setSelectedWallpaper(url)
@@ -113,6 +127,12 @@ export const WallpaperStep: FC<StepNavigationProps> = ({ onNext, onBack }) => {
         icon={<Image className="size-8 text-primary" />}
         title={t('onboardingWallpaperTitle')}
         description={t('onboardingWallpaperDescription')}
+      />
+
+      <PermissionGrant
+        permission={wallhavenPermission}
+        description={t('wallhavenPermissionDescription')}
+        className="w-full max-w-xl"
       />
 
       {renderContent()}

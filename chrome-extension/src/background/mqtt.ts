@@ -1,6 +1,6 @@
 import type { ILoadable } from './type'
 
-import { mqttStateManager, settingStorage } from '@extension/storage'
+import { DEFAULT_MQTT_BROKER_URL, mqttStateManager, settingStorage } from '@extension/storage'
 import {
   MqttPayloadBuilder,
   MqttProvider,
@@ -12,6 +12,15 @@ import {
 } from '@extension/shared'
 import type { MqttBasePayload } from '@extension/shared'
 import type { MqttClient } from 'mqtt'
+
+const MQTT_PERMISSION_ORIGINS = [PERMISSION_ORIGINS.MQTT_BROKER]
+
+const hasRelevantPermissionChange = (permissions: chrome.permissions.Permissions) => {
+  return (
+    permissions.origins?.some(changedOrigin => MQTT_PERMISSION_ORIGINS.some(origin => origin === changedOrigin)) ??
+    false
+  )
+}
 
 async function initMqttClientEvent(client: MqttClient) {
   client.on('close', async () => {
@@ -36,24 +45,25 @@ mqttProvider.on('client-loaded', async client => {
 async function setupMqtt() {
   await mqttStateManager.setConnected(false)
   const settings = await settingStorage.get()
+  const { mqttSettings } = settings
   console.log('Current MQTT settings:', settings.mqttSettings)
 
-  if (!(settings.mqttSettings?.enabled && settings.mqttSettings.secretKey)) {
+  if (!(mqttSettings?.enabled && mqttSettings.secretKey)) {
     console.log('MQTT is disabled or not properly configured.')
     return
   }
 
   // Check if MQTT broker permission is granted
-  const hasMqttPermission = await hasPermission([PERMISSION_ORIGINS.MQTT_BROKER])
+  const hasMqttPermission = await hasPermission(MQTT_PERMISSION_ORIGINS)
   if (!hasMqttPermission) {
     console.log('MQTT broker permission not granted, skipping connection.')
     return
   }
 
   console.log('Connecting to MQTT broker...')
-  mqttProvider.changeSecretPrefix(settings.mqttSettings.secretKey)
-  payloadBuilder.username = settings.mqttSettings.username
-  await mqttProvider.connect({ brokerUrl: 'wss://broker.emqx.io:8084/mqtt' })
+  await mqttProvider.changeSecretPrefix(mqttSettings.secretKey)
+  payloadBuilder.username = mqttSettings.username
+  await mqttProvider.connect({ brokerUrl: mqttSettings.mqttBrokerUrl || DEFAULT_MQTT_BROKER_URL })
   console.log('MQTT connected')
 }
 
@@ -63,16 +73,42 @@ closeMqttClientMessage.registerListener(async () => {
 
 openMqttClientMessage.registerListener(async () => {
   // Check if MQTT broker permission is granted before connecting
-  const hasMqttPermission = await hasPermission([PERMISSION_ORIGINS.MQTT_BROKER])
+  const hasMqttPermission = await hasPermission(MQTT_PERMISSION_ORIGINS)
   if (!hasMqttPermission) {
     console.log('MQTT broker permission not granted, cannot connect.')
     return
   }
 
   const settings = await settingStorage.get()
-  payloadBuilder.username = settings.mqttSettings.username
-  await mqttProvider.changeSecretPrefix(settings.mqttSettings.secretKey)
-  await mqttProvider.connect()
+  const { mqttSettings } = settings
+
+  if (!(mqttSettings?.enabled && mqttSettings.secretKey)) {
+    console.log('MQTT is disabled or not properly configured.')
+    return
+  }
+
+  payloadBuilder.username = mqttSettings.username
+  await mqttProvider.changeSecretPrefix(mqttSettings.secretKey)
+  await mqttProvider.connect({ brokerUrl: mqttSettings.mqttBrokerUrl || DEFAULT_MQTT_BROKER_URL })
+})
+
+chrome.permissions.onAdded.addListener(permissions => {
+  if (!hasRelevantPermissionChange(permissions)) {
+    return
+  }
+
+  void setupMqtt()
+})
+
+chrome.permissions.onRemoved.addListener(permissions => {
+  if (!hasRelevantPermissionChange(permissions)) {
+    return
+  }
+
+  void (async () => {
+    await mqttProvider.disconnect()
+    await mqttStateManager.setConnected(false)
+  })()
 })
 
 const heartBeatEvent = mqttProvider.getOrCreateTopicEvent<MqttBasePayload>('heart-beat')
