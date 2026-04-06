@@ -20,10 +20,6 @@ function convertHistoryItemToCommandResult(item: chrome.history.HistoryItem): IC
 }
 
 export const historyResolver: ICommandResolver = {
-  settings: {
-    active: true,
-    activeKey: 'h',
-  },
   properties: {
     name: 'history',
     displayName: t('commandPluginHistory'),

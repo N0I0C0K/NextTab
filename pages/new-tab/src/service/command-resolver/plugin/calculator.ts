@@ -184,12 +184,6 @@ function calculate(expression: string): string | null {
 }
 
 export const calculatorResolver: ICommandResolver = {
-  settings: {
-    priority: -10, // High priority for quick math
-    active: true,
-    includeInGlobal: true,
-    activeKey: '=',
-  },
   properties: {
     name: 'calculator',
     displayName: t('calculator'),

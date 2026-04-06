@@ -18,15 +18,7 @@ function convertBookmarkToCommandResult(item: chrome.bookmarks.BookmarkTreeNode)
   }
 }
 
-const ACTIVE_KEY = 'b'
-
 export const bookmarksResolver: ICommandResolver = {
-  settings: {
-    active: true,
-    activeKey: ACTIVE_KEY,
-    priority: 5,
-    includeInGlobal: true,
-  },
   properties: {
     name: 'bookmarks',
     displayName: t('commandPluginBookmarks'),

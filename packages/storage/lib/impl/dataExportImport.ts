@@ -46,6 +46,7 @@ const commandPluginSettingsSchema = z.object({
   active: z.boolean(),
   activeKey: z.string(),
   includeInGlobal: z.boolean(),
+  customSettings: z.record(z.string(), z.unknown()).optional(),
 })
 
 const commandSettingsSchema = z.record(z.string(), commandPluginSettingsSchema)

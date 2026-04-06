@@ -162,12 +162,6 @@ function parseInput(input: string): number | null {
 }
 
 export const numberToRmbResolver: ICommandResolver = {
-  settings: {
-    priority: 50,
-    active: true,
-    includeInGlobal: true,
-    activeKey: 'rmb',
-  },
   properties: {
     name: 'numberToRmb',
     displayName: t('numberToRmbLabel'),

@@ -1,4 +1,11 @@
-import type { ICommandResolver, ICommandResultGroup, CommandQueryParams, CommandSettings } from './plugin'
+import type {
+  ICommandResolver,
+  ICommandResultGroup,
+  CommandQueryPayload,
+  CommandSettings,
+  ICommandResolverWithSettings,
+  CommandResolveParams,
+} from './plugin'
 
 import {
   historyResolver,
@@ -11,54 +18,51 @@ import {
 } from './plugin'
 import { WarpDefaultObject } from '@extension/shared'
 import { commandSettingsStorage, defaultCommandSettings } from '@extension/storage'
-import type { CommandSettingsData } from '@extension/storage'
+import type { CommandSettingsMapping, CommandPluginStorageSettings } from '@extension/storage'
 import { stripTriggerKeyForPlugin } from './utils'
 import { filter } from 'lodash'
+import type { ZodType } from 'zod'
 
 export type IDisposable = {
   dispose: () => void
 }
 
-const defaultSettings: CommandSettings = {
+const fallbackSettings: CommandPluginStorageSettings = {
   priority: 0,
   active: true,
   includeInGlobal: true,
   activeKey: '',
 }
 
-interface ICommandResolverWithSettings extends ICommandResolver {
-  getSettings: () => CommandSettings
-}
+function createResolverWithSettings<T extends ZodType<Record<string, unknown>>>(
+  resolver: ICommandResolver<T>,
+  settingProxy: () => CommandPluginStorageSettings,
+): ICommandResolverWithSettings<T> {
+  let cachedRawSettings: CommandPluginStorageSettings | null = null
+  let cachedSettings: CommandSettings<T['_output']> | null = null
 
-function createResolverWithSettings(
-  resolver: ICommandResolver,
-  getStorageSettings: () => CommandSettingsData | null,
-): ICommandResolverWithSettings {
   return {
     ...resolver,
-    getSettings(): CommandSettings {
-      const storageSettings = getStorageSettings()
-      const pluginStorageSettings = storageSettings?.[resolver.properties.name]
-      if (pluginStorageSettings) {
-        return pluginStorageSettings
+    get settings(): CommandSettings<T['_output']> {
+      const rawSettings = settingProxy()
+      if (cachedRawSettings === rawSettings && cachedSettings) {
+        return cachedSettings
       }
-      // Fallback to default command settings or plugin defaults
-      const defaultPluginSettings = defaultCommandSettings[resolver.properties.name]
-      if (defaultPluginSettings) {
-        return defaultPluginSettings
-      }
-      return WarpDefaultObject(resolver.settings, defaultSettings)
-    },
-    get settings(): CommandSettings {
-      return this.getSettings()
+      cachedRawSettings = rawSettings
+      const customSettings = resolver.customSettingsSchema
+        ? resolver.customSettingsSchema.safeParse(rawSettings.customSettings)
+        : undefined
+      cachedSettings = { ...rawSettings, customSettings: customSettings?.data }
+      return cachedSettings
     },
   }
 }
 
 class CommandResolverService {
-  private resolvers: ICommandResolverWithSettings[] = []
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private resolvers: ICommandResolverWithSettings<any>[] = []
   private _queryTimes = 0
-  private _storageSettings: CommandSettingsData | null = null
+  private _storageSettings: CommandSettingsMapping | null = null
   private pluginListResolverInstance: ICommandResolverWithSettings
 
   constructor() {
@@ -67,7 +71,10 @@ class CommandResolverService {
     // Initialize async to ensure storage is properly loaded and subscribed to changes
     this.initStorage()
 
-    this.pluginListResolverInstance = createResolverWithSettings(pluginListResolver, this.getStorageSettings)
+    this.pluginListResolverInstance = createResolverWithSettings(
+      pluginListResolver,
+      this.generateResolverSettingProxy(pluginListResolver),
+    )
   }
 
   get registeredResolvers() {
@@ -89,23 +96,37 @@ class CommandResolverService {
     })
   }
 
-  private getStorageSettings = (): CommandSettingsData | null => {
+  private getStorageSettings(): CommandSettingsMapping | null {
     return this._storageSettings
   }
 
-  register(resolver: ICommandResolver) {
-    this.resolvers.push(createResolverWithSettings(resolver, this.getStorageSettings))
+  private generateResolverSettingProxy<T extends ZodType<Record<string, unknown>>>(
+    resolver: ICommandResolver<T>,
+  ): () => CommandPluginStorageSettings {
+    return () => {
+      const storageSettings = this.getStorageSettings()
+      const pluginStorageSettings = storageSettings?.[resolver.properties.name]
+      const defaultPluginSettings = defaultCommandSettings[resolver.properties.name]
+      if (pluginStorageSettings && defaultPluginSettings) {
+        return WarpDefaultObject(pluginStorageSettings, defaultPluginSettings)
+      }
+      return defaultPluginSettings ?? fallbackSettings
+    }
+  }
+
+  register<T extends ZodType<Record<string, unknown>>>(resolver: ICommandResolver<T>) {
+    this.resolvers.push(createResolverWithSettings(resolver, this.generateResolverSettingProxy(resolver)))
     this.sortResolvers()
   }
 
   sortResolvers() {
     this.resolvers.sort((a, b) => {
-      return a.getSettings().priority - b.getSettings().priority
+      return a.settings.priority - b.settings.priority
     })
   }
 
   choosePlugins(rawQuery: string): { plugins: ICommandResolverWithSettings[]; hit: boolean } {
-    const availablePlugins = this.resolvers.filter(it => it.getSettings().active)
+    const availablePlugins = this.resolvers.filter(it => it.settings.active)
 
     // When query is empty, show plugin list
     if (rawQuery.length === 0) {
@@ -116,7 +137,7 @@ class CommandResolverService {
 
     // Try to match plugins with activeKey
     const matchedPlugins = availablePlugins.filter(it => {
-      const settings = it.getSettings()
+      const settings = it.settings
       return settings.activeKey && rawQuery.startsWith(settings.activeKey)
     })
 
@@ -130,14 +151,14 @@ class CommandResolverService {
     // Return global plugins
     return {
       plugins: this.resolvers.filter(it => {
-        const settings = it.getSettings()
+        const settings = it.settings
         return settings.active && settings.includeInGlobal
       }),
       hit: false,
     }
   }
 
-  resolve(params: CommandQueryParams, onGroupResolve: (group: ICommandResultGroup) => void) {
+  resolve(params: CommandQueryPayload, onGroupResolve: (group: ICommandResultGroup) => void) {
     const _tick = ++this._queryTimes
     // Choose plugins based on raw query
     const { plugins, hit } = this.choosePlugins(params.rawQuery)
@@ -163,18 +184,20 @@ class CommandResolverService {
       plugins.map(it => {
         return new Promise((resolve, reject) => {
           // Get settings once for this plugin
-          const settings = it.getSettings()
+          const settings = it.settings
 
           // Strip trigger key for this specific plugin
           const strippedQuery = stripTriggerKeyForPlugin(params.rawQuery, settings.activeKey)
 
           // Create params with plugin-specific stripped query
-          const pluginParams: CommandQueryParams & { resolverService: CommandResolverService } = {
+          const pluginParams: CommandResolveParams<Record<string, unknown>> = {
             ...baseParams,
             query: strippedQuery,
+            settings,
           }
 
-          it.resolve(pluginParams)
+          it.resolve
+            .call(it, pluginParams)
             .then(res => {
               if (res === null || res.length === 0) {
                 // If plugin returns null or empty array, still show empty group for non-empty queries

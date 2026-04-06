@@ -433,6 +433,62 @@
     "description": "Web Search result title template",
     "message": "Search for \"{query}\""
   },
+  "commandPluginWebSearchTitleWithEngine": {
+    "description": "Web Search result title template with engine name",
+    "message": "Search for \"{query}\" with {engine}"
+  },
+  "commandPluginWebSearchDefaultEngine": {
+    "description": "Default search engine label",
+    "message": "Default search engine"
+  },
+  "commandPluginWebSearchDefaultEngineDescription": {
+    "description": "Default search engine result description",
+    "message": "Use the browser default search engine."
+  },
+  "commandPluginWebSearchSearchEngines": {
+    "description": "Web Search custom search engines field title",
+    "message": "Custom search engines"
+  },
+  "commandPluginWebSearchSearchEnginesDescription": {
+    "description": "Web Search custom search engines field description",
+    "message": "Add one or more URL templates. Use %s as the placeholder for the search text."
+  },
+  "commandPluginWebSearchSearchEngineTemplate": {
+    "description": "Web Search custom search engine template field title",
+    "message": "Search engine URL template"
+  },
+  "commandPluginWebSearchSearchEngineTemplateDescription": {
+    "description": "Web Search custom search engine template field description",
+    "message": "Example: https://www.google.com/search?q=%s"
+  },
+  "commandPluginWebSearchSearchEngineTemplatePlaceholderError": {
+    "description": "Web Search custom search engine template placeholder validation error",
+    "message": "The URL must include a %s placeholder."
+  },
+  "commandPluginWebSearchSearchEngineTitle": {
+    "description": "Web Search custom search engine title label",
+    "message": "Title"
+  },
+  "commandPluginWebSearchSearchEngineTitleDescription": {
+    "description": "Web Search custom search engine title description",
+    "message": "Optional display name for this search engine."
+  },
+  "commandPluginWebSearchSearchEngineItemTitle": {
+    "description": "Web Search custom search engine item title",
+    "message": "Search engine"
+  },
+  "commandPluginWebSearchSearchEngineTitlePlaceholder": {
+    "description": "Placeholder for custom search engine title field",
+    "message": "For example: Google, DuckDuckGo, Perplexity"
+  },
+  "commandPluginWebSearchSearchEngineTemplatePlaceholder": {
+    "description": "Placeholder for custom search engine template field",
+    "message": "https://www.google.com/search?q=%s"
+  },
+  "commandPluginWebSearchCustomEngineFallback": {
+    "description": "Fallback label for unnamed custom search engine",
+    "message": "Custom search engine"
+  },
   "commandPluginCalculator": {
     "description": "Calculator command plugin name",
     "message": "Calculator"
@@ -644,6 +700,26 @@
   "commandPluginSettings": {
     "description": "Command plugin settings section title",
     "message": "Command Plugin Settings"
+  },
+  "commandPluginCustomSettings": {
+    "description": "Command plugin custom settings section title",
+    "message": "Plugin-specific settings"
+  },
+  "commandPluginCustomSettingsSaveButton": {
+    "description": "Save button for command plugin custom settings",
+    "message": "Save"
+  },
+  "commandPluginCustomSettingsSaved": {
+    "description": "Toast message when custom settings saved successfully",
+    "message": "Settings saved."
+  },
+  "commandPluginCustomSettingsSaveError": {
+    "description": "Toast message when custom settings save failed",
+    "message": "Failed to save settings."
+  },
+  "commandPluginCustomSettingsValidationError": {
+    "description": "Toast message when custom settings validation fails",
+    "message": "Validation failed"
   },
   "editQuickItem": {
     "description": "Edit",
