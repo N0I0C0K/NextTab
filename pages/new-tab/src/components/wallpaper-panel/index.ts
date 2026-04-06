@@ -1,0 +1,1 @@
+export { WallpaperPanel } from './WallpaperPanel'
