@@ -6,12 +6,13 @@ import { forwardRef } from 'react'
 interface LinkCardIconProps {
   url: string
   onClick: MouseEventHandler<HTMLDivElement>
+  large?: boolean
 }
 
 /**
  * LinkCardIcon - The clickable icon/image component for a link card
  */
-export const LinkCardIcon = forwardRef<HTMLDivElement, LinkCardIconProps>(({ url, onClick }, ref) => {
+export const LinkCardIcon = forwardRef<HTMLDivElement, LinkCardIconProps>(({ url, onClick, large = false }, ref) => {
   return (
     <div
       className={cn(
@@ -23,7 +24,11 @@ export const LinkCardIcon = forwardRef<HTMLDivElement, LinkCardIconProps>(({ url
       onClick={onClick}
       aria-hidden="true"
       ref={ref}>
-      <img src={getDefaultIconUrl(url)} alt="img" className="size-8 rounded-md select-none" />
+      <img
+        src={getDefaultIconUrl(url)}
+        alt="img"
+        className={cn('rounded-md select-none', large ? 'size-10' : 'size-8')}
+      />
     </div>
   )
 })

@@ -141,6 +141,14 @@
     "description": "History suggestion setting description",
     "message": "Use history for recommendations."
   },
+  "showQuickLinkTitle": {
+    "description": "Show quick link title setting title",
+    "message": "Show Quick Link Title"
+  },
+  "showQuickLinkTitleDescription": {
+    "description": "Show quick link title setting description",
+    "message": "Show the title label below each quick link icon."
+  },
   "autoFocusCommandInput": {
     "description": "Auto focus command input setting title",
     "message": "Auto Focus Command Input"

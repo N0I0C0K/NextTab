@@ -1,7 +1,7 @@
 import { useStorage } from '@extension/shared'
 import { settingStorage } from '@extension/storage'
 import { Stack, Text, Switch, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@extension/ui'
-import { History, Bookmark, NotebookTabs, Folder } from 'lucide-react'
+import { History, Bookmark, NotebookTabs, Folder, Type } from 'lucide-react'
 import type { FC } from 'react'
 import { useEffect, useState } from 'react'
 import { t } from '@extension/i18n'
@@ -59,6 +59,17 @@ export const HomepageSettings: FC = () => {
           <Switch
             checked={settings.useHistorySuggestion}
             onCheckedChange={val => settingStorage.update({ useHistorySuggestion: val })}
+          />
+        }
+      />
+      <SettingItem
+        IconClass={Type}
+        title={t('showQuickLinkTitle')}
+        description={t('showQuickLinkTitleDescription')}
+        control={
+          <Switch
+            checked={settings.showQuickLinkTitle}
+            onCheckedChange={val => settingStorage.update({ showQuickLinkTitle: val })}
           />
         }
       />
