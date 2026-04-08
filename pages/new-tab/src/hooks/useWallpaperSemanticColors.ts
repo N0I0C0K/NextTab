@@ -36,15 +36,15 @@ const SEMANTIC_SWATCH_COLOR_COUNT = 8
 const SEMANTIC_SWATCH_QUALITY = 5
 
 function serializeSwatches(swatches: SwatchMap): CachedWallpaperSwatches {
-  return SWATCH_ROLES.reduce<CachedWallpaperSwatches>((result, role) => {
+  return SWATCH_ROLES.reduce<CachedWallpaperSwatches>((serializedSwatches, role) => {
     const swatch = swatches[role]
 
     if (!swatch) {
-      return result
+      return serializedSwatches
     }
 
-    result[role] = swatch.color.toString()
-    return result
+    serializedSwatches[role] = swatch.color.toString()
+    return serializedSwatches
   }, {})
 }
 
@@ -93,11 +93,11 @@ function loadImageForSwatches(src: string, wallpaperType: WallpaperType): Promis
 }
 
 // FNV-1a provides a tiny deterministic fallback hash for cache keys when Web Crypto is unavailable.
-function createFallbackHash(value: string): string {
+function createFallbackHash(input: string): string {
   let hash = 0x811c9dc5
 
-  for (let index = 0; index < value.length; index += 1) {
-    hash ^= value.charCodeAt(index)
+  for (let index = 0; index < input.length; index += 1) {
+    hash ^= input.charCodeAt(index)
     hash = Math.imul(hash, 0x01000193)
   }
 
@@ -112,7 +112,7 @@ async function createCacheKey(wallpaperSrc: string, wallpaperType: WallpaperType
   const encoded = new TextEncoder().encode(`${wallpaperType}:${wallpaperSrc}`)
   const digest = await globalThis.crypto.subtle.digest('SHA-256', encoded)
 
-  return Array.from(new Uint8Array(digest), value => value.toString(16).padStart(2, '0')).join('')
+  return Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, '0')).join('')
 }
 
 export function useWallpaperSemanticColors(wallpaperSrc: string, wallpaperType: WallpaperType) {
