@@ -11,6 +11,8 @@ import type { WallpaperType } from '@extension/storage'
 import { useStorage } from '@extension/shared'
 import { useWallpaperSemanticColors } from './hooks/useWallpaperSemanticColors'
 
+const TIME_VALUE_CLASSNAME = 'select-none font-extralight leading-none text-[clamp(5rem,12vw,10rem)] 2xl:font-light'
+
 const TimeDisplay = ({ wallpaperSrc, wallpaperType }: { wallpaperSrc: string; wallpaperType: WallpaperType }) => {
   const [time, setTime] = useState<Date>(new Date())
   const [refreshTrigger, setRefreshTrigger] = useState<number>(0)
@@ -34,7 +36,7 @@ const TimeDisplay = ({ wallpaperSrc, wallpaperType }: { wallpaperSrc: string; wa
     <Stack direction={'column'} className="items-center gap-2 md:gap-3">
       <Stack className="items-end">
         <Heading
-          className="select-none font-extralight leading-none text-[clamp(5rem,12vw,10rem)] 2xl:font-light"
+          className={TIME_VALUE_CLASSNAME}
           style={{ color: colors.time }}>
           {time?.getHours().toString().padStart(2, '0')}
         </Heading>
@@ -49,7 +51,7 @@ const TimeDisplay = ({ wallpaperSrc, wallpaperType }: { wallpaperSrc: string; wa
           <circle cx="3" cy="7" r="1" />
         </svg>
         <Heading
-          className="select-none font-extralight leading-none text-[clamp(5rem,12vw,10rem)] 2xl:font-light"
+          className={TIME_VALUE_CLASSNAME}
           style={{ color: colors.time }}>
           {time?.getMinutes().toString().padStart(2, '0')}
         </Heading>

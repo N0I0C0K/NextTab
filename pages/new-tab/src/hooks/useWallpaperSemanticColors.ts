@@ -30,6 +30,11 @@ const DEFAULT_COLORS: Record<'dark' | 'light', TimeDisplayColors> = {
   },
 }
 
+// Keep enough palette depth for vibrant/muted pairs while staying fast on large wallpapers by
+// sampling every fifth pixel during extraction.
+const SEMANTIC_SWATCH_COLOR_COUNT = 8
+const SEMANTIC_SWATCH_QUALITY = 5
+
 function serializeSwatches(swatches: SwatchMap): CachedWallpaperSwatches {
   return SWATCH_ROLES.reduce<CachedWallpaperSwatches>((result, role) => {
     const swatch = swatches[role]
@@ -87,6 +92,7 @@ function loadImageForSwatches(src: string, wallpaperType: WallpaperType): Promis
   })
 }
 
+// FNV-1a provides a tiny deterministic fallback hash for cache keys when Web Crypto is unavailable.
 function createFallbackHash(value: string): string {
   let hash = 0x811c9dc5
 
@@ -131,9 +137,12 @@ export function useWallpaperSemanticColors(wallpaperSrc: string, wallpaperType: 
         }
 
         const image = await loadImageForSwatches(wallpaperSrc, wallpaperType)
-        // Eight colors is enough to preserve both vibrant and muted families, and quality 5 keeps
-        // extraction fast on large wallpapers by sampling every fifth pixel without making swatches unstable.
-        const extractedSwatches = serializeSwatches(await getSwatches(image, { colorCount: 8, quality: 5 }))
+        const extractedSwatches = serializeSwatches(
+          await getSwatches(image, {
+            colorCount: SEMANTIC_SWATCH_COLOR_COUNT,
+            quality: SEMANTIC_SWATCH_QUALITY,
+          }),
+        )
 
         if (!isActive) {
           return
