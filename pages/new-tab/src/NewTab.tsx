@@ -7,11 +7,15 @@ import type { CommandModuleRef } from './components/command'
 import '@/src/style/placeholder.css'
 import { HistoryArea } from './components/history-area'
 import { settingStorage, DEFAULT_WALLPAPER_URL, localWallpaperStorage } from '@extension/storage'
+import type { WallpaperType } from '@extension/storage'
 import { useStorage } from '@extension/shared'
+import { useWallpaperSemanticColors } from './hooks/useWallpaperSemanticColors'
 
-const TimeDisplay = () => {
+const TimeDisplay = ({ wallpaperSrc, wallpaperType }: { wallpaperSrc: string; wallpaperType: WallpaperType }) => {
   const [time, setTime] = useState<Date>(new Date())
   const [refreshTrigger, setRefreshTrigger] = useState<number>(0)
+  const colors = useWallpaperSemanticColors(wallpaperSrc, wallpaperType)
+
   useEffect(() => {
     const timeNow = new Date()
     setTime(timeNow)
@@ -27,21 +31,32 @@ const TimeDisplay = () => {
   }, [refreshTrigger])
 
   return (
-    <Stack direction={'column'} className="items-center">
+    <Stack direction={'column'} className="items-center gap-2 md:gap-3">
       <Stack className="items-end">
-        <Heading className="text-8xl select-none font-thin">{time?.getHours().toString().padStart(2, '0')}</Heading>
+        <Heading
+          className="select-none font-extralight leading-none text-[clamp(5rem,12vw,10rem)] 2xl:font-light"
+          style={{ color: colors.time }}>
+          {time?.getHours().toString().padStart(2, '0')}
+        </Heading>
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 6 24"
           fill="none"
           stroke="currentColor"
-          className="w-4 h-20 fill-current stroke-10 mx-1">
+          className="mx-1 h-[clamp(4rem,10vw,6rem)] w-[clamp(0.75rem,1vw,1rem)] fill-current stroke-10"
+          style={{ color: colors.time }}>
           <circle cx="3" cy="17" r="1" />
           <circle cx="3" cy="7" r="1" />
         </svg>
-        <Heading className="text-8xl select-none font-thin">{time?.getMinutes().toString().padStart(2, '0')}</Heading>
+        <Heading
+          className="select-none font-extralight leading-none text-[clamp(5rem,12vw,10rem)] 2xl:font-light"
+          style={{ color: colors.time }}>
+          {time?.getMinutes().toString().padStart(2, '0')}
+        </Heading>
       </Stack>
-      <Text className="font-semibold select-none text-primary/80">
+      <Text
+        className="select-none font-medium text-[clamp(0.95rem,1.6vw,1.25rem)]"
+        style={{ color: colors.date }}>
         {time.toLocaleDateString('en-US', { year: 'numeric', month: 'numeric', day: 'numeric', weekday: 'long' })}
       </Text>
     </Stack>
@@ -60,6 +75,8 @@ const NewTab = () => {
     }
   })
   const commandModuleRef = useRef<CommandModuleRef>(null)
+  const effectiveWallpaperType: WallpaperType =
+    settings.wallpaperType === 'local' && localWallpaper.imageData && wallpaperSrc === localWallpaper.imageData ? 'local' : 'url'
 
   useEffect(() => {
     // Update wallpaper source when settings change
@@ -82,7 +99,7 @@ const NewTab = () => {
         className={'flex h-screen w-screen max-w-full flex-col justify-center gap-4 relative overflow-hidden'}
         onDoubleClick={handleBackgroundDoubleClick}>
         <Center column className="flex-1">
-          <TimeDisplay />
+          <TimeDisplay wallpaperSrc={wallpaperSrc} wallpaperType={effectiveWallpaperType} />
         </Center>
         <Stack direction={'column'} className="flex-1">
           <Center className="mb-8 h-10">
