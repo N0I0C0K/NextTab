@@ -68,7 +68,11 @@ function getEffectiveWallpaperType(
   localWallpaperImageData: string | null,
   wallpaperSrc: string,
 ): WallpaperType {
-  return wallpaperType === 'local' && localWallpaperImageData && wallpaperSrc === localWallpaperImageData ? 'local' : 'url'
+  if (wallpaperType === 'local') {
+    return localWallpaperImageData && wallpaperSrc === localWallpaperImageData ? 'local' : 'url'
+  }
+
+  return wallpaperType
 }
 
 const NewTab = () => {

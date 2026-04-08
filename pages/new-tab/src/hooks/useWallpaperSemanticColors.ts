@@ -87,9 +87,20 @@ function loadImageForSwatches(src: string, wallpaperType: WallpaperType): Promis
   })
 }
 
+function createFallbackHash(value: string): string {
+  let hash = 0x811c9dc5
+
+  for (let index = 0; index < value.length; index += 1) {
+    hash ^= value.charCodeAt(index)
+    hash = Math.imul(hash, 0x01000193)
+  }
+
+  return (hash >>> 0).toString(16).padStart(8, '0')
+}
+
 async function createCacheKey(wallpaperSrc: string, wallpaperType: WallpaperType): Promise<string> {
   if (!globalThis.crypto?.subtle) {
-    return `${wallpaperType}:${wallpaperSrc}`
+    return `${wallpaperType}:${createFallbackHash(wallpaperSrc)}`
   }
 
   const encoded = new TextEncoder().encode(`${wallpaperType}:${wallpaperSrc}`)
@@ -120,8 +131,8 @@ export function useWallpaperSemanticColors(wallpaperSrc: string, wallpaperType: 
         }
 
         const image = await loadImageForSwatches(wallpaperSrc, wallpaperType)
-        // Use a compact palette size with moderate sampling so wallpaper switches stay responsive
-        // while still yielding stable semantic swatches for the time/date pair selection.
+        // Eight colors is enough to preserve both vibrant and muted families, and quality 5 keeps
+        // extraction fast on large wallpapers by sampling every fifth pixel without making swatches unstable.
         const extractedSwatches = serializeSwatches(await getSwatches(image, { colorCount: 8, quality: 5 }))
 
         if (!isActive) {
