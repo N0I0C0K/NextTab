@@ -63,6 +63,14 @@ const TimeDisplay = ({ wallpaperSrc, wallpaperType }: { wallpaperSrc: string; wa
   )
 }
 
+function getEffectiveWallpaperType(
+  wallpaperType: WallpaperType,
+  localWallpaperImageData: string | null,
+  wallpaperSrc: string,
+): WallpaperType {
+  return wallpaperType === 'local' && localWallpaperImageData && wallpaperSrc === localWallpaperImageData ? 'local' : 'url'
+}
+
 const NewTab = () => {
   const settings = useStorage(settingStorage)
   const localWallpaper = useStorage(localWallpaperStorage)
@@ -75,8 +83,7 @@ const NewTab = () => {
     }
   })
   const commandModuleRef = useRef<CommandModuleRef>(null)
-  const effectiveWallpaperType: WallpaperType =
-    settings.wallpaperType === 'local' && localWallpaper.imageData && wallpaperSrc === localWallpaper.imageData ? 'local' : 'url'
+  const effectiveWallpaperType = getEffectiveWallpaperType(settings.wallpaperType, localWallpaper.imageData, wallpaperSrc)
 
   useEffect(() => {
     // Update wallpaper source when settings change

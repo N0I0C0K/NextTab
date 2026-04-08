@@ -84,10 +84,6 @@ function loadImageForSwatches(src: string, wallpaperType: WallpaperType): Promis
     image.onload = () => resolve(image)
     image.onerror = () => reject(new Error('Failed to load wallpaper for swatch extraction'))
     image.src = src
-
-    if (image.complete && image.naturalWidth > 0) {
-      resolve(image)
-    }
   })
 }
 
@@ -124,6 +120,8 @@ export function useWallpaperSemanticColors(wallpaperSrc: string, wallpaperType: 
         }
 
         const image = await loadImageForSwatches(wallpaperSrc, wallpaperType)
+        // Use a compact palette size with moderate sampling so wallpaper switches stay responsive
+        // while still yielding stable semantic swatches for the time/date pair selection.
         const extractedSwatches = serializeSwatches(await getSwatches(image, { colorCount: 8, quality: 5 }))
 
         if (!isActive) {
