@@ -30,10 +30,13 @@ const DEFAULT_COLORS: Record<'dark' | 'light', TimeDisplayColors> = {
   },
 }
 
-// Keep enough palette depth for vibrant/muted pairs while staying fast on large wallpapers by
-// sampling every fifth pixel during extraction.
+// Number of dominant colors requested from ColorThief so both vibrant and muted semantic roles
+// still have enough palette coverage on varied wallpapers.
 const SEMANTIC_SWATCH_COLOR_COUNT = 8
+// Sampling stride for ColorThief extraction; quality 5 means sampling every fifth pixel to keep
+// extraction fast on large wallpapers without losing stable semantic swatches.
 const SEMANTIC_SWATCH_QUALITY = 5
+// FNV-1a 32-bit constants used for the fallback hash path when Web Crypto is unavailable.
 const FNV1A_OFFSET_BASIS = 0x811c9dc5
 const FNV1A_PRIME = 0x01000193
 

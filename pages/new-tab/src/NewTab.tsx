@@ -11,8 +11,8 @@ import type { WallpaperType } from '@extension/storage'
 import { useStorage } from '@extension/shared'
 import { useWallpaperSemanticColors } from './hooks/useWallpaperSemanticColors'
 
-const TIME_TEXT_CLASSNAME = 'select-none font-extralight leading-none text-[clamp(5rem,12vw,10rem)] 2xl:font-light'
-const TIME_GAP_CLASSNAME = 'gap-[clamp(0.25rem,0.8vw,0.6rem)]'
+const timeTextClassName = 'select-none font-extralight leading-none text-[clamp(5rem,12vw,10rem)] 2xl:font-light'
+const timeGapClassName = 'gap-[clamp(0.25rem,0.8vw,0.6rem)]'
 
 const TimeDisplay = ({
   wallpaperSrc,
@@ -46,20 +46,20 @@ const TimeDisplay = ({
 
   return (
     <Stack direction={'column'} className="items-center gap-2 md:gap-3">
-      <time dateTime={dateTimeValue} className={`flex items-center ${TIME_GAP_CLASSNAME}`}>
+      <time dateTime={dateTimeValue} className={`flex items-center ${timeGapClassName}`}>
         <Heading
-          className={TIME_TEXT_CLASSNAME}
+          className={timeTextClassName}
           style={{ color: colors.time }}>
           {formattedHours}
         </Heading>
         <Heading
           aria-hidden
-          className={TIME_TEXT_CLASSNAME}
+          className={timeTextClassName}
           style={{ color: colors.time }}>
           :
         </Heading>
         <Heading
-          className={TIME_TEXT_CLASSNAME}
+          className={timeTextClassName}
           style={{ color: colors.time }}>
           {formattedMinutes}
         </Heading>
@@ -164,7 +164,7 @@ const NewTab = () => {
         src={wallpaperSrc}
         alt="background wallpaper"
         onLoad={() => {
-          setWallpaperVersion(version => version + 1)
+          setWallpaperVersion(version => (version >= Number.MAX_SAFE_INTEGER ? 0 : version + 1))
         }}
         onError={() => {
           console.log('background image error')
