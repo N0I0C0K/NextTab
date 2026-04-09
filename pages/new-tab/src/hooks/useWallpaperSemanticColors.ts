@@ -131,7 +131,7 @@ function createFallbackHash(input: string): string {
     hash = Math.imul(hash, FNV1A_PRIME)
   }
 
-  return (hash >>> 0).toString(16).padStart(8, '0')
+  return (hash >>> 0).toString(16).padStart(64, '0')
 }
 
 async function createCacheKey(wallpaperSrc: string, wallpaperType: WallpaperType): Promise<string> {
@@ -145,6 +145,12 @@ async function createCacheKey(wallpaperSrc: string, wallpaperType: WallpaperType
   return Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, '0')).join('')
 }
 
+/**
+ * Resolves semantic time/date colors for the active wallpaper.
+ *
+ * `wallpaperVersion` is incremented when the visible wallpaper image finishes loading so this hook
+ * can re-run extraction against the newly loaded wallpaper instead of stale image state.
+ */
 export function useWallpaperSemanticColors(wallpaperSrc: string, wallpaperType: WallpaperType, wallpaperVersion: number) {
   const { realTheme } = useTheme()
   const [swatches, setSwatches] = useState<CachedWallpaperSwatches | null>(null)

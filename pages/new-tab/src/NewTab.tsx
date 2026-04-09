@@ -43,7 +43,7 @@ const TimeDisplay = ({
 
   return (
     <Stack direction={'column'} className="items-center gap-2 md:gap-3">
-      <Stack className={`items-center ${TIME_GAP_CLASSNAME}`}>
+      <time dateTime={time.toTimeString().slice(0, 5)} className={`flex items-center ${TIME_GAP_CLASSNAME}`}>
         <Heading
           className={TIME_TEXT_CLASSNAME}
           style={{ color: colors.time }}>
@@ -60,7 +60,7 @@ const TimeDisplay = ({
           style={{ color: colors.time }}>
           {time?.getMinutes().toString().padStart(2, '0')}
         </Heading>
-      </Stack>
+      </time>
       <Text
         className="select-none font-medium text-[clamp(0.95rem,1.6vw,1.25rem)]"
         style={{ color: colors.date }}>
