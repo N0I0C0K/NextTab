@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils'
 import { useStorage, PERMISSION_ORIGINS, usePermission } from '@extension/shared'
-import { settingStorage, wallpaperHistoryStorage } from '@extension/storage'
-import type { WallhavenSortMode } from '@extension/storage'
+import { settingStorage, wallpaperHistoryStorage, wallpaperSwatchStorage, SWATCH_ROLES } from '@extension/storage'
+import type { WallhavenSortMode, SwatchRole } from '@extension/storage'
 import {
   Button,
   Stack,
@@ -14,7 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@extension/ui'
-import { Check, Loader2, RefreshCw, History, Trash2, X, Link } from 'lucide-react'
+import { Check, Loader2, RefreshCw, History, Trash2, X, Link, Palette } from 'lucide-react'
 import { type FC, useCallback, useEffect, useState, useRef } from 'react'
 import { t } from '@extension/i18n'
 import { WallpaperImage } from './WallpaperImage'
@@ -22,6 +22,15 @@ import { LocalWallpaperSection } from './LocalWallpaperSection'
 import { PermissionGrant } from './PermissionGrant'
 
 const WALLHAVEN_PERMISSION_ORIGINS = [PERMISSION_ORIGINS.WALLHAVEN_API]
+
+const SWATCH_ROLE_I18N: Record<SwatchRole, () => string> = {
+  Vibrant: () => t('swatchRoleVibrant'),
+  Muted: () => t('swatchRoleMuted'),
+  DarkVibrant: () => t('swatchRoleDarkVibrant'),
+  DarkMuted: () => t('swatchRoleDarkMuted'),
+  LightVibrant: () => t('swatchRoleLightVibrant'),
+  LightMuted: () => t('swatchRoleLightMuted'),
+}
 
 // Scroll threshold in pixels to trigger loading more wallpapers
 const SCROLL_THRESHOLD = 100
@@ -142,6 +151,7 @@ const HistoryWallpaperCard: FC<{
 export const WallpaperSettings: FC = () => {
   const settings = useStorage(settingStorage)
   const historyData = useStorage(wallpaperHistoryStorage)
+  const swatchCache = useStorage(wallpaperSwatchStorage)
   const [wallpapers, setWallpapers] = useState<WallhavenWallpaper[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [isLoadingMore, setIsLoadingMore] = useState(false)
@@ -433,6 +443,65 @@ export const WallpaperSettings: FC = () => {
       {/* Local Wallpaper Section */}
       <Separator className="my-2" />
       <LocalWallpaperSection />
+
+      {/* Swatch Color Scheme Section */}
+      {swatchCache.wallpaperId && Object.values(swatchCache.swatches).some(Boolean) && (
+        <>
+          <Separator className="my-2" />
+          <Stack direction={'row'} className="items-center gap-2">
+            <Palette className="size-4 text-muted-foreground" />
+            <Text gray level="s">
+              {t('swatchColorScheme')}
+            </Text>
+          </Stack>
+          <Text gray level="xs">
+            {t('swatchColorSchemeDescription')}
+          </Text>
+          <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+            {/* Auto option */}
+            <button
+              type="button"
+              className={cn(
+                'relative flex flex-col items-center gap-1 rounded-lg border-2 p-2 transition-all',
+                settings.selectedSwatchRole === null
+                  ? 'border-primary ring-2 ring-primary/50'
+                  : 'border-transparent hover:border-muted-foreground/30',
+              )}
+              onClick={() => settingStorage.update({ selectedSwatchRole: null })}>
+              <div className="flex size-8 items-center justify-center rounded-full bg-gradient-to-br from-primary to-muted-foreground">
+                {settings.selectedSwatchRole === null && <Check className="size-4 text-primary-foreground" />}
+              </div>
+              <Text level="xs">{t('swatchRoleAuto')}</Text>
+            </button>
+            {/* Individual swatch roles */}
+            {SWATCH_ROLES.map(role => {
+              const swatch = swatchCache.swatches[role]
+              if (!swatch) return null
+              return (
+                <button
+                  key={role}
+                  type="button"
+                  className={cn(
+                    'relative flex flex-col items-center gap-1 rounded-lg border-2 p-2 transition-all',
+                    settings.selectedSwatchRole === role
+                      ? 'border-primary ring-2 ring-primary/50'
+                      : 'border-transparent hover:border-muted-foreground/30',
+                  )}
+                  onClick={() => settingStorage.update({ selectedSwatchRole: role })}>
+                  <div
+                    className="flex size-8 items-center justify-center rounded-full"
+                    style={{ backgroundColor: swatch.colorHex }}>
+                    {settings.selectedSwatchRole === role && (
+                      <Check className="size-4" style={{ color: swatch.titleTextColorHex }} />
+                    )}
+                  </div>
+                  <Text level="xs">{SWATCH_ROLE_I18N[role]()}</Text>
+                </button>
+              )
+            })}
+          </div>
+        </>
+      )}
     </Stack>
   )
 }

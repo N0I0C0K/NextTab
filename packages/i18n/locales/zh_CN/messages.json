@@ -800,5 +800,41 @@
   "mqttPermissionDescription": {
     "description": "Description for MQTT broker permission",
     "message": "需要授权才能连接 MQTT 服务器"
+  },
+  "swatchColorScheme": {
+    "description": "Label for wallpaper color scheme selection",
+    "message": "文字配色方案"
+  },
+  "swatchColorSchemeDescription": {
+    "description": "Description for wallpaper color scheme selection",
+    "message": "选择从壁纸中提取的配色方案用于时间/日期文字显示。"
+  },
+  "swatchRoleAuto": {
+    "description": "Auto swatch selection option",
+    "message": "自动"
+  },
+  "swatchRoleVibrant": {
+    "description": "Vibrant swatch role",
+    "message": "鲜艳"
+  },
+  "swatchRoleMuted": {
+    "description": "Muted swatch role",
+    "message": "柔和"
+  },
+  "swatchRoleDarkVibrant": {
+    "description": "Dark Vibrant swatch role",
+    "message": "深色鲜艳"
+  },
+  "swatchRoleDarkMuted": {
+    "description": "Dark Muted swatch role",
+    "message": "深色柔和"
+  },
+  "swatchRoleLightVibrant": {
+    "description": "Light Vibrant swatch role",
+    "message": "浅色鲜艳"
+  },
+  "swatchRoleLightMuted": {
+    "description": "Light Muted swatch role",
+    "message": "浅色柔和"
   }
 }

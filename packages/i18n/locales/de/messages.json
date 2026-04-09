@@ -800,5 +800,41 @@
   "mqttPermissionDescription": {
     "description": "Description for MQTT broker permission",
     "message": "Autorisierung erforderlich, um eine Verbindung zum MQTT-Server herzustellen"
+  },
+  "swatchColorScheme": {
+    "description": "Label for wallpaper color scheme selection",
+    "message": "Textfarbschema"
+  },
+  "swatchColorSchemeDescription": {
+    "description": "Description for wallpaper color scheme selection",
+    "message": "Wählen Sie ein aus dem Hintergrundbild extrahiertes Farbschema für die Zeit-/Datumsanzeige."
+  },
+  "swatchRoleAuto": {
+    "description": "Auto swatch selection option",
+    "message": "Automatisch"
+  },
+  "swatchRoleVibrant": {
+    "description": "Vibrant swatch role",
+    "message": "Leuchtend"
+  },
+  "swatchRoleMuted": {
+    "description": "Muted swatch role",
+    "message": "Gedämpft"
+  },
+  "swatchRoleDarkVibrant": {
+    "description": "Dark Vibrant swatch role",
+    "message": "Dunkel leuchtend"
+  },
+  "swatchRoleDarkMuted": {
+    "description": "Dark Muted swatch role",
+    "message": "Dunkel gedämpft"
+  },
+  "swatchRoleLightVibrant": {
+    "description": "Light Vibrant swatch role",
+    "message": "Hell leuchtend"
+  },
+  "swatchRoleLightMuted": {
+    "description": "Light Muted swatch role",
+    "message": "Hell gedämpft"
   }
 }

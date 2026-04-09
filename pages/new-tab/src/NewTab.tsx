@@ -8,8 +8,10 @@ import '@/src/style/placeholder.css'
 import { HistoryArea } from './components/history-area'
 import { settingStorage, DEFAULT_WALLPAPER_URL, localWallpaperStorage } from '@extension/storage'
 import { useStorage } from '@extension/shared'
+import type { SwatchData } from '@extension/storage'
+import { useWallpaperSwatches } from './hooks/useWallpaperSwatches'
 
-const TimeDisplay = () => {
+const TimeDisplay = ({ swatch }: { swatch: SwatchData | null }) => {
   const [time, setTime] = useState<Date>(new Date())
   const [refreshTrigger, setRefreshTrigger] = useState<number>(0)
   useEffect(() => {
@@ -26,22 +28,30 @@ const TimeDisplay = () => {
     }
   }, [refreshTrigger])
 
+  const timeStyle = swatch ? { color: swatch.titleTextColorHex } : undefined
+  const dateStyle = swatch ? { color: swatch.bodyTextColorHex } : undefined
+
   return (
     <Stack direction={'column'} className="items-center">
       <Stack className="items-end">
-        <Heading className="text-8xl select-none font-thin">{time?.getHours().toString().padStart(2, '0')}</Heading>
+        <Heading className="text-8xl select-none font-thin" style={timeStyle}>
+          {time?.getHours().toString().padStart(2, '0')}
+        </Heading>
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 6 24"
           fill="none"
           stroke="currentColor"
-          className="w-4 h-20 fill-current stroke-10 mx-1">
+          className="w-4 h-20 fill-current stroke-10 mx-1"
+          style={timeStyle}>
           <circle cx="3" cy="17" r="1" />
           <circle cx="3" cy="7" r="1" />
         </svg>
-        <Heading className="text-8xl select-none font-thin">{time?.getMinutes().toString().padStart(2, '0')}</Heading>
+        <Heading className="text-8xl select-none font-thin" style={timeStyle}>
+          {time?.getMinutes().toString().padStart(2, '0')}
+        </Heading>
       </Stack>
-      <Text className="font-semibold select-none text-primary/80">
+      <Text className="font-semibold select-none text-primary/80" style={dateStyle}>
         {time.toLocaleDateString('en-US', { year: 'numeric', month: 'numeric', day: 'numeric', weekday: 'long' })}
       </Text>
     </Stack>
@@ -60,6 +70,7 @@ const NewTab = () => {
     }
   })
   const commandModuleRef = useRef<CommandModuleRef>(null)
+  const { activeSwatch } = useWallpaperSwatches(wallpaperSrc)
 
   useEffect(() => {
     // Update wallpaper source when settings change
@@ -82,7 +93,7 @@ const NewTab = () => {
         className={'flex h-screen w-screen max-w-full flex-col justify-center gap-4 relative overflow-hidden'}
         onDoubleClick={handleBackgroundDoubleClick}>
         <Center column className="flex-1">
-          <TimeDisplay />
+          <TimeDisplay swatch={activeSwatch} />
         </Center>
         <Stack direction={'column'} className="flex-1">
           <Center className="mb-8 h-10">

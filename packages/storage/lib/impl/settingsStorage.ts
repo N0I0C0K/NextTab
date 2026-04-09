@@ -2,6 +2,7 @@ import { StorageEnum } from '../base/enums'
 import { createStorage } from '../base/base'
 import type { BaseStorage } from '../base/types'
 import deepmerge from 'deepmerge'
+import type { SwatchRole } from './wallpaperSwatchStorage'
 
 export const DEFAULT_WALLPAPER_URL = 'https://w.wallhaven.cc/full/ml/wallhaven-mlpll9.jpg'
 export const DEFAULT_MQTT_BROKER_URL = 'wss://broker.emqx.io:8084/mqtt'
@@ -40,6 +41,8 @@ export type SettingProps = {
   wallpaperType: WallpaperType
   /** The sorting mode for Wallhaven gallery (toplist or random) */
   wallhavenSortMode: WallhavenSortMode
+  /** The selected swatch role for time/date text colors. null means use default (auto) */
+  selectedSwatchRole: SwatchRole | null
   mqttSettings: MqttSetting
 }
 
@@ -64,6 +67,7 @@ const defaultSetting: SettingProps = {
   wallpaperUrl: null,
   wallpaperType: 'url',
   wallhavenSortMode: 'toplist',
+  selectedSwatchRole: null,
   mqttSettings: {
     enabled: false,
     mqttBrokerUrl: DEFAULT_MQTT_BROKER_URL,
