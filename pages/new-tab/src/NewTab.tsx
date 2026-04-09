@@ -1,17 +1,35 @@
 import '@src/NewTab.css'
 import { Center, Text, Heading, Stack } from '@extension/ui'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { CommandModule, SettingPanel, ScrollLinkCardPage, OnboardingDialog } from './components'
 import type { CommandModuleRef } from './components/command'
 
 import '@/src/style/placeholder.css'
 import { HistoryArea } from './components/history-area'
 import { settingStorage, DEFAULT_WALLPAPER_URL, localWallpaperStorage } from '@extension/storage'
+import type { WallpaperType } from '@extension/storage'
 import { useStorage } from '@extension/shared'
+import { useWallpaperSemanticColors } from './hooks/useWallpaperSemanticColors'
 
-const TimeDisplay = () => {
+const timeTextClassName = 'select-none font-extralight leading-none text-[clamp(5rem,12vw,10rem)] 2xl:font-light'
+const timeGapClassName = 'gap-[clamp(0.25rem,0.8vw,0.6rem)]'
+
+const TimeDisplay = ({
+  wallpaperSrc,
+  wallpaperType,
+  wallpaperVersion,
+}: {
+  wallpaperSrc: string
+  wallpaperType: WallpaperType
+  wallpaperVersion: number
+}) => {
   const [time, setTime] = useState<Date>(new Date())
   const [refreshTrigger, setRefreshTrigger] = useState<number>(0)
+  const colors = useWallpaperSemanticColors(wallpaperSrc, wallpaperType, wallpaperVersion)
+  const formattedHours = time.getHours().toString().padStart(2, '0')
+  const formattedMinutes = time.getMinutes().toString().padStart(2, '0')
+  const dateTimeValue = `${formattedHours}:${formattedMinutes}`
+
   useEffect(() => {
     const timeNow = new Date()
     setTime(timeNow)
@@ -27,30 +45,50 @@ const TimeDisplay = () => {
   }, [refreshTrigger])
 
   return (
-    <Stack direction={'column'} className="items-center">
-      <Stack className="items-end">
-        <Heading className="text-8xl select-none font-thin">{time?.getHours().toString().padStart(2, '0')}</Heading>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 6 24"
-          fill="none"
-          stroke="currentColor"
-          className="w-4 h-20 fill-current stroke-10 mx-1">
-          <circle cx="3" cy="17" r="1" />
-          <circle cx="3" cy="7" r="1" />
-        </svg>
-        <Heading className="text-8xl select-none font-thin">{time?.getMinutes().toString().padStart(2, '0')}</Heading>
-      </Stack>
-      <Text className="font-semibold select-none text-primary/80">
+    <Stack direction={'column'} className="items-center gap-2 md:gap-3">
+      <time dateTime={dateTimeValue} className={`flex items-center ${timeGapClassName}`}>
+        <Heading
+          className={timeTextClassName}
+          style={{ color: colors.time }}>
+          {formattedHours}
+        </Heading>
+        <Heading
+          aria-hidden
+          className={timeTextClassName}
+          style={{ color: colors.time }}>
+          :
+        </Heading>
+        <Heading
+          className={timeTextClassName}
+          style={{ color: colors.time }}>
+          {formattedMinutes}
+        </Heading>
+      </time>
+      <Text
+        className="select-none font-medium text-[clamp(0.95rem,1.6vw,1.25rem)]"
+        style={{ color: colors.date }}>
         {time.toLocaleDateString('en-US', { year: 'numeric', month: 'numeric', day: 'numeric', weekday: 'long' })}
       </Text>
     </Stack>
   )
 }
 
+function getEffectiveWallpaperType(
+  wallpaperType: WallpaperType,
+  localWallpaperImageData: string | null,
+  wallpaperSrc: string,
+): WallpaperType {
+  if (wallpaperType === 'local') {
+    return localWallpaperImageData && wallpaperSrc === localWallpaperImageData ? 'local' : 'url'
+  }
+
+  return wallpaperType
+}
+
 const NewTab = () => {
   const settings = useStorage(settingStorage)
   const localWallpaper = useStorage(localWallpaperStorage)
+  const [wallpaperVersion, setWallpaperVersion] = useState(0)
   const [wallpaperSrc, setWallpaperSrc] = useState<string>(() => {
     // Initialize wallpaper source from settings
     if (settings.wallpaperType === 'local' && localWallpaper.imageData) {
@@ -60,6 +98,10 @@ const NewTab = () => {
     }
   })
   const commandModuleRef = useRef<CommandModuleRef>(null)
+  const effectiveWallpaperType = useMemo(
+    () => getEffectiveWallpaperType(settings.wallpaperType, localWallpaper.imageData, wallpaperSrc),
+    [localWallpaper.imageData, settings.wallpaperType, wallpaperSrc],
+  )
 
   useEffect(() => {
     // Update wallpaper source when settings change
@@ -82,7 +124,11 @@ const NewTab = () => {
         className={'flex h-screen w-screen max-w-full flex-col justify-center gap-4 relative overflow-hidden'}
         onDoubleClick={handleBackgroundDoubleClick}>
         <Center column className="flex-1">
-          <TimeDisplay />
+          <TimeDisplay
+            wallpaperSrc={wallpaperSrc}
+            wallpaperType={effectiveWallpaperType}
+            wallpaperVersion={wallpaperVersion}
+          />
         </Center>
         <Stack direction={'column'} className="flex-1">
           <Center className="mb-8 h-10">
@@ -117,6 +163,9 @@ const NewTab = () => {
           object-cover select-none"
         src={wallpaperSrc}
         alt="background wallpaper"
+        onLoad={() => {
+          setWallpaperVersion(version => (version >= Number.MAX_SAFE_INTEGER ? 0 : version + 1))
+        }}
         onError={() => {
           console.log('background image error')
           // Only fallback to default if not already using it

@@ -21,6 +21,7 @@ const manifest = {
   optional_host_permissions: [
     'https://api.github.com/*', // Version check API
     'https://wallhaven.cc/*', // Wallpaper search API
+    'https://w.wallhaven.cc/*', // Wallpaper image host
     'wss://broker.emqx.io:8084/*', // MQTT WebSocket connection
   ],
   permissions: ['storage', 'tabs', 'notifications', 'search', 'history', 'favicon', 'bookmarks', 'alarms', 'topSites'],

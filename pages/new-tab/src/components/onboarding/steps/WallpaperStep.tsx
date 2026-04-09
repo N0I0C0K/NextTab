@@ -12,7 +12,7 @@ import { PermissionGrant } from '../../settings/PermissionGrant'
 
 /** Number of wallpapers to display in the selection grid */
 const WALLPAPER_COUNT = 6
-const WALLHAVEN_PERMISSION_ORIGINS = [PERMISSION_ORIGINS.WALLHAVEN_API]
+const WALLHAVEN_PERMISSION_ORIGINS = [PERMISSION_ORIGINS.WALLHAVEN_API, PERMISSION_ORIGINS.WALLHAVEN_IMAGE]
 
 export const WallpaperStep: FC<StepNavigationProps> = ({ onNext, onBack }) => {
   const wallhavenPermission = usePermission(WALLHAVEN_PERMISSION_ORIGINS)

@@ -21,7 +21,7 @@ import { WallpaperImage } from './WallpaperImage'
 import { LocalWallpaperSection } from './LocalWallpaperSection'
 import { PermissionGrant } from './PermissionGrant'
 
-const WALLHAVEN_PERMISSION_ORIGINS = [PERMISSION_ORIGINS.WALLHAVEN_API]
+const WALLHAVEN_PERMISSION_ORIGINS = [PERMISSION_ORIGINS.WALLHAVEN_API, PERMISSION_ORIGINS.WALLHAVEN_IMAGE]
 
 // Scroll threshold in pixels to trigger loading more wallpapers
 const SCROLL_THRESHOLD = 100
