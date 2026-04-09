@@ -11,8 +11,8 @@ import type { WallpaperType } from '@extension/storage'
 import { useStorage } from '@extension/shared'
 import { useWallpaperSemanticColors } from './hooks/useWallpaperSemanticColors'
 
-const TIME_VALUE_CLASSNAME = 'select-none font-extralight leading-none text-[clamp(5rem,12vw,10rem)] 2xl:font-light'
-const TIME_SEPARATOR_CLASSNAME = 'select-none font-extralight leading-none text-[clamp(5rem,12vw,10rem)] 2xl:font-light'
+const TIME_TEXT_CLASSNAME = 'select-none font-extralight leading-none text-[clamp(5rem,12vw,10rem)] 2xl:font-light'
+const TIME_GAP_CLASSNAME = 'gap-[clamp(0.25rem,0.8vw,0.6rem)]'
 
 const TimeDisplay = ({
   wallpaperSrc,
@@ -43,20 +43,20 @@ const TimeDisplay = ({
 
   return (
     <Stack direction={'column'} className="items-center gap-2 md:gap-3">
-      <Stack className="items-center gap-[clamp(0.25rem,0.8vw,0.6rem)]">
+      <Stack className={`items-center ${TIME_GAP_CLASSNAME}`}>
         <Heading
-          className={TIME_VALUE_CLASSNAME}
+          className={TIME_TEXT_CLASSNAME}
           style={{ color: colors.time }}>
           {time?.getHours().toString().padStart(2, '0')}
         </Heading>
         <Heading
           aria-hidden
-          className={TIME_SEPARATOR_CLASSNAME}
+          className={TIME_TEXT_CLASSNAME}
           style={{ color: colors.time }}>
           :
         </Heading>
         <Heading
-          className={TIME_VALUE_CLASSNAME}
+          className={TIME_TEXT_CLASSNAME}
           style={{ color: colors.time }}>
           {time?.getMinutes().toString().padStart(2, '0')}
         </Heading>

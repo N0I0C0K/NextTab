@@ -34,6 +34,8 @@ const DEFAULT_COLORS: Record<'dark' | 'light', TimeDisplayColors> = {
 // sampling every fifth pixel during extraction.
 const SEMANTIC_SWATCH_COLOR_COUNT = 8
 const SEMANTIC_SWATCH_QUALITY = 5
+const FNV1A_OFFSET_BASIS = 0x811c9dc5
+const FNV1A_PRIME = 0x01000193
 
 type LoadedSwatchImage = {
   image: HTMLImageElement
@@ -122,11 +124,11 @@ async function loadSwatchImage(src: string, wallpaperType: WallpaperType): Promi
 
 // FNV-1a provides a tiny deterministic fallback hash for cache keys when Web Crypto is unavailable.
 function createFallbackHash(input: string): string {
-  let hash = 0x811c9dc5
+  let hash = FNV1A_OFFSET_BASIS
 
   for (let index = 0; index < input.length; index += 1) {
     hash ^= input.charCodeAt(index)
-    hash = Math.imul(hash, 0x01000193)
+    hash = Math.imul(hash, FNV1A_PRIME)
   }
 
   return (hash >>> 0).toString(16).padStart(8, '0')
