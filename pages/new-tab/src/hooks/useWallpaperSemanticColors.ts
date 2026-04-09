@@ -131,18 +131,18 @@ function createFallbackHash(input: string): string {
     hash = Math.imul(hash, FNV1A_PRIME)
   }
 
-  return (hash >>> 0).toString(16).padStart(64, '0')
+  return (hash >>> 0).toString(16).padStart(8, '0')
 }
 
 async function createCacheKey(wallpaperSrc: string, wallpaperType: WallpaperType): Promise<string> {
   if (!globalThis.crypto?.subtle) {
-    return `${wallpaperType}:${createFallbackHash(wallpaperSrc)}`
+    return `fnv1a:${wallpaperType}:${createFallbackHash(wallpaperSrc)}`
   }
 
   const encoded = new TextEncoder().encode(`${wallpaperType}:${wallpaperSrc}`)
   const digest = await globalThis.crypto.subtle.digest('SHA-256', encoded)
 
-  return Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, '0')).join('')
+  return `sha256:${Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, '0')).join('')}`
 }
 
 /**
@@ -174,6 +174,8 @@ export function useWallpaperSemanticColors(wallpaperSrc: string, wallpaperType: 
           return
         }
 
+        // The calling effect guards stale updates with `isActive`; loaded image objects are short-lived
+        // and any blob URLs created here are revoked in the cleanup block below.
         const { image, cleanup } = await loadSwatchImage(wallpaperSrc, wallpaperType)
 
         try {

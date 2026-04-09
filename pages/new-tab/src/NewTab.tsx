@@ -1,6 +1,6 @@
 import '@src/NewTab.css'
 import { Center, Text, Heading, Stack } from '@extension/ui'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { CommandModule, SettingPanel, ScrollLinkCardPage, OnboardingDialog } from './components'
 import type { CommandModuleRef } from './components/command'
 
@@ -26,6 +26,9 @@ const TimeDisplay = ({
   const [time, setTime] = useState<Date>(new Date())
   const [refreshTrigger, setRefreshTrigger] = useState<number>(0)
   const colors = useWallpaperSemanticColors(wallpaperSrc, wallpaperType, wallpaperVersion)
+  const formattedHours = time.getHours().toString().padStart(2, '0')
+  const formattedMinutes = time.getMinutes().toString().padStart(2, '0')
+  const dateTimeValue = `${formattedHours}:${formattedMinutes}`
 
   useEffect(() => {
     const timeNow = new Date()
@@ -43,11 +46,11 @@ const TimeDisplay = ({
 
   return (
     <Stack direction={'column'} className="items-center gap-2 md:gap-3">
-      <time dateTime={time.toTimeString().slice(0, 5)} className={`flex items-center ${TIME_GAP_CLASSNAME}`}>
+      <time dateTime={dateTimeValue} className={`flex items-center ${TIME_GAP_CLASSNAME}`}>
         <Heading
           className={TIME_TEXT_CLASSNAME}
           style={{ color: colors.time }}>
-          {time?.getHours().toString().padStart(2, '0')}
+          {formattedHours}
         </Heading>
         <Heading
           aria-hidden
@@ -58,7 +61,7 @@ const TimeDisplay = ({
         <Heading
           className={TIME_TEXT_CLASSNAME}
           style={{ color: colors.time }}>
-          {time?.getMinutes().toString().padStart(2, '0')}
+          {formattedMinutes}
         </Heading>
       </time>
       <Text
@@ -95,7 +98,10 @@ const NewTab = () => {
     }
   })
   const commandModuleRef = useRef<CommandModuleRef>(null)
-  const effectiveWallpaperType = getEffectiveWallpaperType(settings.wallpaperType, localWallpaper.imageData, wallpaperSrc)
+  const effectiveWallpaperType = useMemo(
+    () => getEffectiveWallpaperType(settings.wallpaperType, localWallpaper.imageData, wallpaperSrc),
+    [localWallpaper.imageData, settings.wallpaperType, wallpaperSrc],
+  )
 
   useEffect(() => {
     // Update wallpaper source when settings change
