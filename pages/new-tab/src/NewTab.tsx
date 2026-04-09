@@ -12,11 +12,20 @@ import { useStorage } from '@extension/shared'
 import { useWallpaperSemanticColors } from './hooks/useWallpaperSemanticColors'
 
 const TIME_VALUE_CLASSNAME = 'select-none font-extralight leading-none text-[clamp(5rem,12vw,10rem)] 2xl:font-light'
+const TIME_SEPARATOR_CLASSNAME = 'select-none font-extralight leading-none text-[clamp(5rem,12vw,10rem)] 2xl:font-light'
 
-const TimeDisplay = ({ wallpaperSrc, wallpaperType }: { wallpaperSrc: string; wallpaperType: WallpaperType }) => {
+const TimeDisplay = ({
+  wallpaperSrc,
+  wallpaperType,
+  wallpaperVersion,
+}: {
+  wallpaperSrc: string
+  wallpaperType: WallpaperType
+  wallpaperVersion: number
+}) => {
   const [time, setTime] = useState<Date>(new Date())
   const [refreshTrigger, setRefreshTrigger] = useState<number>(0)
-  const colors = useWallpaperSemanticColors(wallpaperSrc, wallpaperType)
+  const colors = useWallpaperSemanticColors(wallpaperSrc, wallpaperType, wallpaperVersion)
 
   useEffect(() => {
     const timeNow = new Date()
@@ -34,22 +43,18 @@ const TimeDisplay = ({ wallpaperSrc, wallpaperType }: { wallpaperSrc: string; wa
 
   return (
     <Stack direction={'column'} className="items-center gap-2 md:gap-3">
-      <Stack className="items-end">
+      <Stack className="items-center gap-[clamp(0.25rem,0.8vw,0.6rem)]">
         <Heading
           className={TIME_VALUE_CLASSNAME}
           style={{ color: colors.time }}>
           {time?.getHours().toString().padStart(2, '0')}
         </Heading>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 6 24"
-          fill="none"
-          stroke="currentColor"
-          className="mx-1 h-[clamp(4rem,10vw,6rem)] w-[clamp(0.75rem,1vw,1rem)] fill-current stroke-10"
+        <Heading
+          aria-hidden
+          className={TIME_SEPARATOR_CLASSNAME}
           style={{ color: colors.time }}>
-          <circle cx="3" cy="17" r="1" />
-          <circle cx="3" cy="7" r="1" />
-        </svg>
+          :
+        </Heading>
         <Heading
           className={TIME_VALUE_CLASSNAME}
           style={{ color: colors.time }}>
@@ -80,6 +85,7 @@ function getEffectiveWallpaperType(
 const NewTab = () => {
   const settings = useStorage(settingStorage)
   const localWallpaper = useStorage(localWallpaperStorage)
+  const [wallpaperVersion, setWallpaperVersion] = useState(0)
   const [wallpaperSrc, setWallpaperSrc] = useState<string>(() => {
     // Initialize wallpaper source from settings
     if (settings.wallpaperType === 'local' && localWallpaper.imageData) {
@@ -112,7 +118,11 @@ const NewTab = () => {
         className={'flex h-screen w-screen max-w-full flex-col justify-center gap-4 relative overflow-hidden'}
         onDoubleClick={handleBackgroundDoubleClick}>
         <Center column className="flex-1">
-          <TimeDisplay wallpaperSrc={wallpaperSrc} wallpaperType={effectiveWallpaperType} />
+          <TimeDisplay
+            wallpaperSrc={wallpaperSrc}
+            wallpaperType={effectiveWallpaperType}
+            wallpaperVersion={wallpaperVersion}
+          />
         </Center>
         <Stack direction={'column'} className="flex-1">
           <Center className="mb-8 h-10">
@@ -147,6 +157,9 @@ const NewTab = () => {
           object-cover select-none"
         src={wallpaperSrc}
         alt="background wallpaper"
+        onLoad={() => {
+          setWallpaperVersion(version => version + 1)
+        }}
         onError={() => {
           console.log('background image error')
           // Only fallback to default if not already using it

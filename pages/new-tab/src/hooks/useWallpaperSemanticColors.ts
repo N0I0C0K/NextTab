@@ -35,6 +35,11 @@ const DEFAULT_COLORS: Record<'dark' | 'light', TimeDisplayColors> = {
 const SEMANTIC_SWATCH_COLOR_COUNT = 8
 const SEMANTIC_SWATCH_QUALITY = 5
 
+type LoadedSwatchImage = {
+  image: HTMLImageElement
+  cleanup?: () => void
+}
+
 function serializeSwatches(swatches: SwatchMap): CachedWallpaperSwatches {
   return SWATCH_ROLES.reduce<CachedWallpaperSwatches>((serializedSwatches, role) => {
     const swatch = swatches[role]
@@ -92,6 +97,29 @@ function loadImageForSwatches(src: string, wallpaperType: WallpaperType): Promis
   })
 }
 
+async function loadSwatchImage(src: string, wallpaperType: WallpaperType): Promise<LoadedSwatchImage> {
+  if (wallpaperType === 'url') {
+    try {
+      const response = await fetch(src)
+
+      if (response.ok) {
+        const objectUrl = URL.createObjectURL(await response.blob())
+
+        return {
+          image: await loadImageForSwatches(objectUrl, 'local'),
+          cleanup: () => URL.revokeObjectURL(objectUrl),
+        }
+      }
+    } catch (error) {
+      console.warn('Failed to fetch wallpaper blob for swatch extraction, falling back to direct image loading:', error)
+    }
+  }
+
+  return {
+    image: await loadImageForSwatches(src, wallpaperType),
+  }
+}
+
 // FNV-1a provides a tiny deterministic fallback hash for cache keys when Web Crypto is unavailable.
 function createFallbackHash(input: string): string {
   let hash = 0x811c9dc5
@@ -115,7 +143,7 @@ async function createCacheKey(wallpaperSrc: string, wallpaperType: WallpaperType
   return Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, '0')).join('')
 }
 
-export function useWallpaperSemanticColors(wallpaperSrc: string, wallpaperType: WallpaperType) {
+export function useWallpaperSemanticColors(wallpaperSrc: string, wallpaperType: WallpaperType, wallpaperVersion: number) {
   const { realTheme } = useTheme()
   const [swatches, setSwatches] = useState<CachedWallpaperSwatches | null>(null)
 
@@ -123,6 +151,8 @@ export function useWallpaperSemanticColors(wallpaperSrc: string, wallpaperType: 
     let isActive = true
 
     const readSwatches = async () => {
+      setSwatches(null)
+
       try {
         const cacheKey = await createCacheKey(wallpaperSrc, wallpaperType)
         const cachedSwatches = await wallpaperSwatchStorage.getSwatches(cacheKey)
@@ -136,22 +166,27 @@ export function useWallpaperSemanticColors(wallpaperSrc: string, wallpaperType: 
           return
         }
 
-        const image = await loadImageForSwatches(wallpaperSrc, wallpaperType)
-        const extractedSwatches = serializeSwatches(
-          await getSwatches(image, {
-            colorCount: SEMANTIC_SWATCH_COLOR_COUNT,
-            quality: SEMANTIC_SWATCH_QUALITY,
-          }),
-        )
+        const { image, cleanup } = await loadSwatchImage(wallpaperSrc, wallpaperType)
 
-        if (!isActive) {
-          return
-        }
+        try {
+          const extractedSwatches = serializeSwatches(
+            await getSwatches(image, {
+              colorCount: SEMANTIC_SWATCH_COLOR_COUNT,
+              quality: SEMANTIC_SWATCH_QUALITY,
+            }),
+          )
 
-        setSwatches(extractedSwatches)
+          if (!isActive) {
+            return
+          }
 
-        if (Object.keys(extractedSwatches).length > 0) {
-          await wallpaperSwatchStorage.setSwatches(cacheKey, extractedSwatches)
+          setSwatches(extractedSwatches)
+
+          if (Object.keys(extractedSwatches).length > 0) {
+            await wallpaperSwatchStorage.setSwatches(cacheKey, extractedSwatches)
+          }
+        } finally {
+          cleanup?.()
         }
       } catch (error) {
         if (!isActive) {
@@ -168,7 +203,7 @@ export function useWallpaperSemanticColors(wallpaperSrc: string, wallpaperType: 
     return () => {
       isActive = false
     }
-  }, [wallpaperSrc, wallpaperType])
+  }, [wallpaperSrc, wallpaperType, wallpaperVersion])
 
   return selectColors(swatches, realTheme)
 }

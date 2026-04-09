@@ -4,6 +4,7 @@
 export const PERMISSION_ORIGINS = {
   GITHUB_API: 'https://api.github.com/*',
   WALLHAVEN_API: 'https://wallhaven.cc/*',
+  WALLHAVEN_IMAGE: 'https://w.wallhaven.cc/*',
   MQTT_BROKER: 'wss://broker.emqx.io:8084/*',
 } as const
 
