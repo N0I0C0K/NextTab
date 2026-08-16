@@ -1,4 +1,4 @@
-import { cn } from '@/lib/utils'
+import { cn } from '@extension/ui/lib/utils'
 import type { FC } from 'react'
 
 const headingLevelToSizeMapping = {

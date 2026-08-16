@@ -1,0 +1,34 @@
+{
+  "extends": "./.wxt/tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@extension/i18n": ["packages/i18n/index.ts"],
+      "@extension/i18n/*": ["packages/i18n/*"],
+      "@extension/shared": ["packages/shared/index.ts"],
+      "@extension/shared/*": ["packages/shared/*"],
+      "@extension/storage": ["packages/storage/index.ts"],
+      "@extension/storage/*": ["packages/storage/*"],
+      "@extension/ui": ["packages/ui/index.ts"],
+      "@extension/ui/*": ["packages/ui/*"],
+      "@src/*": ["pages/new-tab/src/*"],
+      "@newtab/*": ["pages/new-tab/*"]
+    },
+    "types": ["chrome", "node"],
+    "jsx": "react-jsx",
+    "strict": true,
+    "noImplicitReturns": true
+  },
+  "include": [
+    "entrypoints",
+    "pages/new-tab/src",
+    "pages/new-tab/lib",
+    "pages/popup/src",
+    "packages/i18n",
+    "packages/shared",
+    "packages/storage",
+    "packages/ui",
+    "chrome-extension/src",
+    "wxt.config.ts"
+  ]
+}

@@ -1,6 +1,6 @@
 import { Moon, Sun, SunMoon } from 'lucide-react'
 
-//import { Button } from '@/components/ui/button'
+//import { Button } from '@extension/ui/components/ui/button'
 
 import { useTheme } from '../provider/theme'
 import type { FC } from 'react'

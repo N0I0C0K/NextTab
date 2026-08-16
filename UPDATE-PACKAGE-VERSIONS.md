@@ -1,8 +1,8 @@
-For update package version in all ```package.json``` files use this command in root:
+To update the extension version in the root `package.json`, run:
 
-FOR WINDOWS YOU NEED TO USE E.G ```GIT BASH``` CONSOLE OR OTHER WHICH SUPPORT UNIX COMMANDS
+On Windows, use Git Bash or another shell with Bash support.
 ```bash
 pnpm update-version <new_version>
 ```
 
-If script was run successfully you will see ```Updated versions to <new_version>```
+The WXT-generated manifests and release archives use this version automatically.

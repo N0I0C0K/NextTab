@@ -1,4 +1,4 @@
-import { cn } from '@/lib/utils'
+import { cn } from '@newtab/lib/utils'
 import { useStorage, PERMISSION_ORIGINS, usePermission } from '@extension/shared'
 import { settingStorage, wallpaperHistoryStorage } from '@extension/storage'
 import type { WallhavenSortMode } from '@extension/storage'

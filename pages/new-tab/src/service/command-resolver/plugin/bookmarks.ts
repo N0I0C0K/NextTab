@@ -1,4 +1,4 @@
-import { getDefaultIconUrl } from '@/lib/url'
+import { getDefaultIconUrl } from '@newtab/lib/url'
 import type { ICommandResolver, ICommandResult } from '../protocol'
 import { Star } from 'lucide-react'
 import { t } from '@extension/i18n'

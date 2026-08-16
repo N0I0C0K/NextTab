@@ -1,5 +1,5 @@
-import { getDefaultIconUrl } from '@/lib/url'
-import { QuickItemEditForm } from '@/src/components/quick-item-edit-form'
+import { getDefaultIconUrl } from '@newtab/lib/url'
+import { QuickItemEditForm } from '@newtab/src/components/quick-item-edit-form'
 import { quickUrlItemsStorage } from '@extension/storage'
 import {
   ContextMenuItem,

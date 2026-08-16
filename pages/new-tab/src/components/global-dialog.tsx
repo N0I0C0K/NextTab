@@ -1,4 +1,4 @@
-import { cn } from '@/lib/utils'
+import { cn } from '@newtab/lib/utils'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@extension/ui/lib/components'
 import type { GlobalDialogInnerProps } from '@src/provider'
 import { GlobalDialogContext } from '@src/provider/global-dialog'

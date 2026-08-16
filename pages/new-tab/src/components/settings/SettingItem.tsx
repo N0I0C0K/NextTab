@@ -1,4 +1,4 @@
-import { cn } from '@/lib/utils'
+import { cn } from '@newtab/lib/utils'
 import { Space, Stack, Text } from '@extension/ui'
 import type { LucideProps } from 'lucide-react'
 import { type ElementType, type FC, type ReactElement } from 'react'

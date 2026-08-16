@@ -9,6 +9,8 @@
 **/build
 **/dist-zip
 **/artifacts
+.output
+.wxt
 
 # env
 **/.env.*
@@ -20,8 +22,5 @@
 **/.turbo
 
 # compiled
-chrome-extension/public/manifest.json
 **/tailwind-output.css
-
-# vite timestamp (because of bug from lib, remove it after fix will have been realased)
 **/vite.config.mts.timestamp-*

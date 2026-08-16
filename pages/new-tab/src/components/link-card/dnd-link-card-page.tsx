@@ -5,8 +5,8 @@ import { useStorage } from '@extension/shared'
 import { quickUrlItemsStorage } from '@extension/storage'
 import { type FC, useRef } from 'react'
 
-import { SortableLinkCardItem } from '@/src/components/link-card/link-card-item'
-import { cn } from '@/lib/utils'
+import { SortableLinkCardItem } from '@newtab/src/components/link-card/link-card-item'
+import { cn } from '@newtab/lib/utils'
 import { useKeyboardNavigation } from './use-keyboard-navigation'
 
 export const DndLinkCardPage: FC<{

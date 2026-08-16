@@ -1,3 +1,5 @@
 dist
+.output
+.wxt
 node_modules
 tailwind.config.ts

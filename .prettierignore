@@ -1,4 +1,6 @@
 dist
+.output
+.wxt
 node_modules
 .gitignore
 .github

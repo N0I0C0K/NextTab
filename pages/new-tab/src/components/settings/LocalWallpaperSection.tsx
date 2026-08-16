@@ -1,4 +1,4 @@
-import { cn } from '@/lib/utils'
+import { cn } from '@newtab/lib/utils'
 import { useStorage } from '@extension/shared'
 import { settingStorage, localWallpaperStorage } from '@extension/storage'
 import { Button, Stack, Text } from '@extension/ui'

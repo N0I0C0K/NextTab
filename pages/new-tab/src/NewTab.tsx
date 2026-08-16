@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { CommandModule, SettingPanel, ScrollLinkCardPage, OnboardingDialog } from './components'
 import type { CommandModuleRef } from './components/command'
 
-import '@/src/style/placeholder.css'
+import '@newtab/src/style/placeholder.css'
 import { HistoryArea } from './components/history-area'
 import { settingStorage, DEFAULT_WALLPAPER_URL, localWallpaperStorage } from '@extension/storage'
 import { useStorage } from '@extension/shared'

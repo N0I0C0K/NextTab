@@ -1,7 +1,7 @@
 /**
  * Shared bookmark utilities
  */
-import { getDomainFromUrl } from '@/lib/url'
+import { getDomainFromUrl } from '@newtab/lib/url'
 
 /**
  * Get bookmark folders for display in settings

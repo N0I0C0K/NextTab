@@ -1,4 +1,4 @@
-import { getDefaultIconUrl } from '@/lib/url'
+import { getDefaultIconUrl } from '@newtab/lib/url'
 import type { ICommandResolver, ICommandResult } from '../protocol'
 import moment from 'moment'
 import { t } from '@extension/i18n'

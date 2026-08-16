@@ -1,4 +1,4 @@
-import type { Size } from '@/lib/utils'
+import type { Size } from '@newtab/lib/utils'
 import type { QuickUrlItem } from '@extension/storage'
 import { cn } from '@extension/ui'
 import React, { type FC, useEffect, useMemo, useState } from 'react'

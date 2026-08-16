@@ -18,7 +18,7 @@ import { useState, type FC } from 'react'
 import { t } from '@extension/i18n'
 import type { ICommandResolver } from '@src/service/command-resolver'
 import { commandResolverService } from '@src/service/command-resolver'
-import { cn } from '@/lib/utils'
+import { cn } from '@newtab/lib/utils'
 import { SettingItem } from './SettingItem'
 
 const CommandPluginSettingItem: FC<{

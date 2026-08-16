@@ -1,4 +1,4 @@
-import '@src/Popup.css'
+import './Popup.css'
 import { withErrorBoundary, withSuspense } from '@extension/shared'
 import { PopupQuickUrlGrid, PopupToolbar } from './components'
 

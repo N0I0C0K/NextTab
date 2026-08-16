@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import { cn } from '@/lib/utils'
+import { cn } from '@extension/ui/lib/utils'
 import { useDebounce } from '@extension/shared'
 
 const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<'input'>>(

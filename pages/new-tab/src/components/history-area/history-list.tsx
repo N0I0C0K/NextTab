@@ -1,4 +1,4 @@
-import { cn } from '@/lib/utils'
+import { cn } from '@newtab/lib/utils'
 import { useStorage } from '@extension/shared'
 import { historySuggestStorage } from '@extension/storage'
 import { ScrollArea, Stack } from '@extension/ui'

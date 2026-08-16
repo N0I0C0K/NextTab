@@ -1,4 +1,4 @@
-import { cn } from '@/lib/utils'
+import { cn } from '@newtab/lib/utils'
 import { Loader2, Image as ImageIcon } from 'lucide-react'
 import { useState, useEffect, type FC } from 'react'
 

@@ -1,4 +1,4 @@
-import { cn, useBoolean } from '@/lib/utils'
+import { cn, useBoolean } from '@newtab/lib/utils'
 import { useDebounce, useStorage } from '@extension/shared'
 import { settingStorage } from '@extension/storage'
 import { command, Stack, Text } from '@extension/ui'

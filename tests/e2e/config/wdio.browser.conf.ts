@@ -7,24 +7,35 @@ import { getChromeExtensionPath, getFirefoxExtensionPath } from '../utils/extens
 const isFirefox = process.env.__FIREFOX__ === 'true'
 const isCI = process.env.CI === 'true'
 
-const archiveName = isFirefox ? 'extension.xpi' : 'extension.zip'
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url))
-const extPath = path.join(__dirname, `../../../dist-zip/${archiveName}`)
-const bundledExtension = (await fs.readFile(extPath)).toString('base64')
+const outputDirectory = isFirefox ? 'firefox-mv3' : 'chrome-mv3'
+const extensionDirectory = path.join(__dirname, `../../../.output/${outputDirectory}`)
+const outputRoot = path.join(__dirname, '../../../.output')
+const firefoxArchive = isFirefox
+  ? (await fs.readdir(outputRoot)).find(file => file.endsWith('-firefox.zip'))
+  : undefined
+const bundledFirefoxExtension = firefoxArchive
+  ? (await fs.readFile(path.join(outputRoot, firefoxArchive))).toString('base64')
+  : undefined
+
+if (isFirefox && !bundledFirefoxExtension) {
+  throw new Error('Firefox extension archive not found. Run pnpm zip:firefox first.')
+}
 
 const chromeCapabilities = {
   browserName: 'chrome',
   acceptInsecureCerts: true,
   'goog:chromeOptions': {
+    prefs: { 'extensions.ui.developer_mode': true },
     args: [
+      `--disable-extensions-except=${extensionDirectory}`,
+      `--load-extension=${extensionDirectory}`,
       '--disable-web-security',
       '--disable-gpu',
       '--no-sandbox',
       '--disable-dev-shm-usage',
       ...(isCI ? ['--headless'] : []),
     ],
-    prefs: { 'extensions.ui.developer_mode': true },
-    extensions: [bundledExtension],
   },
 }
 
@@ -33,6 +44,9 @@ const firefoxCapabilities = {
   acceptInsecureCerts: true,
   'moz:firefoxOptions': {
     args: [...(isCI ? ['--headless'] : [])],
+    prefs: {
+      'xpinstall.signatures.required': false,
+    },
   },
 }
 
@@ -45,8 +59,7 @@ export const config: WebdriverIO.Config = {
   execArgv: isCI ? [] : ['--inspect'],
   before: async ({ browserName }: WebdriverIO.Capabilities, _specs, browser: WebdriverIO.Browser) => {
     if (browserName === 'firefox') {
-      await browser.installAddOn(bundledExtension, true)
-
+      await browser.installAddOn(bundledFirefoxExtension!, true)
       browser.addCommand('getExtensionPath', async () => getFirefoxExtensionPath(browser))
     } else if (browserName === 'chrome') {
       browser.addCommand('getExtensionPath', async () => getChromeExtensionPath(browser))

@@ -1,8 +1,8 @@
 import { historySuggestStorage, quickUrlItemsStorage } from '@extension/storage'
 import { Stack, Text } from '@extension/ui'
 import { useMemo, type FC } from 'react'
-import { cn } from '@/lib/utils'
-import { getDefaultIconUrl } from '@/lib/url'
+import { cn } from '@newtab/lib/utils'
+import { getDefaultIconUrl } from '@newtab/lib/url'
 import {
   ContextMenu,
   ContextMenuContent,

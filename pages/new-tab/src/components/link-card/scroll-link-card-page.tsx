@@ -1,8 +1,8 @@
-import { cn } from '@/lib/utils'
+import { cn } from '@newtab/lib/utils'
 import { type FC } from 'react'
 import { DndLinkCardPage } from './dnd-link-card-page'
 import { ScrollArea } from '@extension/ui'
-import { AddButton } from '@/src/components/add-button'
+import { AddButton } from '@newtab/src/components/add-button'
 
 import './scroll-link-card-page.css'
 

@@ -6,7 +6,7 @@ import type { FC } from 'react'
 import { useEffect, useState } from 'react'
 import { t } from '@extension/i18n'
 import { SettingItem } from './SettingItem'
-import { getBookmarkFolders } from '@/lib/bookmarks'
+import { getBookmarkFolders } from '@newtab/lib/bookmarks'
 
 // Cache folders to avoid repeated API calls
 let cachedBookmarkFolders: chrome.bookmarks.BookmarkTreeNode[] | null = null

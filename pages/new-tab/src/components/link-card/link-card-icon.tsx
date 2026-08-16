@@ -1,5 +1,5 @@
-import { getDefaultIconUrl } from '@/lib/url'
-import { cn } from '@/lib/utils'
+import { getDefaultIconUrl } from '@newtab/lib/url'
+import { cn } from '@newtab/lib/utils'
 import type { MouseEventHandler } from 'react'
 import { forwardRef } from 'react'
 

@@ -1,7 +1,7 @@
 import type { ICommandResolver, ICommandResult, CommandQueryParams, CommandSettings } from '../protocol'
 import { Layers } from 'lucide-react'
 import { t } from '@extension/i18n'
-import { cn } from '@/lib/utils'
+import { cn } from '@newtab/lib/utils'
 
 /**
  * Internal plugin that shows all available plugins when input is empty

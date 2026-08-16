@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
-import { cn } from '@/lib/utils'
+import { cn } from '@newtab/lib/utils'
 import type { QuickUrlItem } from '@extension/storage'
 import { Text, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@extension/ui'
 import { ContextMenu, ContextMenuContent, ContextMenuTrigger } from '@extension/ui/lib/components/ui/context-menu'
@@ -7,7 +7,7 @@ import { useGlobalDialog } from '@src/provider'
 import type { CSSProperties, MouseEventHandler, Ref, TouchEventHandler } from 'react'
 import { useRef, useState, forwardRef, useCallback } from 'react'
 
-import { MakeSortableItem } from '@/src/components/sortable-area'
+import { MakeSortableItem } from '@newtab/src/components/sortable-area'
 import { LinkCardIcon } from './link-card-icon'
 import { LinkCardTooltipContent } from './link-card-tooltip'
 import { LinkCardContextMenuContent } from './link-card-context-menu'

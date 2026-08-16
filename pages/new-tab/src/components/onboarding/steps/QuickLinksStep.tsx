@@ -4,7 +4,7 @@ import { quickUrlItemsStorage } from '@extension/storage'
 import { useStorage } from '@extension/shared'
 import { t } from '@extension/i18n'
 import { Link } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { cn } from '@newtab/lib/utils'
 import type { StepNavigationProps, TopSiteItem } from '../types'
 import { StepHeader, StepContainer, StepNavigationButtons, CheckboxIndicator } from '../components'
 

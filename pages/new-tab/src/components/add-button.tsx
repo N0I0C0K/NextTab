@@ -3,7 +3,7 @@ import { Plus } from 'lucide-react'
 import { quickUrlItemsStorage } from '@extension/storage'
 import { nanoid } from 'nanoid'
 import type { FC } from 'react'
-import { cn } from '@/lib/utils'
+import { cn } from '@newtab/lib/utils'
 import type { IAddQuickUrlItemShema } from './quick-item-edit-form'
 import { QuickItemEditForm } from './quick-item-edit-form'
 

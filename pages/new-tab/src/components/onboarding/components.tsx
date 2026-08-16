@@ -1,7 +1,7 @@
 import type { FC, ReactNode } from 'react'
 import { Button, Stack, Text } from '@extension/ui'
 import { Check } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { cn } from '@newtab/lib/utils'
 import { t } from '@extension/i18n'
 import type { OnboardingStep } from './types'
 import { STEPS } from './types'

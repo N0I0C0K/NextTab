@@ -1,5 +1,5 @@
-import { INITIAL_QUICK_URL_ITEMS } from '@/lib/consts'
-import { useSize } from '@/lib/utils'
+import { INITIAL_QUICK_URL_ITEMS } from '@newtab/lib/consts'
+import { useSize } from '@newtab/lib/utils'
 import { useDebounce, useStorage } from '@extension/shared'
 import type { QuickUrlItem } from '@extension/storage'
 import { quickUrlItemsStorage } from '@extension/storage'
