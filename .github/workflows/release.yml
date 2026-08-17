@@ -7,15 +7,15 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    
+
     permissions:
       contents: write
 
     steps:
       - uses: actions/checkout@v4
-      
+
       - uses: pnpm/action-setup@v4
-      
+
       - uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
@@ -27,20 +27,13 @@ jobs:
       - name: Build Chrome extension
         run: pnpm zip
 
-      - name: Save Chrome extension
-        run: |
-          mkdir -p artifacts
-          mv dist-zip/extension.zip artifacts/chrome-extension.zip
-
       - name: Build Firefox extension
         run: pnpm zip:firefox
-
-      - name: Save Firefox extension
-        run: mv dist-zip/extension.xpi artifacts/firefox-extension.xpi
 
       - name: Upload release assets
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            ./artifacts/chrome-extension.zip
-            ./artifacts/firefox-extension.xpi
+            ./.output/*-chrome.zip
+            ./.output/*-firefox.zip
+            ./.output/*-sources.zip
