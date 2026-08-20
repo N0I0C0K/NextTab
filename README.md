@@ -5,7 +5,7 @@
 
 [![](https://img.shields.io/badge/React-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev/)
 [![](https://img.shields.io/badge/Typescript-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![](https://badges.aleen42.com/src/vitejs.svg)](https://vitejs.dev/)
+[![WXT](https://img.shields.io/badge/WXT-67D55E?style=flat-square)](https://wxt.dev/)
 [![GitHub License](https://img.shields.io/github/license/N0I0C0K/NextTab?style=flat-square)](https://github.com/N0I0C0K/NextTab/blob/main/LICENSE)
 [![GitHub Release](https://img.shields.io/github/v/release/N0I0C0K/NextTab?style=flat-square)](https://github.com/N0I0C0K/NextTab/releases)
 
@@ -74,11 +74,11 @@ NextTab 是一个专注于提升浏览器效率的新标签页扩展，采用简
 ![历史搜索](doc/images/history-search-demo.gif)
 
 ### Popup 界面
+
 ![Popup 界面](doc/images/popup.jpg)
 
 - 无需到 New Tab 页面也能快速访问快捷链接
 - 一键添加当前页面到快捷链接
-
 
 ## 安装
 
@@ -97,6 +97,7 @@ NextTab 是一个专注于提升浏览器效率的新标签页扩展，采用简
 如果你想参与开发或自定义扩展，请查看 [开发指南](DEVELOPMENT.md)。
 
 开发指南包含：
+
 - 环境搭建
 - 项目结构详解
 - 开发工作流
@@ -132,10 +133,9 @@ pnpm dev
 ---
 
 <div align="center">
-  
+
 **如果觉得有帮助，请给个 ⭐️ Star！**
 
-Made with ❤️ by [N0I0C0K](https://github.com/N0I0C0K). Powered by [chrome-extension-boilerplate-react-vite](https://github.com/Jonghakseo/chrome-extension-boilerplate-react-vite)
+Made with ❤️ by [N0I0C0K](https://github.com/N0I0C0K). Powered by [WXT](https://wxt.dev/)
 
 </div>
-

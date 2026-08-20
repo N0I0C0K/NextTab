@@ -1,7 +1,0 @@
-{
-  "extends": ["../../.eslintrc"],
-  "rules": {
-    "react/prop-types": "off",
-    "react/no-unknown-property": ["error", { "ignore": ["cmdk-input-wrapper"] }]
-  }
-}

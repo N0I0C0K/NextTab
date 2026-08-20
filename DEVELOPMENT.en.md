@@ -1,274 +1,79 @@
 # Development Guide
 
-This document provides development-related information for the NextTab project.
+NextTab is a single-project browser extension built with [WXT](https://wxt.dev/) and React 18.
 
-## 📖 Table of Contents
+## Setup
 
-- [Requirements](#requirements)
-- [Quick Start](#quick-start)
-- [Development Mode](#development-mode)
-- [Common Commands](#common-commands)
-- [Project Structure](#project-structure)
-- [Development Workflow](#development-workflow)
-  - [Adding a New Page](#adding-a-new-page)
-  - [Adding a Storage Type](#adding-a-storage-type)
-  - [Adding UI Components](#adding-ui-components)
-- [Build and Package](#build-and-package)
-- [Testing](#testing)
-- [Code Standards](#code-standards)
-
-## Requirements
-
-- Node.js >= 18.19.1 (see `.nvmrc`)
-- pnpm >= 9.9.0 (required)
-- Git
-
-## Quick Start
-
-1. **Clone the Repository**
-   ```bash
-   git clone https://github.com/N0I0C0K/NextTab.git
-   cd NextTab
-   ```
-
-2. **Install Dependencies**
-   ```bash
-   pnpm install
-   ```
-
-3. **Start Development Mode**
-   ```bash
-   # Chrome development mode (with hot reload)
-   pnpm dev
-   
-   # Firefox development mode
-   pnpm dev:firefox
-   ```
-
-4. **Load into Browser**
-   
-   **Chrome/Edge:**
-   - Open `chrome://extensions/`
-   - Enable "Developer mode"
-   - Click "Load unpacked"
-   - Select the `dist` directory
-   
-   **Firefox:**
-   - Open `about:debugging#/runtime/this-firefox`
-   - Click "Load Temporary Add-on"
-   - Select `manifest.json` in the `dist` directory
-
-## Development Mode
-
-Development mode supports Hot Module Replacement (HMR), and the extension automatically reloads when files are modified.
+- Node.js >= 20.19 (see `.nvmrc`)
+- pnpm 9.9
 
 ```bash
-# Chrome development mode
-pnpm dev
-
-# Firefox development mode
-pnpm dev:firefox
+pnpm install
+pnpm dev             # Chrome/Edge with WXT reload
+pnpm dev:firefox     # Firefox MV3
 ```
 
-Development mode features:
-- Automatic compilation and reload
-- Source map support
-- Fast iteration development
+To load a production build manually, run `pnpm build` and load `.output/chrome-mv3` as an unpacked Chromium extension.
 
-## Common Commands
+## Commands
 
 ```bash
-# Type checking
 pnpm type-check
-
-# Linting and auto-fix
 pnpm lint
-
-# Code formatting
-pnpm prettier
-
-# Production build
-pnpm build           # Chrome
-pnpm build:firefox   # Firefox
-
-# Package as zip file (for publishing)
+pnpm format
+pnpm test            # Vitest unit tests
+pnpm test:e2e        # Build and test the real Chromium extension
+pnpm build
+pnpm build:firefox
 pnpm zip
 pnpm zip:firefox
-
-# Run E2E tests
-pnpm e2e
-
-# Update version
-pnpm update-version <version>
+pnpm check           # Types, lint, unit tests, and both browser builds
 ```
 
-## Project Structure
-
-This is a pnpm + Turbo based Monorepo project:
-
-```
-chrome-extension/     # Core extension (manifest, background script)
-pages/               # Extension UI pages
-  new-tab/          # Main new tab replacement page
-  popup/            # Extension popup
-  options/          # Settings page
-  side-panel/       # Chrome side panel
-packages/            # Shared workspace packages
-  shared/           # Common utilities, hooks, MQTT provider
-  storage/          # Chrome storage abstraction layer
-  ui/              # Reusable UI components (based on shadcn/ui)
-  i18n/            # Internationalization system
-  hmr/             # Hot module replacement support
-  vite-config/     # Shared Vite configuration
-```
-
-### Tech Stack
-
-- **Framework**: React 18
-- **Language**: TypeScript
-- **Build Tools**: Vite + Turbo
-- **Package Manager**: pnpm workspaces
-- **Styling**: Tailwind CSS
-- **UI Components**: shadcn/ui
-- **State Management**: React Hooks + Chrome Storage API
-- **Testing**: E2E testing framework
-
-## Development Workflow
-
-### Adding a New Page
-
-1. Copy an existing page structure (e.g., `pages/popup`)
-2. Update `package.json` with dependencies
-3. Create `vite.config.mts` with entry point
-4. Add to `chrome-extension/manifest.js` if needed
-5. Ensure `pnpm-workspace.yaml` includes the directory
-
-### Adding a Storage Type
-
-1. Create storage in `packages/storage/lib/impl/` using `createStorage()`
-2. Define TypeScript types
-3. Export from `packages/storage/lib/impl/index.ts`
-4. Use `useStorage()` hook in React components
-
-Example:
-```typescript
-import { settingStorage } from '@extension/storage'
-import { useStorage } from '@extension/shared'
-
-// In component
-const settings = useStorage(settingStorage)
-
-// Update (supports deep merge)
-await settingStorage.update({ wallpaperUrl: 'https://...' })
-```
-
-### Adding UI Components
-
-Follow `packages/ui/README.md` for shadcn/ui components:
+Install the Playwright browser before the first E2E run:
 
 ```bash
-# Add component
-pnpm dlx shadcn@latest add {component} -c ./packages/ui
-
-# Export from packages/ui
-# Add export in packages/ui/lib/components/ui/index.ts
-
-# Use withUI() in consuming page's tailwind.config.ts
+pnpm exec playwright install chromium
 ```
 
-## Build and Package
+## Structure
 
-### Development Build
-
-```bash
-pnpm dev        # Chrome
-pnpm dev:firefox # Firefox
+```text
+entrypoints/          WXT background, newtab, and popup entrypoints
+components/           Shared React components
+hooks/                Shared hooks
+utils/                Utilities, messaging, MQTT, i18n, and storage
+assets/               Bundled global styles
+public/               Icons, images, and browser locales
+e2e/                  Playwright extension tests
+wxt.config.ts         Manifest and WXT configuration
 ```
 
-### Production Build
+WXT generates the manifest from `entrypoints`. Add extension pages using WXT entrypoint conventions instead of creating page-specific Vite configurations.
 
-```bash
-pnpm build        # Chrome
-pnpm build:firefox # Firefox
+## Storage
+
+Define normal settings in `utils/storage/impl` with WXT storage:
+
+```ts
+export const exampleStorage = storage.defineItem<string>('local:example-key', {
+  fallback: '',
+})
+
+const value = await exampleStorage.getValue()
+await exampleStorage.setValue('next')
+const unwatch = exampleStorage.watch(value => console.log(value))
 ```
 
-Build output is in the `dist/` directory.
+React components subscribe through `useStorage(item)`. Put read-modify-write operations in named storage functions so concurrency handling stays centralized.
 
-### Package for Release
+Local wallpaper data remains in IndexedDB because large base64 values should not consume extension storage quota. Its adapter exposes the same `getValue/setValue/watch` shape.
 
-```bash
-# Package as zip (for store upload)
-pnpm zip          # Chrome
-pnpm zip:firefox  # Firefox
-```
+## Tests and Releases
 
-Generated zip files are in the project root directory.
+- Use Vitest and `wxt/testing/fake-browser` for storage and extension API unit tests.
+- Use Playwright for newtab, popup, and service worker integration tests.
+- `pnpm zip` and `pnpm zip:firefox` create store packages in `.output`.
+- CI runs unit tests, Chrome E2E, and a Firefox build.
 
-## Testing
-
-### E2E Tests
-
-```bash
-pnpm e2e
-```
-
-Test location: `tests/e2e/`
-
-Note: Current test infrastructure is limited, contributions welcome.
-
-## Code Standards
-
-### TypeScript
-
-- Use `import type { ... }` for type imports
-- No need to explicitly import React (globally configured)
-- Use path aliases (e.g., `@src`, `@root`)
-
-### Styling
-
-- Use Tailwind CSS
-- Use `cn()` utility for class merging (from `@extension/ui`)
-- Follow shadcn/ui component patterns
-
-### Formatting
-
-- Single quotes
-- No semicolons
-- 120 character width
-- Trailing commas
-- See `.prettierrc` for details
-
-### Commit Convention
-
-It's recommended to follow [Conventional Commits](https://www.conventionalcommits.org/):
-
-```
-feat: add new feature
-fix: fix bug
-docs: documentation update
-style: code formatting adjustment
-refactor: code refactoring
-test: test related
-chore: build/toolchain update
-```
-
-## Additional Resources
-
-- [copilot-instructions.md](.github/copilot-instructions.md) - Detailed architecture and development guide
-- [Chrome Extension Documentation](https://developer.chrome.com/docs/extensions/)
-- [Vite Documentation](https://vitejs.dev/)
-- [Turbo Documentation](https://turbo.build/)
-- [shadcn/ui Documentation](https://ui.shadcn.com/)
-
-## Contributing
-
-Issues and Pull Requests are welcome! Please ensure:
-
-1. Code passes `pnpm lint` and `pnpm type-check`
-2. Follow project code standards
-3. Add necessary comments and documentation
-4. Test your changes
-
----
-
-Back to [README.en.md](README.en.md)
+The project uses TypeScript, Tailwind CSS, shadcn/ui, and Prettier. Run `pnpm check` before submitting changes.

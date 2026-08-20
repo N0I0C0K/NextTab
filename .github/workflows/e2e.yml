@@ -1,34 +1,63 @@
-name: Run E2E Tests
+name: Tests
 
 on:
   push:
-    branches: [ main ]
+    branches: [master]
   pull_request:
-    branches: [ main ]
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tests-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  chrome:
-    name: E2E tests for Chrome
+  test:
+    name: Unit and extension tests
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version-file: '.nvmrc'
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile --prefer-offline
-      - run: pnpm e2e
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-  firefox:
-    name: E2E tests for Firefox
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
           cache: pnpm
-      - run: pnpm install --frozen-lockfile --prefer-offline
-      - run: pnpm e2e:firefox
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --prefer-offline
+
+      - name: Type check
+        run: pnpm type-check
+
+      - name: Run unit tests
+        run: pnpm test
+
+      - name: Install Playwright Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Run extension E2E tests
+        run: pnpm test:e2e
+
+      - name: Build Chrome extension
+        run: pnpm build
+
+      - name: Build Firefox extension
+        run: pnpm build:firefox
+
+      - name: Upload E2E failure artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-test-results
+          path: test-results/
+          if-no-files-found: ignore
+          retention-days: 7
