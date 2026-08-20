@@ -95,6 +95,9 @@ export const StepIndicator: FC<StepIndicatorProps> = ({ currentStep }) => {
       {STEPS.map((step, index) => (
         <div
           key={step}
+          data-testid="onboarding-step-indicator"
+          data-step={step}
+          data-active={index === currentIndex ? 'true' : 'false'}
           className={cn(
             'w-2 h-2 rounded-full transition-colors',
             index <= currentIndex ? 'bg-primary' : 'bg-muted-foreground/30',
@@ -113,11 +116,15 @@ interface SelectableCardProps {
   onClick: () => void
   children: ReactNode
   className?: string
+  testId?: string
 }
 
-export const SelectableCard: FC<SelectableCardProps> = ({ selected, onClick, children, className }) => (
+export const SelectableCard: FC<SelectableCardProps> = ({ selected, onClick, children, className, testId }) => (
   <button
     onClick={onClick}
+    type="button"
+    aria-pressed={selected}
+    data-testid={testId}
     className={cn(
       'flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-colors',
       selected ? 'border-primary bg-primary/5' : 'border-muted hover:border-muted-foreground/50',

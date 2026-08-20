@@ -43,8 +43,8 @@ export const defaultSetting: SettingProps = {
   mqttSettings: {
     enabled: false,
     mqttBrokerUrl: DEFAULT_MQTT_BROKER_URL,
-    secretKey: 'ABCDEF',
-    username: 'MomoBoss',
+    secretKey: '',
+    username: '',
   },
 }
 

@@ -129,6 +129,7 @@ export const QuickLinksStep: FC<StepNavigationProps> = ({ onNext, onBack }) => {
           {topSites.map(site => (
             <button
               key={site.url}
+              data-testid="onboarding-top-site"
               onClick={() => toggleSite(site.url)}
               role="checkbox"
               aria-checked={site.selected}

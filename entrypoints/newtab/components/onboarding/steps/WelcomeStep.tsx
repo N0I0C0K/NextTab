@@ -57,6 +57,7 @@ export const WelcomeStep: FC<WelcomeStepProps> = ({ onNext, onImported, onSkipAl
             className="hidden"
             disabled={importing}
             aria-label={t('onboardingImportSettings')}
+            data-testid="onboarding-import-input"
           />
           <Button
             variant="outline"

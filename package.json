@@ -22,8 +22,8 @@
     "format": "prettier . --write --cache --cache-location node_modules/.cache/.prettiercache",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:e2e": "pnpm build && playwright test",
-    "test:e2e:ui": "pnpm build && playwright test --ui",
+    "test:e2e": "wxt build --mode test && playwright test",
+    "test:e2e:ui": "wxt build --mode test && playwright test --ui",
     "check": "pnpm type-check && pnpm lint && pnpm test && pnpm build && pnpm build:firefox",
     "postinstall": "wxt prepare",
     "update-version": "bash update_version.sh"

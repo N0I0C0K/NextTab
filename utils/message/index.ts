@@ -4,7 +4,7 @@ export interface Message<T> {
 }
 
 export class MessageHandler<T> {
-  private listeners: Array<(payload: T) => void> = []
+  private listeners: Array<(payload: T) => void | Promise<void>> = []
   public readonly name: string
   constructor(messageName: string) {
     this.name = messageName
@@ -12,20 +12,20 @@ export class MessageHandler<T> {
   public async emit(payload: T): Promise<void> {
     await sendMessage<T>({ name: this.name, payload })
   }
-  public registerListener(callback: (payload: T) => void): void {
+  public registerListener(callback: (payload: T) => void | Promise<void>): void {
     if (!this.listeners.includes(callback)) {
       this.listeners.push(callback)
     }
   }
-  public unregisterListener(callback: (payload: T) => void): void {
+  public unregisterListener(callback: (payload: T) => void | Promise<void>): void {
     const index = this.listeners.indexOf(callback)
     if (index !== -1) {
       this.listeners.splice(index, 1)
     }
   }
-  public onMessage(message: Message<T>): void {
+  public async onMessage(message: Message<T>): Promise<void> {
     if (message.name !== this.name) return
-    this.listeners.forEach(callback => callback(message.payload))
+    await Promise.all(this.listeners.map(callback => callback(message.payload)))
   }
 }
 
@@ -34,10 +34,17 @@ export class MessageCenter {
   private registeredHandlers: Map<string, MessageHandler<any>> = new Map()
   constructor() {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    chrome.runtime.onMessage.addListener((message: Message<any>) => {
-      if (!this.registeredHandlers.has(message.name)) return
+    chrome.runtime.onMessage.addListener((message: Message<any>, _sender, sendResponse) => {
+      if (!this.registeredHandlers.has(message.name)) return false
       const handler = this.registeredHandlers.get(message.name)!
-      handler.onMessage(message)
+      void handler
+        .onMessage(message)
+        .then(() => sendResponse())
+        .catch(error => {
+          console.error(`Failed to handle runtime message: ${message.name}`, error)
+          sendResponse()
+        })
+      return true
     })
   }
   registerMessageHandler<T>(messageName: string): MessageHandler<T> {

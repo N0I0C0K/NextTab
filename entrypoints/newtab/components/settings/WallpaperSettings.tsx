@@ -66,6 +66,8 @@ const WallpaperCard: FC<{
   return (
     <button
       type="button"
+      data-testid="wallpaper-card"
+      data-wallpaper-id={wallpaper.id}
       className={cn(
         'relative cursor-pointer overflow-hidden rounded-lg border-2 transition-all hover:scale-[1.02] w-full',
         isSelected ? 'border-primary ring-2 ring-primary/50' : 'border-transparent hover:border-muted-foreground/30',
@@ -115,6 +117,7 @@ const HistoryWallpaperCard: FC<{
 
   return (
     <div
+      data-testid="wallpaper-history-card"
       className={cn(
         'relative cursor-pointer overflow-hidden rounded-lg border-2 transition-all hover:scale-[1.02] w-full group',
         isSelected ? 'border-primary ring-2 ring-primary/50' : 'border-transparent hover:border-muted-foreground/30',
@@ -133,6 +136,7 @@ const HistoryWallpaperCard: FC<{
       )}
       <button
         type="button"
+        data-testid="wallpaper-history-delete"
         className="absolute left-1 top-1 rounded-full bg-destructive/80 p-1 opacity-0 transition-opacity
           group-hover:opacity-100"
         onClick={handleDelete}
@@ -275,7 +279,7 @@ export const WallpaperSettings: FC = () => {
         return
       }
     } catch {
-      console.warn('Invalid wallpaper URL:', url)
+      console.warn('Invalid wallpaper URL')
       setError(t('wallpaperInvalidUrlError'))
       return
     }
@@ -328,7 +332,7 @@ export const WallpaperSettings: FC = () => {
               value={settings.wallhavenSortMode}
               onValueChange={value => handleSortModeChange(value as WallhavenSortMode)}
               disabled={isLoading}>
-              <SelectTrigger className="w-[140px] h-9">
+              <SelectTrigger className="w-[140px] h-9" data-testid="wallpaper-sort">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -336,7 +340,13 @@ export const WallpaperSettings: FC = () => {
                 <SelectItem value="random">{t('wallhavenRandom')}</SelectItem>
               </SelectContent>
             </Select>
-            <Button variant="ghost" size="sm" onClick={handleRefresh} disabled={isLoading}>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleRefresh}
+              disabled={isLoading}
+              data-testid="wallpaper-refresh"
+              aria-label="Refresh wallpapers">
               <RefreshCw className={cn('size-4', isLoading && 'animate-spin')} />
             </Button>
           </Stack>
@@ -349,7 +359,7 @@ export const WallpaperSettings: FC = () => {
       {wallhavenPermission.isGranted && (
         <>
           {error && (
-            <div className="rounded-md bg-destructive/10 p-3 text-center">
+            <div className="rounded-md bg-destructive/10 p-3 text-center" data-testid="wallpaper-error">
               <Text level="s" className="text-destructive">
                 {error}
               </Text>
@@ -378,7 +388,7 @@ export const WallpaperSettings: FC = () => {
                 </div>
               )}
               {!hasMore && wallpapers.length > 0 && (
-                <div className="py-4 text-center">
+                <div className="py-4 text-center" data-testid="wallpaper-end">
                   <Text gray level="xs">
                     {t('noMoreWallpapers')}
                   </Text>
@@ -400,7 +410,12 @@ export const WallpaperSettings: FC = () => {
                 {t('historyWallpapers')}
               </Text>
             </Stack>
-            <Button variant="ghost" size="sm" onClick={handleClearHistory}>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleClearHistory}
+              data-testid="wallpaper-history-clear"
+              aria-label="Clear wallpaper history">
               <Trash2 className="size-4" />
             </Button>
           </Stack>

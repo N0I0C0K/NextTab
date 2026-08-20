@@ -46,6 +46,7 @@ export const DndLinkCardPage: FC<{
       }}>
       <div
         ref={containerRef}
+        data-testid="quick-link-grid"
         className={cn('grid', className)}
         style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(6.5rem, 1fr))' }}>
         {userStorageItems.map((val, index) => (

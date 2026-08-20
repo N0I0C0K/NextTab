@@ -72,7 +72,16 @@ export class MqttSecretPrefixTopicRegisterService {
 
   async setSecretPrefix(newPrefix: string) {
     if (this._secretPrefix === newPrefix) return
+
+    // Existing subscriptions contain the previous secret. Remove them before
+    // changing the prefix, then subscribe to the same raw topics under the new one.
+    if (this.connected) {
+      await this.unSubscribeAll()
+    }
     this._secretPrefix = newPrefix
+    if (this.connected) {
+      await this.subscribeAll()
+    }
   }
 
   async setMqttClient(client: MqttClient) {
@@ -83,7 +92,6 @@ export class MqttSecretPrefixTopicRegisterService {
       await this.syncSubscription()
     }
     client.on('connect', async () => {
-      console.log('MqttSecretPrefixTopicRegisterService detected MQTT client connected')
       await this.syncSubscription()
     })
   }
@@ -112,7 +120,6 @@ export class MqttSecretPrefixTopicRegisterService {
     }
     this._client!.subscribe(secretTopic)
     this.registeredSecretTopics.add(secretTopic)
-    console.log('Subscribed to topic:', secretTopic)
   }
 
   private unSubscribeTopic(secretTopic: string) {
@@ -121,12 +128,10 @@ export class MqttSecretPrefixTopicRegisterService {
     }
     this._client!.unsubscribe(secretTopic)
     this.registeredSecretTopics.delete(secretTopic)
-    console.log('Unsubscribed from topic:', secretTopic)
   }
 
   // Subscribe to all raw topics with the current secret prefix
   async syncSubscription() {
-    console.log('Syncing subscriptions with secret prefix...', this.secretPrefix, this.connected)
     if (!this.connected || !this.isSecretPrefixSet) {
       return
     }
@@ -142,7 +147,6 @@ export class MqttSecretPrefixTopicRegisterService {
     if (topics.length === 0) return
     const res = await this._client!.subscribeAsync(topics)
     res.forEach(it => this.registeredSecretTopics.add(it.topic))
-    console.log('Subscribed to all topics with secret prefix:', res)
   }
 
   // Unsubscribe from all registered secret topics
@@ -154,6 +158,5 @@ export class MqttSecretPrefixTopicRegisterService {
     if (topics.length === 0) return
     await this._client!.unsubscribeAsync(topics)
     this.registeredSecretTopics.clear()
-    console.log('Unsubscribed from all topics with secret prefix:', topics)
   }
 }

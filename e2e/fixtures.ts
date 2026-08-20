@@ -10,7 +10,7 @@ export const test = base.extend<ExtensionFixtures>({
   // Playwright requires the first fixture argument to use object destructuring.
   // eslint-disable-next-line no-empty-pattern
   context: async ({}, use) => {
-    const extensionPath = path.resolve(import.meta.dirname, '../.output/chrome-mv3')
+    const extensionPath = path.resolve(import.meta.dirname, '../.output/chrome-mv3-test')
     const context = await chromium.launchPersistentContext('', {
       channel: 'chromium',
       locale: 'en-US',

@@ -103,6 +103,8 @@ export const LinkCardContextMenuContent = ({
           {relatedBookmarks.slice(0, 10).map(bookmark => (
             <ContextMenuItem
               key={bookmark.id}
+              data-testid="related-bookmark"
+              data-bookmark-id={bookmark.id}
               onClick={() => {
                 if (bookmark.url) {
                   chrome.tabs.update({ url: bookmark.url })
@@ -132,6 +134,8 @@ export const LinkCardContextMenuContent = ({
           {relatedTabs.slice(0, 10).map(tab => (
             <ContextMenuItem
               key={tab.id}
+              data-testid="related-tab"
+              data-tab-id={tab.id}
               onClick={() => {
                 if (tab.id !== undefined) {
                   chrome.tabs.update(tab.id, { active: true })

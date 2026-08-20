@@ -1,8 +1,8 @@
 import { useState, useEffect, type FC } from 'react'
 import { Text } from '@/components/shared'
-import { updateSettings } from '@/utils/storage'
+import { settingStorage, updateSettings } from '@/utils/storage'
 import { t } from '@/utils/i18n'
-import { PERMISSION_ORIGINS, usePermission } from '@/utils'
+import { PERMISSION_ORIGINS, usePermission, useStorage } from '@/utils'
 import { Image, Check, AlertCircle } from 'lucide-react'
 import { cn } from '@/entrypoints/newtab/lib/utils'
 import type { StepNavigationProps, PresetWallpaper, WallhavenResponse } from '../types'
@@ -16,8 +16,8 @@ const WALLHAVEN_PERMISSION_ORIGINS = [PERMISSION_ORIGINS.WALLHAVEN_API]
 
 export const WallpaperStep: FC<StepNavigationProps> = ({ onNext, onBack }) => {
   const wallhavenPermission = usePermission(WALLHAVEN_PERMISSION_ORIGINS)
+  const settings = useStorage(settingStorage)
   const [wallpapers, setWallpapers] = useState<PresetWallpaper[]>(FALLBACK_WALLPAPERS)
-  const [selectedWallpaper, setSelectedWallpaper] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -73,9 +73,10 @@ export const WallpaperStep: FC<StepNavigationProps> = ({ onNext, onBack }) => {
   }, [wallhavenPermission.isGranted])
 
   const handleSelect = (url: string) => {
-    setSelectedWallpaper(url)
     updateSettings({ wallpaperUrl: url, wallpaperType: 'url' })
   }
+
+  const selectedWallpaper = settings.wallpaperType === 'url' ? settings.wallpaperUrl : null
 
   const renderContent = () => {
     if (loading) {

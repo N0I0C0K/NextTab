@@ -83,7 +83,9 @@ export const DomainHistoryDialog: FC<DomainHistoryDialogProps> = ({ domain }) =>
   }, [domain, debouncedSearchQuery])
 
   return (
-    <div className="flex flex-col gap-3 w-[50rem] min-h-[20em] max-h-[46rem] h-[50vh] max-w-full">
+    <div
+      className="flex flex-col gap-3 w-[50rem] min-h-[20em] max-h-[46rem] h-[50vh] max-w-full"
+      data-testid="domain-history-dialog">
       <div className="flex items-center gap-2 min-w-0">
         <Text level="md" className="font-semibold truncate">
           {domain}
@@ -97,6 +99,7 @@ export const DomainHistoryDialog: FC<DomainHistoryDialogProps> = ({ domain }) =>
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
         <Input
+          data-testid="domain-history-search"
           type="text"
           placeholder={t('searchInDomain')}
           value={searchQuery}
@@ -159,6 +162,7 @@ const DomainHistoryItem: FC<DomainHistoryItemProps> = ({ title, url, lastVisitTi
     <div
       role="button"
       tabIndex={0}
+      data-testid="domain-history-item"
       className={cn(
         'flex items-center gap-3 py-2.5 px-3 cursor-pointer group',
         'hover:bg-muted rounded-md transition-colors duration-200',

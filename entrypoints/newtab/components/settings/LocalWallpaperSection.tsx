@@ -91,7 +91,12 @@ export const LocalWallpaperSection: FC = () => {
         </Stack>
         <Stack direction={'row'} className="items-center gap-1">
           {localWallpaper.imageData && (
-            <Button variant="ghost" size="sm" onClick={handleClear} aria-label={t('clearLocalWallpaper')}>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleClear}
+              aria-label={t('clearLocalWallpaper')}
+              data-testid="local-wallpaper-clear">
               <Trash2 className="size-4" />
             </Button>
           )}
@@ -112,7 +117,7 @@ export const LocalWallpaperSection: FC = () => {
       />
 
       {error && (
-        <div className="rounded-md bg-destructive/10 p-3">
+        <div className="rounded-md bg-destructive/10 p-3" data-testid="local-wallpaper-error">
           <Text level="s" className="text-destructive">
             {error}
           </Text>
@@ -130,6 +135,7 @@ export const LocalWallpaperSection: FC = () => {
           )}
           role="button"
           tabIndex={0}
+          data-testid="local-wallpaper-preview"
           aria-label={t('selectLocalWallpaper')}
           onClick={handleSelect}
           onKeyDown={e => {

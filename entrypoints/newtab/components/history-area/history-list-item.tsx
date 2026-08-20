@@ -25,6 +25,8 @@ export const HistoryListItem: FC<{
       <ContextMenuTrigger asChild>
         <Stack
           direction={'row'}
+          data-testid="history-suggestion"
+          data-history-id={id}
           className={cn(
             'w-full items-center py-1.5 cursor-pointer group',
             'hover:bg-slate-200/10 duration-200',
@@ -46,10 +48,10 @@ export const HistoryListItem: FC<{
       </ContextMenuTrigger>
       <ContextMenuContent className="w-[16rem]">
         <ContextMenuItemWitchIcon
+          data-testid="history-suggestion-add"
           IconType={Plus}
           shortCut="Ctrl+A"
           onClick={() => {
-            console.log(title)
             addQuickUrl({
               id,
               title,
@@ -60,6 +62,7 @@ export const HistoryListItem: FC<{
           Add to favor
         </ContextMenuItemWitchIcon>
         <ContextMenuItemWitchIcon
+          data-testid="history-suggestion-delete"
           IconType={Trash}
           className="text-red-800"
           shortCut="Ctrl+D"

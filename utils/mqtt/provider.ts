@@ -104,7 +104,6 @@ export class MqttProvider extends EventEmitter<MqttProviderEventMap> {
   }
 
   async connect(options?: MqttConnectionOptions) {
-    console.log('Attempting to connect to MQTT broker with options:', options)
     const { brokerUrl, useReconnect = true } = options || {}
     if (brokerUrl) {
       this.brokerUrl = brokerUrl
@@ -139,7 +138,6 @@ export class MqttProvider extends EventEmitter<MqttProviderEventMap> {
       try {
         const payload = JSON.parse(message.toString())
         topicEvent.onReceive(rawTopic, payload)
-        console.log('Received message on topic', rawTopic, 'with payload', payload)
       } catch (error) {
         console.error('Error emitting topic event:', error)
       }
@@ -174,6 +172,5 @@ export class MqttProvider extends EventEmitter<MqttProviderEventMap> {
     }
     const secretTopic = this.topicRegisterService.joinSecretPrefix(topic)
     await this.client.publishAsync(secretTopic, JSON.stringify(payload))
-    console.log(`Published to topic: ${secretTopic}`, payload)
   }
 }

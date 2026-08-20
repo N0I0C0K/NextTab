@@ -30,6 +30,7 @@ export const ThemeStep: FC<StepNavigationProps> = ({ onNext, onBack }) => {
             key={id}
             selected={theme === id}
             onClick={() => exampleThemeStorage.setValue(id)}
+            testId={`onboarding-theme-${id}`}
             className="min-w-[100px]">
             <Icon className="size-6" />
             <Text level="s">{t(labelKey)}</Text>

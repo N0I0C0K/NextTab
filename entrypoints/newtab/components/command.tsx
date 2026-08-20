@@ -86,12 +86,7 @@ export const CommandModule = forwardRef<
   const setting = useStorage(settingStorage)
 
   return (
-    <command.Command
-      className={cn('rounded-2xl', className)}
-      shouldFilter={false}
-      onValueChange={val => {
-        console.log('value change:', val)
-      }}>
+    <command.Command className={cn('rounded-2xl', className)} shouldFilter={false}>
       <command.CommandInput
         data-testid="command-input"
         onFocus={focusFunc.setTrue}
@@ -130,6 +125,8 @@ export const CommandModule = forwardRef<
                     <command.CommandItem
                       key={res.id}
                       value={res.id}
+                      data-testid="command-result"
+                      data-command-result-id={res.id}
                       onSelect={() => {
                         res.onSelect?.()
                         // Hide the panel after selection

@@ -7,6 +7,7 @@ import {
   sendDrinkWaterReminderMessage,
   hasPermission,
   PERMISSION_ORIGINS,
+  normalizeMqttSenderUserName,
 } from '@/utils'
 import type { MqttBasePayload } from '@/utils'
 import type { MqttClient } from 'mqtt'
@@ -45,25 +46,20 @@ export function startMqttService() {
     await setMqttConnected(false)
     const settings = await settingStorage.getValue()
     const { mqttSettings } = settings
-    console.log('Current MQTT settings:', settings.mqttSettings)
 
     if (!(mqttSettings?.enabled && mqttSettings.secretKey)) {
-      console.log('MQTT is disabled or not properly configured.')
       return
     }
 
     // Check if MQTT broker permission is granted
     const hasMqttPermission = await hasPermission(MQTT_PERMISSION_ORIGINS)
     if (!hasMqttPermission) {
-      console.log('MQTT broker permission not granted, skipping connection.')
       return
     }
 
-    console.log('Connecting to MQTT broker...')
     await mqttProvider.changeSecretPrefix(mqttSettings.secretKey)
     payloadBuilder.username = mqttSettings.username
     await mqttProvider.connect({ brokerUrl: mqttSettings.mqttBrokerUrl || DEFAULT_MQTT_BROKER_URL })
-    console.log('MQTT connected')
   }
 
   closeMqttClientMessage.registerListener(async () => {
@@ -74,7 +70,6 @@ export function startMqttService() {
     // Check if MQTT broker permission is granted before connecting
     const hasMqttPermission = await hasPermission(MQTT_PERMISSION_ORIGINS)
     if (!hasMqttPermission) {
-      console.log('MQTT broker permission not granted, cannot connect.')
       return
     }
 
@@ -82,7 +77,6 @@ export function startMqttService() {
     const { mqttSettings } = settings
 
     if (!(mqttSettings?.enabled && mqttSettings.secretKey)) {
-      console.log('MQTT is disabled or not properly configured.')
       return
     }
 
@@ -115,13 +109,8 @@ export function startMqttService() {
   // Drink water event handler - defined before usage
   const drinkWaterEvent = mqttProvider.getOrCreateTopicEvent<MqttBasePayload>('drink-water')
   drinkWaterEvent.subscribe(async payload => {
-    console.log('Received drink water reminder from:', payload.senderUserName)
-
     // Validate sender username to prevent malicious content
-    const senderUserName =
-      typeof payload.senderUserName === 'string' && payload.senderUserName.trim()
-        ? payload.senderUserName.trim().substring(0, 50) // Limit length for safety
-        : 'Someone'
+    const senderUserName = normalizeMqttSenderUserName(payload.senderUserName)
 
     // Create Chrome notification with safe ID generation
     const notificationId = `drink-water-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`
@@ -136,10 +125,7 @@ export function startMqttService() {
   })
 
   sendDrinkWaterReminderMessage.registerListener(async () => {
-    console.log('Received request to send drink water reminder')
-
     await drinkWaterEvent.emit(payloadBuilder.buildPayload({}))
-    console.log('Drink water reminder sent successfully')
   })
 
   chrome.alarms.create('mqtt-heart-beat', { periodInMinutes: 0.5 })

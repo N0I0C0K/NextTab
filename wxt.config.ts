@@ -1,8 +1,10 @@
 import { defineConfig } from 'wxt'
 
+const WALLHAVEN_ORIGIN = 'https://wallhaven.cc/*'
+
 export default defineConfig({
   modules: ['@wxt-dev/module-react'],
-  manifest: ({ browser }) => ({
+  manifest: ({ browser, mode }) => ({
     name: '__MSG_extensionName__',
     description: '__MSG_extensionDescription__',
     default_locale: 'en',
@@ -17,7 +19,12 @@ export default defineConfig({
       'alarms',
       'topSites',
     ],
-    optional_host_permissions: ['https://api.github.com/*', 'https://wallhaven.cc/*', 'wss://broker.emqx.io:8084/*'],
+    host_permissions: mode === 'test' ? [WALLHAVEN_ORIGIN] : undefined,
+    optional_host_permissions: [
+      'https://api.github.com/*',
+      ...(mode === 'test' ? [] : [WALLHAVEN_ORIGIN]),
+      'wss://broker.emqx.io:8084/*',
+    ],
     action: {
       default_icon: 'icon-34.png',
     },

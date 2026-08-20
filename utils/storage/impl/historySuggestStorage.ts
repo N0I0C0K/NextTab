@@ -11,19 +11,27 @@ export const historySuggestStorage = storage.defineItem<HistoryItem[]>('local:hi
 
 export const removeHistorySuggestionById = (id: string) => removeUrlItemById(historySuggestStorage, id)
 
-export async function refreshHistorySuggestions(): Promise<void> {
-  const quickUrls = await quickUrlItemsStorage.getValue()
-  const knownHosts = new Set(quickUrls.map(value => new URL(value.url).host))
-  const history = await chrome.history.search({
-    text: '',
-    maxResults: 1000,
-    startTime: moment().subtract(30, 'days').valueOf(),
-  })
+const getUrlHost = (url: string): string | null => {
+  try {
+    return new URL(url).host
+  } catch {
+    return null
+  }
+}
+
+export function buildHistorySuggestions(
+  quickUrls: QuickUrlItem[],
+  history: chrome.history.HistoryItem[],
+  limit = 50,
+): HistoryItem[] {
+  const knownHosts = new Set(quickUrls.map(value => getUrlHost(value.url)).filter((host): host is string => !!host))
   const suggestions: HistoryItem[] = []
-  for (const item of history.sort((left, right) => (right.visitCount ?? 0) - (left.visitCount ?? 0))) {
+
+  for (const item of [...history].sort((left, right) => (right.visitCount ?? 0) - (left.visitCount ?? 0))) {
     if (!item.url) continue
-    const host = new URL(item.url).host
-    if (knownHosts.has(host)) continue
+    const host = getUrlHost(item.url)
+    if (!host || knownHosts.has(host)) continue
+
     knownHosts.add(host)
     suggestions.push({
       id: item.id,
@@ -32,7 +40,18 @@ export async function refreshHistorySuggestions(): Promise<void> {
       lastVisitTime: item.lastVisitTime,
       visitCount: item.visitCount,
     })
-    if (suggestions.length >= 50) break
+    if (suggestions.length >= limit) break
   }
-  await historySuggestStorage.setValue(suggestions)
+
+  return suggestions
+}
+
+export async function refreshHistorySuggestions(): Promise<void> {
+  const quickUrls = await quickUrlItemsStorage.getValue()
+  const history = await chrome.history.search({
+    text: '',
+    maxResults: 1000,
+    startTime: moment().subtract(30, 'days').valueOf(),
+  })
+  await historySuggestStorage.setValue(buildHistorySuggestions(quickUrls, history))
 }

@@ -37,7 +37,7 @@ const settingsSchema = z.object({
 const quickUrlItemSchema = z.object({
   id: z.string(),
   title: z.string(),
-  url: z.string(),
+  url: z.url(),
   iconUrl: z.string().optional(),
 })
 
@@ -121,7 +121,13 @@ export async function exportAllData(): Promise<void> {
  * Each section is validated independently via Zod; invalid sections emit a warning and are skipped.
  */
 export async function importAllData(file: File): Promise<ImportResult> {
-  const { raw, warnings } = await readImportFile(file)
+  return importAllDataFromText(await file.text())
+}
+
+/** Import data from JSON text. Exported for deterministic validation tests. */
+export async function importAllDataFromText(content: string): Promise<ImportResult> {
+  const raw = parseImportFile(content)
+  const warnings: string[] = []
 
   // Import settings via deep-merge so missing fields fall back to current stored values
   if ('settings' in raw) {
@@ -185,36 +191,23 @@ const importFileSchema = z.record(z.string(), z.unknown())
  * Per-section validation (with Zod) is deferred to {@link importAllData}
  * so that one invalid section does not prevent other valid sections from being imported.
  */
-function readImportFile(file: File): Promise<{ raw: Record<string, unknown>; warnings: string[] }> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader()
+function parseImportFile(content: string): Record<string, unknown> {
+  try {
+    const parsed = JSON.parse(content)
+    const result = importFileSchema.safeParse(parsed)
 
-    reader.onload = e => {
-      try {
-        const content = e.target?.result as string
-        const parsed = JSON.parse(content)
-        const result = importFileSchema.safeParse(parsed)
-
-        if (!result.success) {
-          throw new Error('expected a JSON object')
-        }
-
-        const raw = result.data
-        // Use key-existence checks so present-but-null/invalid fields are not treated as missing
-        if (!('settings' in raw) && !('quickUrls' in raw) && !('theme' in raw) && !('commandSettings' in raw)) {
-          throw new Error('no recognisable fields found')
-        }
-
-        resolve({ raw, warnings: [] })
-      } catch (error) {
-        reject(new Error('Failed to parse import file: ' + (error as Error).message))
-      }
+    if (!result.success) {
+      throw new Error('expected a JSON object')
     }
 
-    reader.onerror = () => {
-      reject(new Error('Failed to read file'))
+    const raw = result.data
+    // Use key-existence checks so present-but-null/invalid fields are not treated as missing.
+    if (!('settings' in raw) && !('quickUrls' in raw) && !('theme' in raw) && !('commandSettings' in raw)) {
+      throw new Error('no recognisable fields found')
     }
 
-    reader.readAsText(file)
-  })
+    return raw
+  } catch (error) {
+    throw new Error('Failed to parse import file: ' + (error as Error).message)
+  }
 }
