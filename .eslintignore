@@ -1,3 +1,6 @@
-dist
-node_modules
-tailwind.config.ts
+node_modules/
+.wxt/
+.output/
+coverage/
+playwright-report/
+test-results/

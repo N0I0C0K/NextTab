@@ -1,0 +1,213 @@
+/**
+ * Data export/import functionality for user settings and data
+ */
+
+import { z } from 'zod'
+import { settingStorage, updateSettings } from './settingsStorage'
+import { quickUrlItemsStorage } from './quickUrlStorage'
+import { exampleThemeStorage } from './exampleThemeStorage'
+import { commandSettingsStorage } from './commandSettingsStorage'
+
+// ---- Zod schemas --------------------------------------------------------
+
+// All fields are partial so importing an older file (missing newer fields)
+// still succeeds; updateSettings() deepmerge fills in missing values.
+const mqttSettingSchema = z
+  .object({
+    mqttBrokerUrl: z.string(),
+    secretKey: z.string(),
+    enabled: z.boolean(),
+    username: z.string(),
+  })
+  .partial()
+
+const settingsSchema = z.object({
+  useHistorySuggestion: z.boolean().optional(),
+  autoFocusCommandInput: z.boolean().optional(),
+  doubleClickBackgroundFocusCommand: z.boolean().optional(),
+  showBookmarksInQuickUrlMenu: z.boolean().optional(),
+  showOpenTabsInQuickUrlMenu: z.boolean().optional(),
+  bookmarkFolderId: z.string().nullable().optional(),
+  wallpaperUrl: z.string().nullable().optional(),
+  wallpaperType: z.union([z.literal('url'), z.literal('local')]).optional(),
+  wallhavenSortMode: z.union([z.literal('toplist'), z.literal('random')]).optional(),
+  mqttSettings: mqttSettingSchema.optional(),
+})
+
+const quickUrlItemSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  url: z.url(),
+  iconUrl: z.string().optional(),
+})
+
+const commandPluginSettingsSchema = z.object({
+  priority: z.number(),
+  active: z.boolean(),
+  activeKey: z.string(),
+  includeInGlobal: z.boolean(),
+})
+
+const commandSettingsSchema = z.record(z.string(), commandPluginSettingsSchema)
+
+const themeSchema = z.union([z.literal('light'), z.literal('dark'), z.literal('system')])
+
+const exportedDataSchema = z.object({
+  version: z.string().optional(),
+  exportDate: z.string().optional(),
+  theme: themeSchema.optional(),
+  settings: settingsSchema.optional(),
+  quickUrls: z.array(quickUrlItemSchema).optional(),
+  commandSettings: commandSettingsSchema.optional(),
+})
+
+// ---- Public types -------------------------------------------------------
+
+/** Shape of a full export file produced by {@link exportAllData}. */
+export type ExportedData = z.infer<typeof exportedDataSchema>
+
+export type ImportResult = {
+  warnings: string[]
+}
+
+// ---- Helpers ------------------------------------------------------------
+
+/** Format a ZodError into a concise, human-readable string. */
+function formatZodError(error: z.ZodError): string {
+  return error.issues
+    .map(issue => (issue.path.length ? `${issue.path.join('.')}: ${issue.message}` : issue.message))
+    .join('; ')
+}
+
+// ---- Export -------------------------------------------------------------
+
+/**
+ * Export all user data as JSON and download it
+ */
+export async function exportAllData(): Promise<void> {
+  const settings = await settingStorage.getValue()
+  const quickUrls = await quickUrlItemsStorage.getValue()
+  const theme = await exampleThemeStorage.getValue()
+  const commandSettings = await commandSettingsStorage.getValue()
+  const version = chrome.runtime.getManifest().version
+
+  const exportData: ExportedData = {
+    version,
+    exportDate: new Date().toISOString(),
+    theme,
+    settings,
+    quickUrls,
+    commandSettings,
+  }
+
+  const jsonString = JSON.stringify(exportData, null, 2)
+  const blob = new Blob([jsonString], { type: 'application/json' })
+  const url = URL.createObjectURL(blob)
+
+  const link = document.createElement('a')
+  link.href = url
+  link.download = `nexttab-settings-${version}-${new Date().toISOString().split('T')[0]}.json`
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+  URL.revokeObjectURL(url)
+}
+
+// ---- Import -------------------------------------------------------------
+
+/**
+ * Import all user data from a JSON file.
+ * Supports partial imports — missing fields are skipped and current values are preserved.
+ * Each section is validated independently via Zod; invalid sections emit a warning and are skipped.
+ */
+export async function importAllData(file: File): Promise<ImportResult> {
+  return importAllDataFromText(await file.text())
+}
+
+/** Import data from JSON text. Exported for deterministic validation tests. */
+export async function importAllDataFromText(content: string): Promise<ImportResult> {
+  const raw = parseImportFile(content)
+  const warnings: string[] = []
+
+  // Import settings via deep-merge so missing fields fall back to current stored values
+  if ('settings' in raw) {
+    const result = settingsSchema.safeParse(raw.settings)
+    if (result.success) {
+      const settingsToImport = result.data
+
+      // Local wallpaper is not exported.
+      if (settingsToImport.wallpaperType === 'local') {
+        settingsToImport.wallpaperType = 'url'
+      }
+
+      // update() uses deepmerge, so only provided fields overwrite stored values.
+      // localWallpaperData is never included in settingsToImport (type guarantees this),
+      // so it is always preserved from the current device storage.
+      await updateSettings(settingsToImport)
+    } else {
+      warnings.push(`settings: ${formatZodError(result.error)}`)
+    }
+  }
+
+  // Import quick URLs
+  if ('quickUrls' in raw) {
+    const result = z.array(quickUrlItemSchema).safeParse(raw.quickUrls)
+    if (result.success) {
+      await quickUrlItemsStorage.setValue(result.data)
+    } else {
+      warnings.push(`quickUrls: ${formatZodError(result.error)}`)
+    }
+  }
+
+  // Import theme if present
+  if ('theme' in raw) {
+    const result = themeSchema.safeParse(raw.theme)
+    if (result.success) {
+      await exampleThemeStorage.setValue(result.data)
+    } else {
+      warnings.push(`theme: ${formatZodError(result.error)}`)
+    }
+  }
+
+  // Import command settings if present
+  if ('commandSettings' in raw) {
+    const result = commandSettingsSchema.safeParse(raw.commandSettings)
+    if (result.success) {
+      await commandSettingsStorage.setValue(result.data)
+    } else {
+      warnings.push(`commandSettings: ${formatZodError(result.error)}`)
+    }
+  }
+
+  return { warnings }
+}
+
+// Loose top-level schema: just ensures the JSON is a non-array object so that individual
+// section schemas can validate each field independently and emit per-field warnings.
+const importFileSchema = z.record(z.string(), z.unknown())
+
+/**
+ * Read the JSON file and do a minimal top-level sanity check.
+ * Per-section validation (with Zod) is deferred to {@link importAllData}
+ * so that one invalid section does not prevent other valid sections from being imported.
+ */
+function parseImportFile(content: string): Record<string, unknown> {
+  try {
+    const parsed = JSON.parse(content)
+    const result = importFileSchema.safeParse(parsed)
+
+    if (!result.success) {
+      throw new Error('expected a JSON object')
+    }
+
+    const raw = result.data
+    // Use key-existence checks so present-but-null/invalid fields are not treated as missing.
+    if (!('settings' in raw) && !('quickUrls' in raw) && !('theme' in raw) && !('commandSettings' in raw)) {
+      throw new Error('no recognisable fields found')
+    }
+
+    return raw
+  } catch (error) {
+    throw new Error('Failed to parse import file: ' + (error as Error).message)
+  }
+}

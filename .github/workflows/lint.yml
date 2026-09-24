@@ -2,12 +2,11 @@ name: Lint Check
 
 on:
   push:
-    branches: [ main ]
+    branches: [master]
   pull_request:
 
 jobs:
   eslint:
-
     runs-on: ubuntu-latest
 
     steps:

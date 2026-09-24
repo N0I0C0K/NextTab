@@ -1,0 +1,133 @@
+import { Button, Stack, Text } from '@/components/shared'
+import { Info, ExternalLink, MessageSquareWarning, RefreshCw } from 'lucide-react'
+import { useMemo, type FC } from 'react'
+import { t } from '@/utils/i18n'
+import { SettingItem } from './SettingItem'
+import packageJson from '../../../../package.json'
+import { useLatestVersion } from '@/entrypoints/newtab/hooks/useLatestVersion'
+import { isUpdateAvailable } from '@/entrypoints/newtab/utils/semver'
+import { PERMISSION_ORIGINS, usePermission } from '@/utils'
+import { PermissionGrant } from './PermissionGrant'
+
+const GITHUB_PERMISSION_ORIGINS = [PERMISSION_ORIGINS.GITHUB_API]
+
+const useAboutUrls = () => {
+  const repositoryUrl = packageJson.repository?.url || 'https://github.com/N0I0C0K/NextTab'
+  return {
+    repositoryUrl,
+    issuesUrl: `${repositoryUrl}/issues/new`,
+    releasesUrl: `${repositoryUrl}/releases`,
+  }
+}
+
+/**
+ * Component that displays latest version info.
+ * Only rendered when GitHub API permission is granted.
+ */
+const LatestVersionInfo: FC<{ repositoryUrl: string; releasesUrl: string; currentVersion: string }> = ({
+  repositoryUrl,
+  releasesUrl,
+  currentVersion,
+}) => {
+  const { latestVersion, isChecking, checkError } = useLatestVersion(repositoryUrl)
+
+  const hasUpdate = useMemo(() => {
+    return !checkError && isUpdateAvailable(currentVersion, latestVersion)
+  }, [checkError, currentVersion, latestVersion])
+
+  const getLatestVersionDisplay = () => {
+    if (isChecking) return t('checkingForUpdates')
+    if (checkError) return t('failedToCheckUpdates')
+    if (!latestVersion) return '-'
+    return latestVersion
+  }
+
+  const getUpdateStatusDisplay = () => {
+    if (isChecking || checkError || !latestVersion) return null
+    return hasUpdate ? (
+      <Text level="xs" className={'text-yellow-500'}>
+        ·{' '}
+        <a href={releasesUrl} target="_blank" rel="noopener noreferrer" className="hover:underline">
+          {t('updateAvailable')}
+        </a>
+      </Text>
+    ) : (
+      <Text level="xs" className={'text-green-500'}>
+        · {t('upToDate')}
+      </Text>
+    )
+  }
+
+  return (
+    <Stack direction={'row'} center className="absolute bottom-0 end-1 gap-1">
+      <Text gray level="xs">
+        {t('latestVersion')}:
+      </Text>
+      <Text level="xs" className="font-mono">
+        {getLatestVersionDisplay()}
+      </Text>
+      {getUpdateStatusDisplay()}
+    </Stack>
+  )
+}
+
+export const AboutSettings: FC = () => {
+  const version = chrome.runtime.getManifest().version
+  const { repositoryUrl, issuesUrl, releasesUrl } = useAboutUrls()
+
+  // Permission state for GitHub API
+  const githubPermission = usePermission(GITHUB_PERMISSION_ORIGINS)
+
+  const openUrl = (url: string) => chrome.tabs.create({ url })
+
+  return (
+    <Stack direction={'column'} className={'gap-2 w-full'} data-testid="about-settings">
+      <Text gray level="s">
+        {t('aboutDescription')}
+      </Text>
+      <SettingItem
+        IconClass={Info}
+        title={t('version')}
+        description={t('versionDescription')}
+        control={<Text className="font-mono text-muted-foreground">{version}</Text>}
+        additionalControl={
+          githubPermission.isGranted ? (
+            <LatestVersionInfo repositoryUrl={repositoryUrl} releasesUrl={releasesUrl} currentVersion={version} />
+          ) : undefined
+        }
+      />
+      {/* Permission prompt for GitHub API (version check) */}
+      <PermissionGrant permission={githubPermission} description={t('githubPermissionDescription')} />
+      <SettingItem
+        IconClass={ExternalLink}
+        title={t('repository')}
+        description={t('repositoryDescription')}
+        control={
+          <Button variant={'outline'} onClick={() => openUrl(repositoryUrl)} data-testid="open-repository">
+            {t('viewOnGithub')}
+          </Button>
+        }
+      />
+      <SettingItem
+        IconClass={MessageSquareWarning}
+        title={t('reportIssue')}
+        description={t('reportIssueDescription')}
+        control={
+          <Button variant={'outline'} onClick={() => openUrl(issuesUrl)} data-testid="open-issue">
+            {t('reportIssue')}
+          </Button>
+        }
+      />
+      <SettingItem
+        IconClass={RefreshCw}
+        title={t('updates')}
+        description={t('checkForUpdatesDescription')}
+        control={
+          <Button variant={'outline'} onClick={() => openUrl(releasesUrl)} data-testid="open-releases">
+            {t('checkForUpdates')}
+          </Button>
+        }
+      />
+    </Stack>
+  )
+}
