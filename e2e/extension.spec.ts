@@ -563,10 +563,13 @@ test('quick link sorting persists without overwriting the manual order', async (
   await page.getByTestId('quick-link-sort-alphabetical').click()
   await expect(cards.first()).toHaveAttribute('data-quick-link-id', 'a')
   await expect(page.getByTestId('quick-link-drag-handle')).toHaveCount(0)
-  await expect.poll(() => readExtensionStorage<{ quickUrlSortMode: string }>(page, SETTINGS_KEY))
+  await expect
+    .poll(() => readExtensionStorage<{ quickUrlSortMode: string }>(page, SETTINGS_KEY))
     .toMatchObject({ quickUrlSortMode: 'alphabetical' })
   expect((await readExtensionStorage<Array<{ id: string }>>(page, QUICK_LINKS_KEY)).map(item => item.id)).toEqual([
-    'z', 'a', 'b',
+    'z',
+    'a',
+    'b',
   ])
 
   await page.reload()
@@ -581,7 +584,9 @@ test('quick link sorting persists without overwriting the manual order', async (
   await expect(cards.first()).toHaveAttribute('data-quick-link-id', 'z')
   await expect(page.getByTestId('quick-link-drag-handle')).toHaveCount(3)
   expect((await readExtensionStorage<Array<{ id: string }>>(page, QUICK_LINKS_KEY)).map(item => item.id)).toEqual([
-    'z', 'a', 'b',
+    'z',
+    'a',
+    'b',
   ])
   expect(await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth)).toBe(false)
 })
