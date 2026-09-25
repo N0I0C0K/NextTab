@@ -1,4 +1,6 @@
 node_modules/
+.turbo/
+dist/
 .wxt/
 .output/
 coverage/

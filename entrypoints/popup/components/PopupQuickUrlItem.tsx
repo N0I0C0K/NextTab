@@ -1,6 +1,5 @@
 import type { QuickUrlItem } from '@/utils/storage'
-import { Text } from '@/components/shared'
-import { getDefaultIconUrl } from '@/utils'
+import { QuickLinkIcon } from '@/components/shared/custom/quick-link-icon'
 import { memo, useCallback } from 'react'
 
 interface PopupQuickUrlItemProps {
@@ -9,8 +8,6 @@ interface PopupQuickUrlItemProps {
 
 export const PopupQuickUrlItem = memo(({ item }: PopupQuickUrlItemProps) => {
   const { url, title } = item
-  const iconUrl = getDefaultIconUrl(url)
-
   const handleClick = useCallback(
     async (ev: React.MouseEvent) => {
       if (ev.shiftKey && !ev.ctrlKey && !ev.metaKey) {
@@ -43,27 +40,10 @@ export const PopupQuickUrlItem = memo(({ item }: PopupQuickUrlItemProps) => {
       data-testid="popup-quick-link"
       onClick={handleClick}
       aria-label={title}
-      className="flex flex-col items-center justify-center gap-1 p-2 rounded-md transition-colors group border-0
-        hover:bg-muted cursor-pointer">
-      <div className="w-10 h-10 rounded-md overflow-hidden flex items-center justify-center">
-        <img
-          src={iconUrl}
-          alt={title}
-          className="w-full h-full object-cover"
-          onError={e => {
-            const target = e.target as HTMLImageElement
-            target.style.display = 'none'
-            const parent = target.parentElement
-            if (parent) {
-              parent.textContent = title.charAt(0).toUpperCase()
-              parent.classList.add('text-xl', 'font-semibold', 'text-muted-foreground')
-            }
-          }}
-        />
-      </div>
-      <Text level="xs" className="text-center line-clamp-2 max-w-full leading-tight select-none">
-        {title}
-      </Text>
+      title={title}
+      className="popup-quick-link">
+      <QuickLinkIcon url={url} title={title} className="popup-quick-link-icon" />
+      <span className="popup-quick-link-label">{title}</span>
     </button>
   )
 })

@@ -9,7 +9,7 @@ import { t } from '@/utils/i18n'
 
 const CommandItemIcon: FC<{ iconUrl?: string; IconType?: React.ElementType }> = ({ iconUrl, IconType }) => {
   return (
-    <div className="bg-muted-foreground/10 rounded-sm size-10 flex items-center justify-center shrink-0">
+    <div className="bg-muted rounded-lg size-9 flex items-center justify-center shrink-0">
       {iconUrl && <img src={iconUrl} alt="icon" className="size-6 rounded-md" />}
       {IconType && <IconType className="stroke-2 size-6" />}
     </div>
@@ -86,7 +86,7 @@ export const CommandModule = forwardRef<
   const setting = useStorage(settingStorage)
 
   return (
-    <command.Command className={cn('rounded-2xl', className)} shouldFilter={false}>
+    <command.Command className={cn('rounded-xl', className)} shouldFilter={false}>
       <command.CommandInput
         data-testid="command-input"
         onFocus={focusFunc.setTrue}
@@ -95,11 +95,12 @@ export const CommandModule = forwardRef<
         ref={inputRef}
         onValueChange={newVal => {
           setInputVal(newVal)
+          focusFunc.setTrue()
         }}
         // eslint-disable-next-line jsx-a11y/no-autofocus
         autoFocus={setting.autoFocusCommandInput}
         placeholder={t('searchCommandPlaceholder')}
-        className="h-14 md:h-12 text-lg md:text-base"
+        className="text-base"
         keyBindings={keyBindings}
       />
       <command.CommandList

@@ -1,67 +1,26 @@
-import { styled } from '@stitches/react'
+import * as React from 'react'
+import { cn } from 'cn'
 
-export const Stack = styled('div', {
-  display: 'flex',
-  variants: {
-    direction: {
-      row: {
-        display: 'flex',
-        flexDirection: 'row',
-      },
-      column: {
-        display: 'flex',
-        flexDirection: 'column',
-      },
-      rowr: {
-        display: 'flex',
-        flexDirection: 'row-reverse',
-      },
-      columnr: {
-        display: 'flex',
-        flexDirection: 'column-reverse',
-      },
-    },
-    center: {
-      true: {
-        alignItems: 'center',
-      },
-    },
-  },
-  defaultVariants: {
-    direction: 'row',
-    center: false,
-  },
-})
+type StackProps = React.HTMLAttributes<HTMLDivElement> & {
+  direction?: 'row' | 'column' | 'rowr' | 'columnr'
+  center?: boolean
+}
 
-export const AnimateStack = styled('div', {
-  display: 'flex',
-  variants: {
-    direction: {
-      row: {
-        display: 'flex',
-        flexDirection: 'row',
-      },
-      column: {
-        display: 'flex',
-        flexDirection: 'column',
-      },
-      rowr: {
-        display: 'flex',
-        flexDirection: 'row-reverse',
-      },
-      columnr: {
-        display: 'flex',
-        flexDirection: 'column-reverse',
-      },
-    },
-    center: {
-      true: {
-        alignItems: 'center',
-      },
-    },
-  },
-  defaultVariants: {
-    direction: 'row',
-    center: false,
-  },
-})
+export const Stack = React.forwardRef<HTMLDivElement, StackProps>(
+  ({ direction = 'row', center = false, className, ...props }, ref) => (
+    <div
+      ref={ref}
+      className={cn(
+        'flex',
+        direction === 'column' && 'flex-col',
+        direction === 'rowr' && 'flex-row-reverse',
+        direction === 'columnr' && 'flex-col-reverse',
+        center && 'items-center',
+        className,
+      )}
+      {...props}
+    />
+  ),
+)
+
+Stack.displayName = 'Stack'

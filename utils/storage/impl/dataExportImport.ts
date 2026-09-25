@@ -27,6 +27,7 @@ const settingsSchema = z.object({
   doubleClickBackgroundFocusCommand: z.boolean().optional(),
   showBookmarksInQuickUrlMenu: z.boolean().optional(),
   showOpenTabsInQuickUrlMenu: z.boolean().optional(),
+  quickUrlSortMode: z.union([z.literal('manual'), z.literal('alphabetical')]).optional(),
   bookmarkFolderId: z.string().nullable().optional(),
   wallpaperUrl: z.string().nullable().optional(),
   wallpaperType: z.union([z.literal('url'), z.literal('local')]).optional(),

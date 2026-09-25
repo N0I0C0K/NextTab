@@ -54,6 +54,18 @@ describe('settings import', () => {
     expect(result.warnings[1]).toContain('quickUrls:')
   })
 
+  it('imports the quick-link sort preference without changing the links', async () => {
+    await quickUrlItemsStorage.setValue([
+      { id: 'z', title: 'Zulu', url: 'https://z.example.com/' },
+      { id: 'a', title: 'Alpha', url: 'https://a.example.com/' },
+    ])
+    const result = await importAllDataFromText(JSON.stringify({ settings: { quickUrlSortMode: 'alphabetical' } }))
+
+    expect(result.warnings).toEqual([])
+    expect((await settingStorage.getValue()).quickUrlSortMode).toBe('alphabetical')
+    expect((await quickUrlItemsStorage.getValue()).map(item => item.id)).toEqual(['z', 'a'])
+  })
+
   it.each([
     ['malformed JSON', '{'],
     ['an array', '[]'],

@@ -1,6 +1,4 @@
 import * as React from 'react'
-import type * as LabelPrimitive from '@radix-ui/react-label'
-import { Slot } from '@radix-ui/react-slot'
 import type { ControllerProps, FieldPath, FieldValues } from 'react-hook-form'
 import { Controller, FormProvider, useFormContext } from 'react-hook-form'
 
@@ -73,31 +71,22 @@ const FormItem = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivEl
 )
 FormItem.displayName = 'FormItem'
 
-const FormLabel = React.forwardRef<
-  React.ElementRef<typeof LabelPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root>
->(({ className, ...props }, ref) => {
+const FormLabel = ({ className, ...props }: React.ComponentProps<'label'>) => {
   const { error, formItemId } = useFormField()
 
-  return <Label ref={ref} className={cn(error && 'text-destructive', className)} htmlFor={formItemId} {...props} />
-})
+  return <Label className={cn(error && 'text-destructive', className)} htmlFor={formItemId} {...props} />
+}
 FormLabel.displayName = 'FormLabel'
 
-const FormControl = React.forwardRef<React.ElementRef<typeof Slot>, React.ComponentPropsWithoutRef<typeof Slot>>(
-  ({ ...props }, ref) => {
-    const { error, formItemId, formDescriptionId, formMessageId } = useFormField()
+const FormControl = ({ children }: { children: React.ReactElement }) => {
+  const { error, formItemId, formDescriptionId, formMessageId } = useFormField()
 
-    return (
-      <Slot
-        ref={ref}
-        id={formItemId}
-        aria-describedby={!error ? `${formDescriptionId}` : `${formDescriptionId} ${formMessageId}`}
-        aria-invalid={!!error}
-        {...props}
-      />
-    )
-  },
-)
+  return React.cloneElement(children as React.ReactElement<Record<string, unknown>>, {
+    id: formItemId,
+    'aria-describedby': !error ? formDescriptionId : `${formDescriptionId} ${formMessageId}`,
+    'aria-invalid': !!error,
+  })
+}
 FormControl.displayName = 'FormControl'
 
 const FormDescription = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLParagraphElement>>(

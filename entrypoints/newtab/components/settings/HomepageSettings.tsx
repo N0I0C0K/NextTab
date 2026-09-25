@@ -1,7 +1,7 @@
 import { useStorage } from '@/utils'
 import { settingStorage, updateSettings } from '@/utils/storage'
 import { Stack, Text, Switch, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/shared'
-import { History, Bookmark, NotebookTabs, Folder } from 'lucide-react'
+import { Bookmark, NotebookTabs, Folder } from 'lucide-react'
 import type { FC } from 'react'
 import { useEffect, useState } from 'react'
 import { t } from '@/utils/i18n'
@@ -52,17 +52,6 @@ export const HomepageSettings: FC = () => {
         {t('configureHomepageSettings')}
       </Text>
       <SettingItem
-        IconClass={History}
-        title={t('historySuggestion')}
-        description={t('historySuggestionDescription')}
-        control={
-          <Switch
-            checked={settings.useHistorySuggestion}
-            onCheckedChange={val => updateSettings({ useHistorySuggestion: val })}
-          />
-        }
-      />
-      <SettingItem
         IconClass={Bookmark}
         title={t('showBookmarksInQuickUrlMenu')}
         description={t('showBookmarksInQuickUrlMenuDescription')}
@@ -75,6 +64,7 @@ export const HomepageSettings: FC = () => {
       />
       {settings.showBookmarksInQuickUrlMenu && (
         <SettingItem
+          className="nt-setting-item-stacked"
           IconClass={Folder}
           title={t('bookmarkFolder')}
           description={t('bookmarkFolderDescription')}

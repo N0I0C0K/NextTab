@@ -1,5 +1,4 @@
 export { WelcomeStep } from './WelcomeStep'
 export { ThemeStep } from './ThemeStep'
-export { WallpaperStep } from './WallpaperStep'
 export { QuickLinksStep } from './QuickLinksStep'
 export { CompleteStep } from './CompleteStep'

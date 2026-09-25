@@ -1,6 +1,7 @@
 import { createRoot } from 'react-dom/client'
 import '@/assets/global.css'
 import './style.css'
+import { ThemeProvider } from '@/components/shared'
 import Popup from './App'
 
 function init() {
@@ -10,7 +11,11 @@ function init() {
   }
   const root = createRoot(appContainer)
 
-  root.render(<Popup />)
+  root.render(
+    <ThemeProvider>
+      <Popup />
+    </ThemeProvider>,
+  )
 }
 
 init()

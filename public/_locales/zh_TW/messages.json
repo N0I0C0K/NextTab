@@ -7,6 +7,17 @@
     "description": "Extension name",
     "message": "NextTab"
   },
+  "quickLinksHeading": { "message": "常用網站" },
+  "sortQuickLinks": { "message": "排序" },
+  "sortQuickLinksManual": { "message": "原始順序" },
+  "sortQuickLinksAlphabetical": { "message": "依字母排序" },
+  "addSite": { "message": "新增網站" },
+  "addQuickLinkTitle": { "message": "新增常用網站" },
+  "addQuickLinkDescription": { "message": "將常用網站放到新分頁，一鍵即可開啟。" },
+  "siteName": { "message": "網站名稱" },
+  "siteNameDescription": { "message": "顯示在新分頁上的名稱。" },
+  "websiteUrl": { "message": "網站網址" },
+  "emptyQuickLinks": { "message": "還沒有常用網站，新增一個開始使用吧。" },
   "toggleTheme": {
     "message": "切換主題"
   },
@@ -33,7 +44,7 @@
   },
   "searchCommandPlaceholder": {
     "description": "Command search input placeholder",
-    "message": "搜尋..."
+    "message": "搜尋網頁、書籤，或輸入指令…"
   },
   "submitSearch": {
     "description": "Submit search button aria label",

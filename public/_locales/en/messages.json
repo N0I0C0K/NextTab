@@ -7,6 +7,17 @@
     "description": "Extension name",
     "message": "NextTab"
   },
+  "quickLinksHeading": { "message": "Quick links" },
+  "sortQuickLinks": { "message": "Sort" },
+  "sortQuickLinksManual": { "message": "Original order" },
+  "sortQuickLinksAlphabetical": { "message": "Alphabetical" },
+  "addSite": { "message": "Add site" },
+  "addQuickLinkTitle": { "message": "Add a quick link" },
+  "addQuickLinkDescription": { "message": "Keep a frequently used website one click away." },
+  "siteName": { "message": "Site name" },
+  "siteNameDescription": { "message": "The name shown on your new tab." },
+  "websiteUrl": { "message": "Website URL" },
+  "emptyQuickLinks": { "message": "No quick links yet. Add a site to get started." },
   "toggleTheme": {
     "message": "Toggle theme"
   },
@@ -33,7 +44,7 @@
   },
   "searchCommandPlaceholder": {
     "description": "Command search input placeholder",
-    "message": "search..."
+    "message": "Search the web, bookmarks, or type a command…"
   },
   "submitSearch": {
     "description": "Submit search button aria label",

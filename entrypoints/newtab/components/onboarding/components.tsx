@@ -18,7 +18,7 @@ interface StepHeaderProps {
 
 export const StepHeader: FC<StepHeaderProps> = ({ icon, title, description, iconClassName }) => (
   <>
-    <div className={cn('rounded-full bg-primary/10 p-4', iconClassName)}>{icon}</div>
+    <div className={cn('rounded-xl border border-border bg-muted p-3', iconClassName)}>{icon}</div>
     <Stack direction="column" className="items-center gap-2 text-center">
       <Text className="text-2xl font-semibold">{title}</Text>
       <Text gray className="max-w-sm">
@@ -37,7 +37,7 @@ interface StepContainerProps {
 }
 
 export const StepContainer: FC<StepContainerProps> = ({ children, className }) => (
-  <Stack direction="column" className={cn('items-center gap-6 py-4', className)}>
+  <Stack direction="column" className={cn('items-center gap-6 py-6', className)}>
     {children}
   </Stack>
 )
@@ -126,8 +126,8 @@ export const SelectableCard: FC<SelectableCardProps> = ({ selected, onClick, chi
     aria-pressed={selected}
     data-testid={testId}
     className={cn(
-      'flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-colors',
-      selected ? 'border-primary bg-primary/5' : 'border-muted hover:border-muted-foreground/50',
+      'flex flex-col items-center gap-2 p-4 rounded-lg border transition-colors',
+      selected ? 'border-primary bg-muted' : 'border-border hover:bg-muted',
       className,
     )}>
     {children}

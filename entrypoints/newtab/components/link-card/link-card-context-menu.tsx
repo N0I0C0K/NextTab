@@ -6,6 +6,7 @@ import {
   ContextMenuItemWitchIcon,
   ContextMenuSeparator,
   ContextMenuLabel,
+  ContextMenuGroup,
 } from '@/components/shared/ui/context-menu'
 import type { GlobalDialogProps } from '@/entrypoints/newtab/providers'
 import { Pencil, Trash, History } from 'lucide-react'
@@ -99,30 +100,34 @@ export const LinkCardContextMenuContent = ({
       {showBookmarks && relatedBookmarks.length > 0 && (
         <>
           <ContextMenuSeparator />
-          <ContextMenuLabel>{t('relatedBookmarks')}</ContextMenuLabel>
-          {relatedBookmarks.slice(0, 10).map(bookmark => (
-            <ContextMenuItem
-              key={bookmark.id}
-              data-testid="related-bookmark"
-              data-bookmark-id={bookmark.id}
-              onClick={() => {
-                if (bookmark.url) {
-                  chrome.tabs.update({ url: bookmark.url })
-                }
-              }}
-              className="flex items-center gap-2">
-              <img
-                src={getDefaultIconUrl(bookmark.url || '')}
-                alt={bookmark.title || bookmark.url || 'Bookmark icon'}
-                className="size-4 rounded-sm flex-shrink-0"
-                onError={e => {
-                  // Fallback to hide broken images
-                  e.currentTarget.style.display = 'none'
+          <ContextMenuGroup>
+            <ContextMenuLabel>{t('relatedBookmarks')}</ContextMenuLabel>
+            {relatedBookmarks.slice(0, 10).map(bookmark => (
+              <ContextMenuItem
+                key={bookmark.id}
+                data-testid="related-bookmark"
+                data-bookmark-id={bookmark.id}
+                onClick={() => {
+                  if (bookmark.url) {
+                    chrome.tabs.update({ url: bookmark.url })
+                  }
                 }}
-              />
-              <span className="truncate flex-1">{bookmark.title || bookmark.url}</span>
-            </ContextMenuItem>
-          ))}
+                className="flex items-center gap-2">
+                <img
+                  src={getDefaultIconUrl(bookmark.url || '')}
+                  alt={bookmark.title || bookmark.url || 'Bookmark icon'}
+                  className="size-4 rounded-sm flex-shrink-0"
+                  onError={e => {
+                    // Fallback to hide broken images
+                    e.currentTarget.style.display = 'none'
+                  }}
+                />
+                <span className="min-w-0 flex-1 truncate" title={bookmark.title || bookmark.url}>
+                  {bookmark.title || bookmark.url}
+                </span>
+              </ContextMenuItem>
+            ))}
+          </ContextMenuGroup>
         </>
       )}
 
@@ -130,33 +135,37 @@ export const LinkCardContextMenuContent = ({
       {showOpenTabs && relatedTabs.length > 0 && (
         <>
           <ContextMenuSeparator />
-          <ContextMenuLabel>{t('relatedOpenTabs')}</ContextMenuLabel>
-          {relatedTabs.slice(0, 10).map(tab => (
-            <ContextMenuItem
-              key={tab.id}
-              data-testid="related-tab"
-              data-tab-id={tab.id}
-              onClick={() => {
-                if (tab.id !== undefined) {
-                  chrome.tabs.update(tab.id, { active: true })
-                  if (tab.windowId !== undefined) {
-                    chrome.windows.update(tab.windowId, { focused: true })
+          <ContextMenuGroup>
+            <ContextMenuLabel>{t('relatedOpenTabs')}</ContextMenuLabel>
+            {relatedTabs.slice(0, 10).map(tab => (
+              <ContextMenuItem
+                key={tab.id}
+                data-testid="related-tab"
+                data-tab-id={tab.id}
+                onClick={() => {
+                  if (tab.id !== undefined) {
+                    chrome.tabs.update(tab.id, { active: true })
+                    if (tab.windowId !== undefined) {
+                      chrome.windows.update(tab.windowId, { focused: true })
+                    }
                   }
-                }
-              }}
-              className="flex items-center gap-2">
-              <img
-                src={tab.favIconUrl || getDefaultIconUrl(tab.url || '')}
-                alt={tab.title || tab.url || 'Tab icon'}
-                className="size-4 rounded-sm flex-shrink-0"
-                onError={e => {
-                  // Fallback to hide broken images
-                  e.currentTarget.style.display = 'none'
                 }}
-              />
-              <span className="truncate flex-1">{tab.title || tab.url}</span>
-            </ContextMenuItem>
-          ))}
+                className="flex items-center gap-2">
+                <img
+                  src={tab.favIconUrl || getDefaultIconUrl(tab.url || '')}
+                  alt={tab.title || tab.url || 'Tab icon'}
+                  className="size-4 rounded-sm flex-shrink-0"
+                  onError={e => {
+                    // Fallback to hide broken images
+                    e.currentTarget.style.display = 'none'
+                  }}
+                />
+                <span className="min-w-0 flex-1 truncate" title={tab.title || tab.url}>
+                  {tab.title || tab.url}
+                </span>
+              </ContextMenuItem>
+            ))}
+          </ContextMenuGroup>
         </>
       )}
     </>

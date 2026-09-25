@@ -1,27 +1,29 @@
 import { useStorage } from '@/utils'
-import { quickUrlItemsStorage } from '@/utils/storage'
+import { getDisplayQuickUrls, quickUrlItemsStorage, settingStorage } from '@/utils/storage'
 import { t } from '@/utils/i18n'
 import { PopupQuickUrlItem } from './PopupQuickUrlItem'
 
 export const PopupQuickUrlGrid = () => {
   const quickUrls = useStorage(quickUrlItemsStorage)
+  const settings = useStorage(settingStorage)
+  const displayQuickUrls = getDisplayQuickUrls(quickUrls, settings.quickUrlSortMode ?? 'manual')
 
   if (quickUrls.length === 0) {
     return (
-      <div className="flex items-center justify-center h-full text-muted-foreground">
+      <div className="flex min-h-40 items-center justify-center text-muted-foreground">
         <p className="text-sm">{t('noQuickLinks')}</p>
       </div>
     )
   }
 
   return (
-    <div className="w-full h-full overflow-y-auto">
-      <div className="quick-url-grid grid gap-1 p-2">
-        {quickUrls.map(item => (
+    <div className="w-full">
+      <div className="quick-url-grid grid">
+        {displayQuickUrls.map(item => (
           <PopupQuickUrlItem key={item.id} item={item} />
         ))}
       </div>
-      <div className="mt-3 p-2 border-t border-border">
+      <div className="px-4 pb-4 pt-2">
         <p className="text-xs text-muted-foreground text-center leading-relaxed">{t('popupKeyboardHint')}</p>
       </div>
     </div>
