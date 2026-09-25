@@ -8,6 +8,9 @@
     "message": "NextTab"
   },
   "quickLinksHeading": { "message": "Quick links" },
+  "sortQuickLinks": { "message": "Sort" },
+  "sortQuickLinksManual": { "message": "Original order" },
+  "sortQuickLinksAlphabetical": { "message": "Alphabetical" },
   "addSite": { "message": "Add site" },
   "addQuickLinkTitle": { "message": "Add a quick link" },
   "addQuickLinkDescription": { "message": "Keep a frequently used website one click away." },

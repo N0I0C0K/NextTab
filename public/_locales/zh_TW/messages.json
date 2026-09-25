@@ -8,6 +8,9 @@
     "message": "NextTab"
   },
   "quickLinksHeading": { "message": "常用網站" },
+  "sortQuickLinks": { "message": "排序" },
+  "sortQuickLinksManual": { "message": "原始順序" },
+  "sortQuickLinksAlphabetical": { "message": "依字母排序" },
   "addSite": { "message": "新增網站" },
   "addQuickLinkTitle": { "message": "新增常用網站" },
   "addQuickLinkDescription": { "message": "將常用網站放到新分頁，一鍵即可開啟。" },

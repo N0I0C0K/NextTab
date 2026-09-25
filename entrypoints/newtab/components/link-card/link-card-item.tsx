@@ -14,11 +14,20 @@ import { useRelatedTabs } from './use-related-tabs'
 interface LinkCardProps extends QuickUrlItem {
   index: number
   selected?: boolean
+  canReorder?: boolean
   className?: string
 }
 
-export const SortableLinkCardItem: FC<LinkCardProps> = ({ url, title, id, index, className, selected = false }) => {
-  const { ref, handleRef } = useSortable({ id, index })
+export const SortableLinkCardItem: FC<LinkCardProps> = ({
+  url,
+  title,
+  id,
+  index,
+  className,
+  selected = false,
+  canReorder = true,
+}) => {
+  const { ref, handleRef } = useSortable({ id, index, disabled: !canReorder })
   const [contextMenuOpen, setContextMenuOpen] = useState(false)
   const globalDialog = useGlobalDialog()
 
@@ -43,7 +52,7 @@ export const SortableLinkCardItem: FC<LinkCardProps> = ({ url, title, id, index,
           : event.key === 'ArrowRight' || event.key === 'ArrowDown'
             ? 1
             : 0
-      if (!direction) return
+      if (!direction || !canReorder) return
       event.preventDefault()
       event.stopPropagation()
       void updateStorageItem(quickUrlItemsStorage, items => {
@@ -52,7 +61,7 @@ export const SortableLinkCardItem: FC<LinkCardProps> = ({ url, title, id, index,
         return nextIndex < 0 || nextIndex >= items.length ? items : arrayMove(items, currentIndex, nextIndex)
       })
     },
-    [id],
+    [id, canReorder],
   )
 
   return (
@@ -72,15 +81,17 @@ export const SortableLinkCardItem: FC<LinkCardProps> = ({ url, title, id, index,
           <LinkCardIcon url={url} />
           <span className="nt-link-label">{title}</span>
         </button>
-        <button
-          ref={handleRef}
-          type="button"
-          className="nt-link-grip"
-          data-testid="quick-link-drag-handle"
-          aria-label={`Reorder ${title}. Drag or use arrow keys.`}
-          onKeyDown={handleMoveByKeyboard}>
-          <GripVertical size={16} aria-hidden="true" />
-        </button>
+        {canReorder && (
+          <button
+            ref={handleRef}
+            type="button"
+            className="nt-link-grip"
+            data-testid="quick-link-drag-handle"
+            aria-label={`Reorder ${title}. Drag or use arrow keys.`}
+            onKeyDown={handleMoveByKeyboard}>
+            <GripVertical size={16} aria-hidden="true" />
+          </button>
+        )}
       </ContextMenuTrigger>
       <ContextMenuContent className="max-w-xs">
         <LinkCardContextMenuContent

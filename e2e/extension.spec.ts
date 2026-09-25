@@ -489,6 +489,52 @@ test('quick link drag handle supports keyboard reordering', async ({ page, exten
     .toEqual(['b', 'a'])
 })
 
+test('quick link sorting persists without overwriting the manual order', async ({ page, extensionId }) => {
+  await openNewTab(page, extensionId)
+  await page.evaluate(
+    key =>
+      chrome.storage.local.set({
+        [key]: [
+          { id: 'z', title: 'Zulu', url: 'https://z.example.com/' },
+          { id: 'a', title: 'Alpha', url: 'https://a.example.com/' },
+          { id: 'b', title: 'Beta', url: 'https://b.example.com/' },
+        ],
+      }),
+    QUICK_LINKS_KEY,
+  )
+
+  const cards = page.getByTestId('quick-link-card')
+  await expect(cards.first()).toHaveAttribute('data-quick-link-id', 'z')
+  await expect(page.getByTestId('quick-link-sort-trigger')).toContainText('Sort')
+  await page.getByTestId('quick-link-sort-trigger').click()
+  await expect(page.getByTestId('quick-link-sort-manual')).toContainText('Original order')
+  await expect(page.getByTestId('quick-link-sort-alphabetical')).toContainText('Alphabetical')
+  await page.getByTestId('quick-link-sort-alphabetical').click()
+  await expect(cards.first()).toHaveAttribute('data-quick-link-id', 'a')
+  await expect(page.getByTestId('quick-link-drag-handle')).toHaveCount(0)
+  await expect.poll(() => readExtensionStorage<{ quickUrlSortMode: string }>(page, SETTINGS_KEY))
+    .toMatchObject({ quickUrlSortMode: 'alphabetical' })
+  expect((await readExtensionStorage<Array<{ id: string }>>(page, QUICK_LINKS_KEY)).map(item => item.id)).toEqual([
+    'z', 'a', 'b',
+  ])
+
+  await page.reload()
+  await expect(cards.first()).toHaveAttribute('data-quick-link-id', 'a')
+  await page.goto(`chrome-extension://${extensionId}/popup.html`)
+  await expect(page.getByTestId('popup-quick-link').first()).toHaveAttribute('aria-label', 'Alpha')
+
+  await openNewTab(page, extensionId)
+  await page.setViewportSize({ width: 320, height: 700 })
+  await page.getByTestId('quick-link-sort-trigger').click()
+  await page.getByTestId('quick-link-sort-manual').click()
+  await expect(cards.first()).toHaveAttribute('data-quick-link-id', 'z')
+  await expect(page.getByTestId('quick-link-drag-handle')).toHaveCount(3)
+  expect((await readExtensionStorage<Array<{ id: string }>>(page, QUICK_LINKS_KEY)).map(item => item.id)).toEqual([
+    'z', 'a', 'b',
+  ])
+  expect(await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth)).toBe(false)
+})
+
 test('quick link rows stay aligned and reorder across responsive layouts', async ({ page, extensionId }) => {
   await openNewTab(page, extensionId)
   await page.evaluate(key => {

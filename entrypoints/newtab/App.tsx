@@ -5,6 +5,7 @@ import type { CommandModuleRef } from './components/command'
 import { useStorage } from '@/utils'
 import { settingStorage } from '@/utils/storage'
 import { t } from '@/utils/i18n'
+import { QuickLinkSortMenu } from './components/link-card/quick-link-sort-menu'
 
 function TimeDisplay() {
   const [time, setTime] = useState(() => new Date())
@@ -55,7 +56,10 @@ export default function NewTab() {
         <section className="nt-links-section" aria-labelledby="nt-links-title">
           <div className="nt-section-heading">
             <h2 id="nt-links-title">{t('quickLinksHeading')}</h2>
-            <AddButton />
+            <div className="flex items-center gap-1">
+              <QuickLinkSortMenu />
+              <AddButton />
+            </div>
           </div>
           <ScrollLinkCardPage />
         </section>

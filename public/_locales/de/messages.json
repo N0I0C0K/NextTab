@@ -8,6 +8,9 @@
     "message": "NextTab"
   },
   "quickLinksHeading": { "message": "Schnellzugriffe" },
+  "sortQuickLinks": { "message": "Sortieren" },
+  "sortQuickLinksManual": { "message": "Ursprüngliche Reihenfolge" },
+  "sortQuickLinksAlphabetical": { "message": "Alphabetisch" },
   "addSite": { "message": "Website hinzufügen" },
   "addQuickLinkTitle": { "message": "Schnellzugriff hinzufügen" },
   "addQuickLinkDescription": { "message": "Häufig genutzte Websites mit einem Klick öffnen." },

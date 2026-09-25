@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it } from 'vitest'
 import { fakeBrowser } from 'wxt/testing/fake-browser'
 import {
   addQuickUrl,
+  getDisplayQuickUrls,
   moveQuickUrlById,
   putQuickUrlById,
   quickUrlItemsStorage,
@@ -37,5 +38,18 @@ describe('quick link storage', () => {
     await removeQuickUrlById('c')
 
     expect(await quickUrlItemsStorage.getValue()).toEqual([{ ...link('b'), title: 'Updated' }])
+  })
+
+  it('alphabetical display does not change the saved manual order', async () => {
+    const items = [
+      { ...link('z'), title: 'Zulu' },
+      { ...link('a'), title: 'Alpha 10' },
+      { ...link('b'), title: 'alpha 2' },
+    ]
+    await quickUrlItemsStorage.setValue(items)
+
+    expect(getDisplayQuickUrls(items, 'alphabetical').map(item => item.id)).toEqual(['b', 'a', 'z'])
+    expect(getDisplayQuickUrls(items, 'manual')).toBe(items)
+    expect((await quickUrlItemsStorage.getValue()).map(item => item.id)).toEqual(['z', 'a', 'b'])
   })
 })

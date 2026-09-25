@@ -14,6 +14,7 @@ export type MqttSetting = {
 
 export type WallpaperType = 'url' | 'local'
 export type WallhavenSortMode = 'toplist' | 'random'
+export type QuickUrlSortMode = 'manual' | 'alphabetical'
 
 export type SettingProps = {
   useHistorySuggestion: boolean
@@ -21,6 +22,7 @@ export type SettingProps = {
   doubleClickBackgroundFocusCommand: boolean
   showBookmarksInQuickUrlMenu: boolean
   showOpenTabsInQuickUrlMenu: boolean
+  quickUrlSortMode: QuickUrlSortMode
   bookmarkFolderId: string | null
   wallpaperUrl: string | null
   wallpaperType: WallpaperType
@@ -36,6 +38,7 @@ export const defaultSetting: SettingProps = {
   doubleClickBackgroundFocusCommand: false,
   showBookmarksInQuickUrlMenu: true,
   showOpenTabsInQuickUrlMenu: true,
+  quickUrlSortMode: 'manual',
   bookmarkFolderId: null,
   wallpaperUrl: null,
   wallpaperType: 'url',

@@ -2,7 +2,7 @@ import { DragDropProvider, PointerSensor } from '@dnd-kit/react'
 import { isSortable } from '@dnd-kit/react/sortable'
 import { arrayMove } from '@dnd-kit/helpers'
 import { useStorage } from '@/utils'
-import { quickUrlItemsStorage, updateStorageItem } from '@/utils/storage'
+import { getDisplayQuickUrls, quickUrlItemsStorage, settingStorage, updateStorageItem } from '@/utils/storage'
 import { type FC, useRef } from 'react'
 
 import { SortableLinkCardItem } from '@/entrypoints/newtab/components/link-card/link-card-item'
@@ -14,10 +14,13 @@ export const DndLinkCardPage: FC<{
   className?: string
 }> = ({ className }) => {
   const userStorageItems = useStorage(quickUrlItemsStorage)
+  const settings = useStorage(settingStorage)
+  const canReorder = (settings.quickUrlSortMode ?? 'manual') === 'manual'
+  const displayItems = getDisplayQuickUrls(userStorageItems, settings.quickUrlSortMode ?? 'manual')
   const containerRef = useRef<HTMLDivElement>(null)
 
   const { selectedIndex } = useKeyboardNavigation({
-    items: userStorageItems,
+    items: displayItems,
     enabled: true, // Always enabled
     containerRef,
   })
@@ -31,6 +34,7 @@ export const DndLinkCardPage: FC<{
         }),
       ]}
       onDragEnd={async event => {
+        if (!canReorder) return
         const { source } = event.operation
         if (isSortable(source)) {
           const { initialIndex, index } = source.sortable
@@ -42,11 +46,17 @@ export const DndLinkCardPage: FC<{
         }
       }}>
       <div ref={containerRef} data-testid="quick-link-grid" className={cn('nt-links-grid', className)}>
-        {userStorageItems.length === 0 && (
+        {displayItems.length === 0 && (
           <p className="col-span-full py-6 text-center text-sm text-muted-foreground">{t('emptyQuickLinks')}</p>
         )}
-        {userStorageItems.map((val, index) => (
-          <SortableLinkCardItem {...val} key={val.id} index={index} selected={selectedIndex === index} />
+        {displayItems.map((val, index) => (
+          <SortableLinkCardItem
+            {...val}
+            key={val.id}
+            index={index}
+            canReorder={canReorder}
+            selected={selectedIndex === index}
+          />
         ))}
       </div>
     </DragDropProvider>

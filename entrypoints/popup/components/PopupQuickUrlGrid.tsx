@@ -1,10 +1,12 @@
 import { useStorage } from '@/utils'
-import { quickUrlItemsStorage } from '@/utils/storage'
+import { getDisplayQuickUrls, quickUrlItemsStorage, settingStorage } from '@/utils/storage'
 import { t } from '@/utils/i18n'
 import { PopupQuickUrlItem } from './PopupQuickUrlItem'
 
 export const PopupQuickUrlGrid = () => {
   const quickUrls = useStorage(quickUrlItemsStorage)
+  const settings = useStorage(settingStorage)
+  const displayQuickUrls = getDisplayQuickUrls(quickUrls, settings.quickUrlSortMode ?? 'manual')
 
   if (quickUrls.length === 0) {
     return (
@@ -17,7 +19,7 @@ export const PopupQuickUrlGrid = () => {
   return (
     <div className="w-full">
       <div className="quick-url-grid grid">
-        {quickUrls.map(item => (
+        {displayQuickUrls.map(item => (
           <PopupQuickUrlItem key={item.id} item={item} />
         ))}
       </div>

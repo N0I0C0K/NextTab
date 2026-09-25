@@ -8,6 +8,9 @@
     "message": "NextTab"
   },
   "quickLinksHeading": { "message": "常用网站" },
+  "sortQuickLinks": { "message": "排序" },
+  "sortQuickLinksManual": { "message": "原始顺序" },
+  "sortQuickLinksAlphabetical": { "message": "按字母排序" },
   "addSite": { "message": "添加网站" },
   "addQuickLinkTitle": { "message": "添加常用网站" },
   "addQuickLinkDescription": { "message": "把常用网站放到新标签页，一键即可打开。" },

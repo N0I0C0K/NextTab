@@ -2,6 +2,14 @@ import { storage } from 'wxt/utils/storage'
 import type { StorageItem } from '../core'
 import { updateStorageItem } from '../core'
 import type { QuickUrlItem } from '../base/types'
+import type { QuickUrlSortMode } from './settingsStorage'
+
+/** Sort a copy for display; the stored array remains the user's manual order. */
+export function getDisplayQuickUrls(items: QuickUrlItem[], mode: QuickUrlSortMode): QuickUrlItem[] {
+  if (mode !== 'alphabetical') return items
+  const collator = new Intl.Collator(undefined, { sensitivity: 'base', numeric: true })
+  return [...items].sort((a, b) => collator.compare(a.title, b.title))
+}
 
 export const quickUrlItemsStorage = storage.defineItem<QuickUrlItem[]>('local:quick-url-item-storage-key', {
   fallback: [],
