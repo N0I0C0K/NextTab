@@ -540,6 +540,35 @@ test('quick link drag handle supports keyboard reordering', async ({ page, exten
     .toEqual(['b', 'a'])
 })
 
+test('missing favicons use link initials in NewTab and popup', async ({ page, extensionId }) => {
+  await openNewTab(page, extensionId)
+  await page.evaluate(
+    key =>
+      chrome.storage.local.set({
+        [key]: [
+          { id: 'latin', title: '  (Framer)', url: 'https://missing-favicon-one.invalid/' },
+          { id: 'han', title: '吉他练习', url: 'https://missing-favicon-two.invalid/' },
+        ],
+      }),
+    QUICK_LINKS_KEY,
+  )
+
+  const newTabIcons = page.getByTestId('quick-link-card').locator('.nt-link-icon')
+  await expect(newTabIcons).toHaveCount(2)
+  await expect(newTabIcons.nth(0)).toHaveAttribute('data-icon-status', 'fallback')
+  await expect(newTabIcons.nth(1)).toHaveAttribute('data-icon-status', 'fallback')
+  await expect(newTabIcons.nth(0)).toHaveText('F')
+  await expect(newTabIcons.nth(1)).toHaveText('吉')
+
+  await page.goto(`chrome-extension://${extensionId}/popup.html`)
+  const popupIcons = page.getByTestId('popup-quick-link').locator('.popup-quick-link-icon')
+  await expect(popupIcons).toHaveCount(2)
+  await expect(popupIcons.nth(0)).toHaveAttribute('data-icon-status', 'fallback')
+  await expect(popupIcons.nth(1)).toHaveAttribute('data-icon-status', 'fallback')
+  await expect(popupIcons.nth(0)).toHaveText('F')
+  await expect(popupIcons.nth(1)).toHaveText('吉')
+})
+
 test('quick link sorting persists without overwriting the manual order', async ({ page, extensionId }) => {
   await openNewTab(page, extensionId)
   await page.evaluate(

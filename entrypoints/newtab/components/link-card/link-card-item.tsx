@@ -78,7 +78,7 @@ export const SortableLinkCardItem: FC<LinkCardProps> = ({
           />
         }>
         <button type="button" className="nt-link-open" aria-label={`${title} — ${url}`} onClick={handleOpen}>
-          <LinkCardIcon url={url} />
+          <LinkCardIcon url={url} title={title} />
           <span className="nt-link-label">{title}</span>
         </button>
         {canReorder && (

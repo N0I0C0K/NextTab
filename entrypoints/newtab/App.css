@@ -177,11 +177,6 @@
   height: 20px;
   object-fit: contain;
 }
-.nt-link-fallback-icon {
-  width: 19px;
-  height: 19px;
-  color: hsl(var(--muted-foreground));
-}
 .nt-link-label {
   display: block;
   min-width: 0;

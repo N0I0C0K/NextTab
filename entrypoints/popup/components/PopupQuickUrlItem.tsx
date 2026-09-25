@@ -1,7 +1,6 @@
 import type { QuickUrlItem } from '@/utils/storage'
-import { getDefaultIconUrl } from '@/utils'
-import { Globe2 } from 'lucide-react'
-import { memo, useCallback, useMemo, useState } from 'react'
+import { QuickLinkIcon } from '@/components/shared/custom/quick-link-icon'
+import { memo, useCallback } from 'react'
 
 interface PopupQuickUrlItemProps {
   item: QuickUrlItem
@@ -9,9 +8,6 @@ interface PopupQuickUrlItemProps {
 
 export const PopupQuickUrlItem = memo(({ item }: PopupQuickUrlItemProps) => {
   const { url, title } = item
-  const iconUrl = useMemo(() => getDefaultIconUrl(url), [url])
-  const [failedUrl, setFailedUrl] = useState<string | null>(null)
-
   const handleClick = useCallback(
     async (ev: React.MouseEvent) => {
       if (ev.shiftKey && !ev.ctrlKey && !ev.metaKey) {
@@ -46,13 +42,7 @@ export const PopupQuickUrlItem = memo(({ item }: PopupQuickUrlItemProps) => {
       aria-label={title}
       title={title}
       className="popup-quick-link">
-      <span className="popup-quick-link-icon" aria-hidden="true">
-        {failedUrl === url ? (
-          <Globe2 className="size-[19px] text-muted-foreground" />
-        ) : (
-          <img src={iconUrl} alt="" onError={() => setFailedUrl(url)} />
-        )}
-      </span>
+      <QuickLinkIcon url={url} title={title} className="popup-quick-link-icon" />
       <span className="popup-quick-link-label">{title}</span>
     </button>
   )
