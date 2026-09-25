@@ -29,7 +29,21 @@ import {
   ScrollArea,
 } from '@/components/shared'
 import type { LucideProps } from 'lucide-react'
-import { Settings2, CupSoda, KeyRound, ToggleRight, User, Activity, Dot } from 'lucide-react'
+import {
+  Settings2,
+  CupSoda,
+  KeyRound,
+  ToggleRight,
+  User,
+  Activity,
+  Dot,
+  House,
+  Palette,
+  Terminal,
+  Server,
+  Database,
+  Info,
+} from 'lucide-react'
 import { Suspense, type ElementType, type FC, type ReactElement, type ReactNode } from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/shared/ui/tabs'
 import { t } from '@/utils/i18n'
@@ -95,9 +109,9 @@ const ConnectSettingItem: FC<{ canConnect: boolean }> = ({ canConnect }) => {
       }
       additionalControl={
         <>
-          <Stack direction={'row'} center className="absolute bottom-0 end-1">
+          <Stack direction={'row'} center className="gap-0.5">
             <Dot className={mqttServerState.connected ? 'text-green-500' : 'text-red-500'} />
-            <Text gray level="xs" className="-ml-2">
+            <Text gray level="xs">
               {mqttServerState.connected ? t('connected') : t('disconnected')}
             </Text>
           </Stack>
@@ -138,6 +152,7 @@ const MqttSettings: FC = () => {
       <ConnectSettingItem canConnect={mqttPermission.isGranted === true} />
       <DisableWhenConnectedWrapper isConnected={isConnected}>
         <SettingItem
+          className="nt-setting-item-stacked"
           IconClass={KeyRound}
           title={t('secretKey')}
           description={t('secretKeyDescription')}
@@ -153,6 +168,7 @@ const MqttSettings: FC = () => {
       </DisableWhenConnectedWrapper>
       <DisableWhenConnectedWrapper isConnected={isConnected}>
         <SettingItem
+          className="nt-setting-item-stacked"
           IconClass={User}
           title={t('username')}
           description={t('usernameDescription')}
@@ -188,21 +204,27 @@ const SettingTabs: FC = () => {
     <Tabs defaultValue="homepage-settings" className="nt-settings-tabs">
       <TabsList className="nt-settings-tab-list">
         <TabsTrigger className="justify-start" value="homepage-settings" data-testid="settings-tab-homepage">
+          <House aria-hidden="true" />
           {t('homepageTab')}
         </TabsTrigger>
         <TabsTrigger className="justify-start" value="appearance-settings" data-testid="settings-tab-appearance">
+          <Palette aria-hidden="true" />
           {t('appearanceTab')}
         </TabsTrigger>
         <TabsTrigger className="justify-start" value="command-settings" data-testid="settings-tab-command">
+          <Terminal aria-hidden="true" />
           {t('commandTab')}
         </TabsTrigger>
         <TabsTrigger className="justify-start" value="mqtt-settings" data-testid="settings-tab-server">
+          <Server aria-hidden="true" />
           {t('serverTab')}
         </TabsTrigger>
         <TabsTrigger className="justify-start" value="data-settings" data-testid="settings-tab-data">
+          <Database aria-hidden="true" />
           {t('dataTab')}
         </TabsTrigger>
         <TabsTrigger className="justify-start" value="about-settings" data-testid="settings-tab-about">
+          <Info aria-hidden="true" />
           {t('aboutTab')}
         </TabsTrigger>
       </TabsList>

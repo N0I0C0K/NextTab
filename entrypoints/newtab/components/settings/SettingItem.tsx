@@ -1,5 +1,5 @@
 import { cn } from '@/entrypoints/newtab/lib/utils'
-import { Space, Stack, Text } from '@/components/shared'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/shared'
 import type { LucideProps } from 'lucide-react'
 import { type ElementType, type FC, type ReactElement } from 'react'
 
@@ -12,23 +12,30 @@ export const SettingItem: FC<{
   additionalControl?: ReactElement
 }> = ({ control, title, className, description, IconClass, additionalControl }) => {
   return (
-    <Stack
-      direction={'row'}
-      className={cn('items-center relative rounded-lg border border-border bg-card p-4 gap-3', className)}>
-      <IconClass className="shrink-0 size-6 text-muted-foreground" aria-hidden="true" />
-      <Stack direction={'column'} className="gap-0.5" data-slot="setting-item-copy">
-        <Text className="font-medium" level="md">
+    <div className={cn('nt-setting-item rounded-lg border border-border bg-card', className)}>
+      <IconClass className="size-6 shrink-0 text-muted-foreground" aria-hidden="true" />
+      <div className="nt-setting-copy" data-slot="setting-item-copy">
+        <span className="nt-setting-title font-medium" title={title}>
           {title}
-        </Text>
-        <Text gray className="-mt-1 max-w-[20em]" level="s">
-          {description}
-        </Text>
-      </Stack>
-      <Space className="mx-1" />
-      <div className="max-w-[50%]" data-slot="setting-item-control">
-        {control}
+        </span>
+        {description && (
+          <TooltipProvider delay={300}>
+            <Tooltip>
+              <TooltipTrigger
+                render={<button type="button" className="nt-setting-description" aria-label={description} />}>
+                <span className="truncate">{description}</span>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" className="max-w-72 text-left leading-relaxed">
+                {description}
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        )}
       </div>
-      {additionalControl}
-    </Stack>
+      <div className="nt-setting-control" data-slot="setting-item-control">
+        {control}
+        {additionalControl && <div className="nt-setting-secondary">{additionalControl}</div>}
+      </div>
+    </div>
   )
 }

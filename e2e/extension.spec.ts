@@ -148,7 +148,58 @@ test('settings drawer remains aligned and controls fit at narrow widths', async 
   const selectBounds = await page.locator('.nt-setting-item-stacked [data-slot="select-trigger"]').boundingBox()
   expect(cardBounds).not.toBeNull()
   expect(selectBounds).not.toBeNull()
+  expect(cardBounds!.x + cardBounds!.width).toBeLessThanOrEqual(390)
   expect(selectBounds!.x + selectBounds!.width).toBeLessThanOrEqual(cardBounds!.x + cardBounds!.width)
+})
+
+test('settings navigation and cards stay aligned while long descriptions remain accessible', async ({
+  page,
+  extensionId,
+}) => {
+  await openNewTab(page, extensionId)
+  await openSettings(page)
+
+  const tabs = page.locator('.nt-settings-tab-list [data-slot="tabs-trigger"]')
+  await expect(tabs).toHaveCount(6)
+  for (const tab of await tabs.all()) {
+    await expect(tab.locator('svg')).toHaveCount(1)
+  }
+
+  const cards = page.getByTestId('homepage-settings').locator('.nt-setting-item')
+  await expect(cards).toHaveCount(3)
+  const heights = await cards.evaluateAll(elements => elements.map(element => element.getBoundingClientRect().height))
+  expect(Math.max(...heights) - Math.min(...heights)).toBeLessThan(2)
+
+  const description = cards.nth(1).locator('.nt-setting-description')
+  const fullDescription = await description.getAttribute('aria-label')
+  expect(fullDescription?.length).toBeGreaterThan(30)
+  await description.hover()
+  await expect(page.locator('[data-slot="tooltip-content"]')).toHaveText(fullDescription!)
+  await page.mouse.move(0, 0)
+  await description.focus()
+  await expect(page.locator('[data-slot="tooltip-content"]')).toHaveText(fullDescription!)
+
+  await page.setViewportSize({ width: 390, height: 844 })
+  const cardBounds = await cards.nth(1).boundingBox()
+  const selectBounds = await cards.nth(1).locator('[data-slot="select-trigger"]').boundingBox()
+  expect(cardBounds).not.toBeNull()
+  expect(selectBounds).not.toBeNull()
+  expect(cardBounds!.x + cardBounds!.width).toBeLessThanOrEqual(390)
+  expect(selectBounds!.x + selectBounds!.width).toBeLessThanOrEqual(cardBounds!.x + cardBounds!.width)
+  const switchBounds = await cards.first().getByRole('switch').boundingBox()
+  expect(switchBounds).not.toBeNull()
+  expect(switchBounds!.x + switchBounds!.width).toBeLessThanOrEqual(390)
+  expect(await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth)).toBe(false)
+
+  await page.getByTestId('settings-tab-server').click()
+  const serverInputs = page.getByTestId('server-settings').locator('.nt-setting-item-stacked [data-slot="input"]')
+  await expect(serverInputs).toHaveCount(2)
+  for (const input of await serverInputs.all()) {
+    const bounds = await input.boundingBox()
+    expect(bounds).not.toBeNull()
+    expect(bounds!.width).toBeGreaterThan(240)
+    expect(bounds!.x + bounds!.width).toBeLessThanOrEqual(390)
+  }
 })
 
 test('command settings use consistent card surfaces, borders, and icon sizes', async ({ page, extensionId }) => {

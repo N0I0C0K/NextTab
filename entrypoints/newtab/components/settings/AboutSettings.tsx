@@ -59,7 +59,7 @@ const LatestVersionInfo: FC<{ repositoryUrl: string; releasesUrl: string; curren
   }
 
   return (
-    <Stack direction={'row'} center className="absolute bottom-0 end-1 gap-1">
+    <Stack direction={'row'} center className="gap-1 whitespace-nowrap">
       <Text gray level="xs">
         {t('latestVersion')}:
       </Text>
