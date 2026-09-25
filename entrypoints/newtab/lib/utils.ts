@@ -1,10 +1,5 @@
-import { clsx, type ClassValue } from 'clsx'
 import { useState, useLayoutEffect } from 'react'
-import { twMerge } from 'tailwind-merge'
-
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
-}
+export { cn } from 'cn'
 
 export function useSize(ref: React.RefObject<Element>): Size {
   const [size, setSize] = useState<Size>([150, window.innerWidth / 2])

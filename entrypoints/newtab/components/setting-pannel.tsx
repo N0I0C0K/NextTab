@@ -29,7 +29,7 @@ import {
   ScrollArea,
 } from '@/components/shared'
 import type { LucideProps } from 'lucide-react'
-import { AlignJustify, CupSoda, KeyRound, ToggleRight, User, Activity, Dot } from 'lucide-react'
+import { Settings2, CupSoda, KeyRound, ToggleRight, User, Activity, Dot } from 'lucide-react'
 import { Suspense, type ElementType, type FC, type ReactElement, type ReactNode } from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/shared/ui/tabs'
 import { t } from '@/utils/i18n'
@@ -63,9 +63,7 @@ const DisableWhenConnectedWrapper: FC<{ isConnected: boolean; children: ReactEle
   return (
     <TooltipProvider>
       <Tooltip>
-        <TooltipTrigger asChild>
-          <div>{children}</div>
-        </TooltipTrigger>
+        <TooltipTrigger render={<div>{children}</div>} />
         <TooltipContent>
           <Text>{t('disconnectToModify')}</Text>
         </TooltipContent>
@@ -174,7 +172,7 @@ const MqttSettings: FC = () => {
 
 const SettingTabs: FC = () => {
   const renderTabContent = (value: string, content: ReactNode) => (
-    <TabsContent value={value}>
+    <TabsContent value={value} className="mt-0 min-w-0 flex-1 p-6">
       <Suspense
         fallback={
           <Text gray level="s">
@@ -187,24 +185,24 @@ const SettingTabs: FC = () => {
   )
 
   return (
-    <Tabs defaultValue="homepage-settings">
-      <TabsList>
-        <TabsTrigger value="homepage-settings" data-testid="settings-tab-homepage">
+    <Tabs defaultValue="homepage-settings" className="nt-settings-tabs">
+      <TabsList className="nt-settings-tab-list">
+        <TabsTrigger className="justify-start" value="homepage-settings" data-testid="settings-tab-homepage">
           {t('homepageTab')}
         </TabsTrigger>
-        <TabsTrigger value="appearance-settings" data-testid="settings-tab-appearance">
+        <TabsTrigger className="justify-start" value="appearance-settings" data-testid="settings-tab-appearance">
           {t('appearanceTab')}
         </TabsTrigger>
-        <TabsTrigger value="command-settings" data-testid="settings-tab-command">
+        <TabsTrigger className="justify-start" value="command-settings" data-testid="settings-tab-command">
           {t('commandTab')}
         </TabsTrigger>
-        <TabsTrigger value="mqtt-settings" data-testid="settings-tab-server">
+        <TabsTrigger className="justify-start" value="mqtt-settings" data-testid="settings-tab-server">
           {t('serverTab')}
         </TabsTrigger>
-        <TabsTrigger value="data-settings" data-testid="settings-tab-data">
+        <TabsTrigger className="justify-start" value="data-settings" data-testid="settings-tab-data">
           {t('dataTab')}
         </TabsTrigger>
-        <TabsTrigger value="about-settings" data-testid="settings-tab-about">
+        <TabsTrigger className="justify-start" value="about-settings" data-testid="settings-tab-about">
           {t('aboutTab')}
         </TabsTrigger>
       </TabsList>
@@ -226,39 +224,33 @@ const SidebarButton: FC<{
   description?: string
 }> = ({ className, IconClass, children, label, description }) => {
   return (
-    <Tooltip>
-      <Dialog>
-        <TooltipTrigger asChild>
-          <DialogTrigger asChild>
-            <Button
-              size={'icon'}
-              variant={'ghost'}
-              className={cn('rounded-full')}
-              aria-label={label}
-              data-testid="settings-trigger">
-              <IconClass />
-            </Button>
-          </DialogTrigger>
-        </TooltipTrigger>
-        <DialogContent
-          className={cn('min-w-[30rem] w-[30vw] max-w-[60rem] min-h-[30rem] h-[60vh] flex flex-col', className)}>
-          <DialogHeader>
-            <DialogTitle>{label}</DialogTitle>
-            <DialogDescription>{description}</DialogDescription>
-          </DialogHeader>
-          <ScrollArea className="max-h-[70vh] pr-3">{children}</ScrollArea>
-        </DialogContent>
-        <TooltipContent side="left">
-          <Text>{label}</Text>
-        </TooltipContent>
-      </Dialog>
-    </Tooltip>
+    <Dialog>
+      <DialogTrigger
+        render={
+          <Button
+            size="icon"
+            variant="outline"
+            className="size-9 rounded-lg bg-card"
+            aria-label={label}
+            data-testid="settings-trigger"
+          />
+        }>
+        <IconClass className="size-4" />
+      </DialogTrigger>
+      <DialogContent className={cn('nt-settings-dialog', className)}>
+        <DialogHeader className="border-b border-border px-6 py-5 text-left">
+          <DialogTitle>{label}</DialogTitle>
+          <DialogDescription>{description}</DialogDescription>
+        </DialogHeader>
+        <ScrollArea className="min-h-0 flex-1">{children}</ScrollArea>
+      </DialogContent>
+    </Dialog>
   )
 }
 
 const DrawerSettingPanel: FC = () => {
   return (
-    <SidebarButton IconClass={AlignJustify} label={t('settings')} description={t('setYourPreferences')}>
+    <SidebarButton IconClass={Settings2} label={t('settings')} description={t('setYourPreferences')}>
       <SettingTabs />
     </SidebarButton>
   )

@@ -7,6 +7,14 @@
     "description": "Extension name",
     "message": "NextTab"
   },
+  "quickLinksHeading": { "message": "常用网站" },
+  "addSite": { "message": "添加网站" },
+  "addQuickLinkTitle": { "message": "添加常用网站" },
+  "addQuickLinkDescription": { "message": "把常用网站放到新标签页，一键即可打开。" },
+  "siteName": { "message": "网站名称" },
+  "siteNameDescription": { "message": "显示在新标签页上的名称。" },
+  "websiteUrl": { "message": "网站地址" },
+  "emptyQuickLinks": { "message": "还没有常用网站，添加一个开始使用吧。" },
   "toggleTheme": {
     "message": "切换主题"
   },
@@ -33,7 +41,7 @@
   },
   "searchCommandPlaceholder": {
     "description": "Command search input placeholder",
-    "message": "搜索..."
+    "message": "搜索网页、书签，或输入命令…"
   },
   "submitSearch": {
     "description": "Submit search button aria label",

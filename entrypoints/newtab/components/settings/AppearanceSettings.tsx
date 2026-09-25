@@ -1,9 +1,6 @@
-import { Stack, Text, ThemeToggle, Separator } from '@/components/shared'
-import { SunMoon } from 'lucide-react'
+import { Stack, Text, ThemeToggle } from '@/components/shared'
 import type { FC } from 'react'
 import { t } from '@/utils/i18n'
-import { SettingItem } from './SettingItem'
-import { WallpaperSettings } from './WallpaperSettings'
 
 export const AppearanceSettings: FC = () => {
   return (
@@ -11,14 +8,7 @@ export const AppearanceSettings: FC = () => {
       <Text gray level="s">
         {t('configureAppearanceSettings')}
       </Text>
-      <SettingItem
-        IconClass={SunMoon}
-        title={t('theme')}
-        description={t('themeDescription')}
-        control={<ThemeToggle />}
-      />
-      <Separator className="my-2" />
-      <WallpaperSettings />
+      <ThemeToggle />
     </Stack>
   )
 }

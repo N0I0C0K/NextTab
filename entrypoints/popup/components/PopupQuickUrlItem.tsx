@@ -1,7 +1,7 @@
 import type { QuickUrlItem } from '@/utils/storage'
-import { Text } from '@/components/shared'
 import { getDefaultIconUrl } from '@/utils'
-import { memo, useCallback } from 'react'
+import { Globe2 } from 'lucide-react'
+import { memo, useCallback, useMemo, useState } from 'react'
 
 interface PopupQuickUrlItemProps {
   item: QuickUrlItem
@@ -9,7 +9,8 @@ interface PopupQuickUrlItemProps {
 
 export const PopupQuickUrlItem = memo(({ item }: PopupQuickUrlItemProps) => {
   const { url, title } = item
-  const iconUrl = getDefaultIconUrl(url)
+  const iconUrl = useMemo(() => getDefaultIconUrl(url), [url])
+  const [failedUrl, setFailedUrl] = useState<string | null>(null)
 
   const handleClick = useCallback(
     async (ev: React.MouseEvent) => {
@@ -43,27 +44,16 @@ export const PopupQuickUrlItem = memo(({ item }: PopupQuickUrlItemProps) => {
       data-testid="popup-quick-link"
       onClick={handleClick}
       aria-label={title}
-      className="flex flex-col items-center justify-center gap-1 p-2 rounded-md transition-colors group border-0
-        hover:bg-muted cursor-pointer">
-      <div className="w-10 h-10 rounded-md overflow-hidden flex items-center justify-center">
-        <img
-          src={iconUrl}
-          alt={title}
-          className="w-full h-full object-cover"
-          onError={e => {
-            const target = e.target as HTMLImageElement
-            target.style.display = 'none'
-            const parent = target.parentElement
-            if (parent) {
-              parent.textContent = title.charAt(0).toUpperCase()
-              parent.classList.add('text-xl', 'font-semibold', 'text-muted-foreground')
-            }
-          }}
-        />
-      </div>
-      <Text level="xs" className="text-center line-clamp-2 max-w-full leading-tight select-none">
-        {title}
-      </Text>
+      title={title}
+      className="popup-quick-link">
+      <span className="popup-quick-link-icon" aria-hidden="true">
+        {failedUrl === url ? (
+          <Globe2 className="size-[19px] text-muted-foreground" />
+        ) : (
+          <img src={iconUrl} alt="" onError={() => setFailedUrl(url)} />
+        )}
+      </span>
+      <span className="popup-quick-link-label">{title}</span>
     </button>
   )
 })

@@ -36,17 +36,17 @@ const CommandPluginSettingItem: FC<{
   return (
     <AccordionItem
       value={plugin.properties.name}
-      className={cn('rounded-md bg-muted px-3')}
+      className="rounded-lg border border-border bg-card px-4"
       data-testid={`command-plugin-${plugin.properties.name}`}>
       <AccordionTrigger className="hover:no-underline py-3">
         <Stack direction={'column'} className="gap-1 flex-1 items-start">
           <Stack direction={'row'} center className="gap-2 w-full">
-            <IconType className="size-8 text-muted-foreground" />
+            <IconType className="size-6 shrink-0 text-muted-foreground" aria-hidden="true" />
             <Stack direction={'column'} className="gap-0.5 items-start">
               <Text className={cn('font-medium', settings.active ? '' : 'text-muted-foreground')} level="md">
                 {plugin.properties.displayName}
               </Text>
-              <Text gray level="xs" className="">
+              <Text gray level="s">
                 {plugin.properties.description}
               </Text>
             </Stack>
@@ -142,7 +142,7 @@ export const CommandSettings: FC = () => {
       <Text gray level="s">
         {t('commandPluginSettings')}
       </Text>
-      <Accordion type="multiple" className="flex flex-col gap-2">
+      <Accordion multiple className="flex flex-col gap-2">
         {plugins.map(plugin => {
           const pluginSettings =
             commandSettings[plugin.properties.name] || defaultCommandSettings[plugin.properties.name]

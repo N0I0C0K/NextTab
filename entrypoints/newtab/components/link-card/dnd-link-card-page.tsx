@@ -8,6 +8,7 @@ import { type FC, useRef } from 'react'
 import { SortableLinkCardItem } from '@/entrypoints/newtab/components/link-card/link-card-item'
 import { cn } from '@/entrypoints/newtab/lib/utils'
 import { useKeyboardNavigation } from './use-keyboard-navigation'
+import { t } from '@/utils/i18n'
 
 export const DndLinkCardPage: FC<{
   className?: string
@@ -25,12 +26,8 @@ export const DndLinkCardPage: FC<{
     <DragDropProvider
       sensors={[
         PointerSensor.configure({
-          activationConstraints: {
-            delay: {
-              tolerance: 4,
-              value: 400,
-            },
-          },
+          activationConstraints: event =>
+            event.pointerType === 'touch' ? { delay: { tolerance: 5, value: 250 } } : { distance: { value: 5 } },
         }),
       ]}
       onDragEnd={async event => {
@@ -44,11 +41,10 @@ export const DndLinkCardPage: FC<{
           }
         }
       }}>
-      <div
-        ref={containerRef}
-        data-testid="quick-link-grid"
-        className={cn('grid', className)}
-        style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(6.5rem, 1fr))' }}>
+      <div ref={containerRef} data-testid="quick-link-grid" className={cn('nt-links-grid', className)}>
+        {userStorageItems.length === 0 && (
+          <p className="col-span-full py-6 text-center text-sm text-muted-foreground">{t('emptyQuickLinks')}</p>
+        )}
         {userStorageItems.map((val, index) => (
           <SortableLinkCardItem {...val} key={val.id} index={index} selected={selectedIndex === index} />
         ))}

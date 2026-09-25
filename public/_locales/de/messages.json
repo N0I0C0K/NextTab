@@ -7,6 +7,14 @@
     "description": "Extension name",
     "message": "NextTab"
   },
+  "quickLinksHeading": { "message": "Schnellzugriffe" },
+  "addSite": { "message": "Website hinzufügen" },
+  "addQuickLinkTitle": { "message": "Schnellzugriff hinzufügen" },
+  "addQuickLinkDescription": { "message": "Häufig genutzte Websites mit einem Klick öffnen." },
+  "siteName": { "message": "Name der Website" },
+  "siteNameDescription": { "message": "Der Name auf Ihrem neuen Tab." },
+  "websiteUrl": { "message": "Website-URL" },
+  "emptyQuickLinks": { "message": "Noch keine Schnellzugriffe. Fügen Sie eine Website hinzu." },
   "toggleTheme": {
     "message": "Design wechseln"
   },
@@ -33,7 +41,7 @@
   },
   "searchCommandPlaceholder": {
     "description": "Command search input placeholder",
-    "message": "suchen..."
+    "message": "Web, Lesezeichen oder Befehle suchen…"
   },
   "submitSearch": {
     "description": "Submit search button aria label",

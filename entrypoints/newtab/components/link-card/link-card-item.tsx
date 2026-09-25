@@ -1,105 +1,101 @@
-/* eslint-disable jsx-a11y/no-static-element-interactions */
+import { useCallback, useState, type FC, type KeyboardEvent, type MouseEvent } from 'react'
+import { useSortable } from '@dnd-kit/react/sortable'
+import { arrayMove } from '@dnd-kit/helpers'
+import { GripVertical } from 'lucide-react'
 import { cn } from '@/entrypoints/newtab/lib/utils'
-import type { QuickUrlItem } from '@/utils/storage'
-import { Text, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/shared'
+import { quickUrlItemsStorage, updateStorageItem, type QuickUrlItem } from '@/utils/storage'
 import { ContextMenu, ContextMenuContent, ContextMenuTrigger } from '@/components/shared/ui/context-menu'
 import { useGlobalDialog } from '@/entrypoints/newtab/providers'
-import type { CSSProperties, MouseEventHandler, Ref, TouchEventHandler } from 'react'
-import { useRef, useState, forwardRef, useCallback } from 'react'
-
-import { MakeSortableItem } from '@/entrypoints/newtab/components/sortable-area'
 import { LinkCardIcon } from './link-card-icon'
-import { LinkCardTooltipContent } from './link-card-tooltip'
 import { LinkCardContextMenuContent } from './link-card-context-menu'
 import { useRelatedBookmarks } from './use-related-bookmarks'
 import { useRelatedTabs } from './use-related-tabs'
 
 interface LinkCardProps extends QuickUrlItem {
-  ref?: Ref<HTMLDivElement>
+  index: number
   selected?: boolean
-}
-
-interface CustomGridItemProps {
-  onMouseDown?: MouseEventHandler
-  onMouseUp?: MouseEventHandler
-  onTouchEnd?: TouchEventHandler
   className?: string
-  style?: CSSProperties
 }
 
-export const LinkCardItem = forwardRef<HTMLDivElement, LinkCardProps & CustomGridItemProps>(
-  ({ url, title, id, className, onMouseDown, onMouseUp, onTouchEnd, style, selected = false }, ref) => {
-    const [contextMenuOpen, setContextMenuOpen] = useState(false)
-    const globalDialog = useGlobalDialog()
-    const innerRef = useRef<HTMLDivElement>(null)
+export const SortableLinkCardItem: FC<LinkCardProps> = ({ url, title, id, index, className, selected = false }) => {
+  const { ref, handleRef } = useSortable({ id, index })
+  const [contextMenuOpen, setContextMenuOpen] = useState(false)
+  const globalDialog = useGlobalDialog()
 
-    // Fetch related bookmarks when context menu opens
-    const { relatedBookmarks, showBookmarks } = useRelatedBookmarks(url, contextMenuOpen)
-    // Fetch related open tabs when context menu opens
-    const { relatedTabs, showOpenTabs } = useRelatedTabs(url, contextMenuOpen)
-    const handleIconClick = useCallback(
-      (ev: React.MouseEvent<HTMLDivElement>) => {
-        if (ev.ctrlKey || ev.metaKey) {
-          chrome.tabs.create({ url: url, active: true })
-        } else {
-          chrome.tabs.update({ url: url })
-        }
-      },
-      [url],
-    )
+  const { relatedBookmarks, showBookmarks } = useRelatedBookmarks(url, contextMenuOpen)
+  const { relatedTabs, showOpenTabs } = useRelatedTabs(url, contextMenuOpen)
+  const handleOpen = useCallback(
+    (ev: MouseEvent<HTMLButtonElement>) => {
+      if (ev.ctrlKey || ev.metaKey) {
+        chrome.tabs.create({ url, active: true })
+      } else {
+        chrome.tabs.update({ url })
+      }
+    },
+    [url],
+  )
 
-    return (
-      <TooltipProvider>
-        <Tooltip>
-          <ContextMenu onOpenChange={setContextMenuOpen}>
-            <div
-              style={style}
-              className={cn(
-                `relative min-w-[4.5rem] group flex flex-col items-center justify-center overflow-hidden p-2 gap-1
-                rounded-md duration-200 cursor-default`,
-                selected && 'bg-primary/10',
-                className,
-              )}
-              key={id}
-              data-testid="quick-link-card"
-              data-quick-link-id={id}
-              data-selected={selected ? 'true' : 'false'}
-              aria-current={selected ? 'true' : undefined}
-              ref={ref}
-              onMouseDown={onMouseDown}
-              onMouseUp={onMouseUp}
-              onTouchEnd={onTouchEnd}>
-              <TooltipTrigger asChild>
-                <ContextMenuTrigger>
-                  <LinkCardIcon url={url} onClick={handleIconClick} ref={innerRef} />
-                </ContextMenuTrigger>
-              </TooltipTrigger>
-              <Text level="s" className="select-none line-clamp-1">
-                {title}
-              </Text>
-            </div>
-            <TooltipContent>
-              <LinkCardTooltipContent title={title} url={url} id={id} />
-            </TooltipContent>
-            <ContextMenuContent className="max-w-xs">
-              <LinkCardContextMenuContent
-                id={id}
-                title={title}
-                url={url}
-                relatedBookmarks={relatedBookmarks}
-                showBookmarks={showBookmarks}
-                relatedTabs={relatedTabs}
-                showOpenTabs={showOpenTabs}
-                globalDialog={globalDialog}
-              />
-            </ContextMenuContent>
-          </ContextMenu>
-        </Tooltip>
-      </TooltipProvider>
-    )
-  },
-)
+  const handleMoveByKeyboard = useCallback(
+    (event: KeyboardEvent<HTMLButtonElement>) => {
+      const direction =
+        event.key === 'ArrowLeft' || event.key === 'ArrowUp'
+          ? -1
+          : event.key === 'ArrowRight' || event.key === 'ArrowDown'
+            ? 1
+            : 0
+      if (!direction) return
+      event.preventDefault()
+      event.stopPropagation()
+      void updateStorageItem(quickUrlItemsStorage, items => {
+        const currentIndex = items.findIndex(item => item.id === id)
+        const nextIndex = currentIndex + direction
+        return nextIndex < 0 || nextIndex >= items.length ? items : arrayMove(items, currentIndex, nextIndex)
+      })
+    },
+    [id],
+  )
 
-LinkCardItem.displayName = 'LinkCardItem'
+  return (
+    <ContextMenu onOpenChange={setContextMenuOpen}>
+      <ContextMenuTrigger
+        render={
+          <div
+            ref={ref}
+            className={cn('nt-link', className)}
+            data-testid="quick-link-card"
+            data-quick-link-id={id}
+            data-selected={selected ? 'true' : 'false'}
+            aria-current={selected ? 'true' : undefined}
+          />
+        }>
+        <button type="button" className="nt-link-open" aria-label={`${title} — ${url}`} onClick={handleOpen}>
+          <LinkCardIcon url={url} />
+          <span className="nt-link-label">{title}</span>
+        </button>
+        <button
+          ref={handleRef}
+          type="button"
+          className="nt-link-grip"
+          data-testid="quick-link-drag-handle"
+          aria-label={`Reorder ${title}. Drag or use arrow keys.`}
+          onKeyDown={handleMoveByKeyboard}>
+          <GripVertical size={16} aria-hidden="true" />
+        </button>
+      </ContextMenuTrigger>
+      <ContextMenuContent className="max-w-xs">
+        <LinkCardContextMenuContent
+          id={id}
+          title={title}
+          url={url}
+          relatedBookmarks={relatedBookmarks}
+          showBookmarks={showBookmarks}
+          relatedTabs={relatedTabs}
+          showOpenTabs={showOpenTabs}
+          globalDialog={globalDialog}
+        />
+      </ContextMenuContent>
+    </ContextMenu>
+  )
+}
 
-export const SortableLinkCardItem = MakeSortableItem(LinkCardItem)
+export const LinkCardItem = SortableLinkCardItem

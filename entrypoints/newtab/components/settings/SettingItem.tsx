@@ -14,13 +14,9 @@ export const SettingItem: FC<{
   return (
     <Stack
       direction={'row'}
-      className={cn(
-        'items-center overflow-hidden relative rounded-md p-3 border-slate-400/20',
-        'bg-muted gap-2',
-        className,
-      )}>
-      <IconClass className="min-w-8 size-8 text-muted-foreground" />
-      <Stack direction={'column'} className="gap-0.5">
+      className={cn('items-center relative rounded-lg border border-border bg-card p-4 gap-3', className)}>
+      <IconClass className="shrink-0 size-6 text-muted-foreground" aria-hidden="true" />
+      <Stack direction={'column'} className="gap-0.5" data-slot="setting-item-copy">
         <Text className="font-medium" level="md">
           {title}
         </Text>
@@ -29,7 +25,9 @@ export const SettingItem: FC<{
         </Text>
       </Stack>
       <Space className="mx-1" />
-      <div className="max-w-[50%]">{control}</div>
+      <div className="max-w-[50%]" data-slot="setting-item-control">
+        {control}
+      </div>
       {additionalControl}
     </Stack>
   )

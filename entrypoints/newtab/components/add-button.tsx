@@ -1,40 +1,35 @@
-import { Popover, Center, PopoverTrigger, Button, PopoverContent } from '@/components/shared'
+import { useState, type FC } from 'react'
 import { Plus } from 'lucide-react'
-import { addQuickUrl } from '@/utils/storage'
 import { nanoid } from 'nanoid'
-import type { FC } from 'react'
-import { cn } from '@/entrypoints/newtab/lib/utils'
-import type { IAddQuickUrlItemShema } from './quick-item-edit-form'
-import { QuickItemEditForm } from './quick-item-edit-form'
-
-function onSubmit(value: IAddQuickUrlItemShema) {
-  addQuickUrl({
-    title: value.title,
-    url: value.url,
-    id: nanoid(),
-  })
-}
+import { Button, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/shared'
+import { addQuickUrl } from '@/utils/storage'
+import { t } from '@/utils/i18n'
+import { QuickItemEditForm, type IAddQuickUrlItemShema } from './quick-item-edit-form'
 
 export const AddButton: FC<{ className?: string }> = ({ className }) => {
+  const [open, setOpen] = useState(false)
+  const handleSubmit = async (value: IAddQuickUrlItemShema) => {
+    await addQuickUrl({ title: value.title, url: value.url, id: nanoid() })
+    setOpen(false)
+  }
+
   return (
-    <>
-      <Popover>
-        <Center column>
-          <PopoverTrigger asChild>
-            <Button
-              size={'icon'}
-              variant={'ghost'}
-              className={cn('rounded-full', className)}
-              aria-label="Add quick link"
-              data-testid="add-quick-link">
-              <Plus />
-            </Button>
-          </PopoverTrigger>
-        </Center>
-        <PopoverContent className="">
-          <QuickItemEditForm onSubmit={onSubmit} submitButtonTitle="Add" />
-        </PopoverContent>
-      </Popover>
-    </>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <Button
+        variant="ghost"
+        size="sm"
+        className={className}
+        onClick={() => setOpen(true)}
+        data-testid="add-quick-link">
+        <Plus className="mr-1 size-4" aria-hidden="true" /> {t('addSite')}
+      </Button>
+      <DialogContent className="w-[calc(100vw-32px)] max-w-md rounded-xl">
+        <DialogHeader>
+          <DialogTitle>{t('addQuickLinkTitle')}</DialogTitle>
+          <DialogDescription>{t('addQuickLinkDescription')}</DialogDescription>
+        </DialogHeader>
+        <QuickItemEditForm onSubmit={handleSubmit} submitButtonTitle={t('addSite')} />
+      </DialogContent>
+    </Dialog>
   )
 }

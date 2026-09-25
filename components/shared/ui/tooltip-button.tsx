@@ -1,5 +1,4 @@
 import * as React from 'react'
-import type {} from '@radix-ui/react-popover'
 
 import type { ButtonProps } from './button'
 import { Button } from './button'
@@ -15,9 +14,7 @@ export const TooltipButton = React.forwardRef<
   return (
     <TooltipProvider>
       <Tooltip>
-        <TooltipTrigger asChild>
-          <Button ref={ref} {...props} />
-        </TooltipTrigger>
+        <TooltipTrigger render={<Button ref={ref} {...props} />} />
         <TooltipContent className="" side={side}>
           {React.isValidElement(tooltip) ? tooltip : <span>{tooltip}</span>}
         </TooltipContent>

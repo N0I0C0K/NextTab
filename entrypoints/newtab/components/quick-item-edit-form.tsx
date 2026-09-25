@@ -1,4 +1,5 @@
 import type { FC } from 'react'
+import { t } from '@/utils/i18n'
 
 import { Button, Stack, Input } from '@/components/shared'
 import {
@@ -30,22 +31,22 @@ export interface QuickItemEditFormProps {
 export const QuickItemEditForm: FC<QuickItemEditFormProps> = ({ onSubmit, submitButtonTitle, defaultValue }) => {
   const addQuickUrlItemform = useForm<IAddQuickUrlItemShema>({
     resolver: zodResolver(addQuickUrlItemShema),
-    values: defaultValue,
+    defaultValues: defaultValue ?? { title: '', url: '' },
   })
   return (
     <Form {...addQuickUrlItemform}>
       <form onSubmit={addQuickUrlItemform.handleSubmit(onSubmit)}>
-        <Stack direction={'column'} className="gap-2">
+        <Stack direction={'column'} className="gap-4">
           <FormField
             control={addQuickUrlItemform.control}
             name="title"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Title</FormLabel>
+                <FormLabel>{t('siteName')}</FormLabel>
                 <FormControl>
-                  <Input id="quick-link-title" className="h-8" {...field} />
+                  <Input id="quick-link-title" placeholder="e.g. GitHub" {...field} />
                 </FormControl>
-                <FormDescription>Specify a name to display</FormDescription>
+                <FormDescription>{t('siteNameDescription')}</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -55,15 +56,15 @@ export const QuickItemEditForm: FC<QuickItemEditFormProps> = ({ onSubmit, submit
             name="url"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Url</FormLabel>
+                <FormLabel>{t('websiteUrl')}</FormLabel>
                 <FormControl>
-                  <Input id="quick-link-url" className="h-8" {...field} />
+                  <Input id="quick-link-url" placeholder="https://example.com" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-          <Button type="submit" className="mt-4">
+          <Button type="submit" className="mt-2 w-full">
             {submitButtonTitle}
           </Button>
         </Stack>

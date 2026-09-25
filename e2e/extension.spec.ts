@@ -6,44 +6,7 @@ const SETTINGS_KEY = 'settings-storage'
 const THEME_KEY = 'theme-storage-key'
 const QUICK_LINKS_KEY = 'quick-url-item-storage-key'
 const COMMAND_SETTINGS_KEY = 'command-settings-storage'
-const WALLPAPER_HISTORY_KEY = 'wallpaper-history-storage'
-const HISTORY_SUGGESTIONS_KEY = 'history-suggest-url-item-storage-key'
-const HISTORY_UPDATE_KEY = 'history-update-key'
 const MQTT_STATE_KEY = 'mqtt-state-storage'
-const WALLPAPER_THUMBNAIL =
-  'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Y9ZpWQAAAAASUVORK5CYII='
-
-function createWallhavenPage(pageNumber: number, sorting: string, lastPage = 3) {
-  return {
-    data: Array.from({ length: 12 }, (_, index) => {
-      const id = `${sorting}-${pageNumber}-${index}`
-      return {
-        id,
-        path: `https://wallhaven.cc/w/${id}.jpg`,
-        thumbs: {
-          small: WALLPAPER_THUMBNAIL,
-          large: WALLPAPER_THUMBNAIL,
-          original: WALLPAPER_THUMBNAIL,
-        },
-        resolution: '1920x1080',
-        colors: ['#000000'],
-      }
-    }),
-    meta: {
-      current_page: pageNumber,
-      last_page: lastPage,
-      per_page: 12,
-      total: lastPage * 12,
-    },
-  }
-}
-
-async function scrollWallpaperGalleryToBottom(page: Page) {
-  await page.getByTestId('wallpaper-gallery').evaluate(element => {
-    element.scrollTop = element.scrollHeight
-    element.dispatchEvent(new Event('scroll', { bubbles: true }))
-  })
-}
 
 async function readExtensionStorage<T>(page: Page, key: string): Promise<T> {
   return page.evaluate(async storageKey => {
@@ -74,9 +37,6 @@ function collectPageErrors(page: Page) {
 
 test('new tab renders and onboarding completes end to end', async ({ page, extensionId }) => {
   const pageErrors = collectPageErrors(page)
-  await page.route('https://wallhaven.cc/api/v1/search**', route =>
-    route.fulfill({ status: 500, contentType: 'application/json', body: '{}' }),
-  )
   await openNewTab(page, extensionId, false)
 
   await expect(page).toHaveTitle('New Tab')
@@ -84,10 +44,11 @@ test('new tab renders and onboarding completes end to end', async ({ page, exten
   await page.getByTestId('onboarding-start').click()
   await page.getByTestId('onboarding-next').click()
   await page.getByTestId('onboarding-skip-step').click()
-  await page.getByTestId('onboarding-skip-step').click()
   await page.getByTestId('onboarding-complete').click()
 
   await expect(page.getByTestId('settings-trigger')).toBeVisible()
+  await expect(page.locator('.nt-links-panel')).toBeVisible()
+  await expect(page.locator('.x-bg-img')).toHaveCount(0)
   await expect.poll(() => readExtensionStorage<boolean>(page, ONBOARDING_KEY)).toBe(true)
   await page.reload()
   await expect(page.getByTestId('onboarding-start')).toHaveCount(0)
@@ -95,9 +56,6 @@ test('new tab renders and onboarding completes end to end', async ({ page, exten
 })
 
 test('onboarding preserves selections when navigating back and cannot be dismissed', async ({ page, extensionId }) => {
-  await page.route('https://wallhaven.cc/api/v1/search**', route =>
-    route.fulfill({ status: 500, contentType: 'application/json', body: '{}' }),
-  )
   await openNewTab(page, extensionId, false)
 
   await page.keyboard.press('Escape')
@@ -110,15 +68,7 @@ test('onboarding preserves selections when navigating back and cannot be dismiss
   await expect.poll(() => readExtensionStorage<string>(page, THEME_KEY)).toBe('dark')
   await page.getByTestId('onboarding-next').click()
 
-  await expect(page.getByText('Failed to load wallpapers, showing fallback options')).toBeVisible()
-  const wallpapers = page.getByRole('radio')
-  await expect(wallpapers).toHaveCount(5)
-  await wallpapers.nth(1).click()
-  await expect(wallpapers.nth(1)).toHaveAttribute('aria-checked', 'true')
-  await page.getByTestId('onboarding-next').click()
-
-  await page.getByTestId('onboarding-back').click()
-  await expect(page.getByRole('radio').nth(1)).toHaveAttribute('aria-checked', 'true')
+  await expect(page.getByTestId('onboarding-skip-step')).toBeVisible()
   await page.getByTestId('onboarding-back').click()
   await expect(page.getByTestId('onboarding-theme-dark')).toHaveAttribute('aria-pressed', 'true')
 })
@@ -176,20 +126,79 @@ test('all settings pages render without runtime errors', async ({ page, extensio
   expect(pageErrors).toEqual([])
 })
 
+test('settings drawer remains aligned and controls fit at narrow widths', async ({ page, extensionId }) => {
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await openNewTab(page, extensionId)
+  await openSettings(page)
+
+  const drawer = page.locator('[data-slot="dialog-content"]')
+  const desktopBounds = await drawer.boundingBox()
+  expect(desktopBounds).not.toBeNull()
+  expect(desktopBounds!.x).toBeGreaterThanOrEqual(670)
+  expect(desktopBounds!.y).toBe(0)
+  expect(desktopBounds!.height).toBe(900)
+
+  await page.setViewportSize({ width: 390, height: 844 })
+  const mobileBounds = await drawer.boundingBox()
+  expect(mobileBounds).not.toBeNull()
+  expect(mobileBounds!.x).toBe(0)
+  expect(mobileBounds!.width).toBe(390)
+
+  const cardBounds = await page.locator('.nt-setting-item-stacked').boundingBox()
+  const selectBounds = await page.locator('.nt-setting-item-stacked [data-slot="select-trigger"]').boundingBox()
+  expect(cardBounds).not.toBeNull()
+  expect(selectBounds).not.toBeNull()
+  expect(selectBounds!.x + selectBounds!.width).toBeLessThanOrEqual(cardBounds!.x + cardBounds!.width)
+})
+
+test('command settings use consistent card surfaces, borders, and icon sizes', async ({ page, extensionId }) => {
+  await openNewTab(page, extensionId)
+  await openSettings(page)
+  await page.getByTestId('settings-tab-command').click()
+  await expect(page.getByTestId('command-settings')).toBeVisible()
+  await expect(page.locator('[data-slot="accordion-item"]').first()).toBeVisible()
+
+  const styles = await page.evaluate(() => {
+    const settingCard = document.querySelector<HTMLElement>(
+      '[data-testid="command-settings"] [data-slot="setting-item-copy"]',
+    )?.parentElement
+    const pluginCard = document.querySelector<HTMLElement>('[data-slot="accordion-item"]')
+    const header = document.querySelector<HTMLElement>('[data-slot="dialog-header"]')
+    const settingIcon = settingCard?.querySelector('svg')
+    const pluginIcon = pluginCard?.querySelector('[data-slot="accordion-trigger"] svg:not([data-slot])')
+    if (!settingCard || !pluginCard || !header || !settingIcon || !pluginIcon) return null
+
+    return {
+      settingBackground: getComputedStyle(settingCard).backgroundColor,
+      pluginBackground: getComputedStyle(pluginCard).backgroundColor,
+      settingBorder: getComputedStyle(settingCard).borderBottomColor,
+      pluginBorder: getComputedStyle(pluginCard).borderBottomColor,
+      headerBorder: getComputedStyle(header).borderBottomColor,
+      settingIconWidth: settingIcon.getBoundingClientRect().width,
+      pluginIconWidth: pluginIcon.getBoundingClientRect().width,
+    }
+  })
+
+  expect(styles).not.toBeNull()
+  expect(styles!.pluginBackground).toBe(styles!.settingBackground)
+  expect(styles!.pluginBorder).toBe(styles!.settingBorder)
+  expect(styles!.headerBorder).toBe(styles!.settingBorder)
+  expect(styles!.settingIconWidth).toBe(24)
+  expect(styles!.pluginIconWidth).toBe(24)
+})
+
 test('homepage settings persist after reload', async ({ page, extensionId }) => {
   await openNewTab(page, extensionId)
   await openSettings(page)
 
   const switches = page.getByTestId('homepage-settings').getByRole('switch')
-  await expect(switches).toHaveCount(3)
+  await expect(switches).toHaveCount(2)
   await switches.nth(0).click()
   await switches.nth(1).click()
-  await switches.nth(2).click()
 
   await expect
     .poll(() => readExtensionStorage<Record<string, boolean>>(page, SETTINGS_KEY))
     .toMatchObject({
-      useHistorySuggestion: true,
       showBookmarksInQuickUrlMenu: false,
       showOpenTabsInQuickUrlMenu: false,
     })
@@ -197,245 +206,48 @@ test('homepage settings persist after reload', async ({ page, extensionId }) => 
   await page.reload()
   await openSettings(page)
   const persistedSwitches = page.getByTestId('homepage-settings').getByRole('switch')
-  await expect(persistedSwitches.nth(0)).toHaveAttribute('data-state', 'checked')
-  await expect(persistedSwitches.nth(1)).toHaveAttribute('data-state', 'unchecked')
-  await expect(persistedSwitches.nth(2)).toHaveAttribute('data-state', 'unchecked')
+  await expect(persistedSwitches.nth(0)).toHaveAttribute('aria-checked', 'false')
+  await expect(persistedSwitches.nth(1)).toHaveAttribute('aria-checked', 'false')
 })
 
-test('history suggestions can be added to quick links or dismissed', async ({ page, extensionId }) => {
-  await openNewTab(page, extensionId)
-  await page.evaluate(key => localStorage.setItem(key, Date.now().toString()), HISTORY_UPDATE_KEY)
-  await openSettings(page)
-
-  const historySwitch = page.getByTestId('homepage-settings').getByRole('switch').nth(0)
-  await historySwitch.click()
-  await expect
-    .poll(() => readExtensionStorage<{ useHistorySuggestion: boolean }>(page, SETTINGS_KEY))
-    .toMatchObject({ useHistorySuggestion: true })
-
-  await page.evaluate(key => {
-    return chrome.storage.local.set({
-      [key]: [
-        { id: 'history-add', title: 'Add Me', url: 'https://add.example.com/', visitCount: 10 },
-        { id: 'history-delete', title: 'Delete Me', url: 'https://delete.example.com/', visitCount: 5 },
-      ],
-    })
-  }, HISTORY_SUGGESTIONS_KEY)
-  await page.keyboard.press('Escape')
-
-  const suggestions = page.getByTestId('history-suggestion')
-  await expect(suggestions).toHaveCount(2)
-  await suggestions.filter({ hasText: 'Add Me' }).click({ button: 'right' })
-  await page.getByTestId('history-suggestion-add').click()
-  await expect(suggestions).toHaveCount(1)
-  await expect
-    .poll(() => readExtensionStorage<Array<{ id: string }>>(page, QUICK_LINKS_KEY))
-    .toContainEqual(expect.objectContaining({ id: 'history-add' }))
-
-  await suggestions.filter({ hasText: 'Delete Me' }).click({ button: 'right' })
-  await page.getByTestId('history-suggestion-delete').click()
-  await expect(suggestions).toHaveCount(0)
-})
-
-test('appearance settings persist theme, URL, and local wallpaper', async ({ page, extensionId }) => {
+test('appearance keeps the theme readable without a wallpaper', async ({ page, extensionId }) => {
   const pageErrors = collectPageErrors(page)
-  await page.route('https://wallhaven.cc/api/v1/search**', route =>
-    route.fulfill({ status: 500, contentType: 'application/json', body: '{}' }),
-  )
   await openNewTab(page, extensionId)
   await openSettings(page)
   await page.getByTestId('settings-tab-appearance').click()
-  await expect(page.getByTestId('appearance-settings')).toBeVisible()
 
   await page.getByTestId('theme-toggle').click()
   await page.getByRole('menuitem', { name: 'Dark' }).click()
   await expect(page.locator('html')).toHaveClass(/dark/)
   await expect.poll(() => readExtensionStorage<string>(page, THEME_KEY)).toBe('dark')
-
-  const wallpaperUrl = 'https://example.com/wallpaper.jpg'
-  await page.getByTestId('wallpaper-url').fill(wallpaperUrl)
-  await expect
-    .poll(() => readExtensionStorage<{ wallpaperUrl: string }>(page, SETTINGS_KEY))
-    .toMatchObject({
-      wallpaperUrl,
-    })
-
-  await page.getByTestId('local-wallpaper-input').setInputFiles({
-    name: 'wallpaper.png',
-    mimeType: 'image/png',
-    buffer: Buffer.from(
-      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Y9ZpWQAAAAASUVORK5CYII=',
-      'base64',
-    ),
-  })
-  await expect(page.locator('img[alt="Local wallpaper"]')).toBeVisible()
-  await expect
-    .poll(() => readExtensionStorage<{ wallpaperType: string }>(page, SETTINGS_KEY))
-    .toMatchObject({
-      wallpaperType: 'local',
-    })
-
-  await page.reload()
-  await expect(page.locator('img[alt="background wallpaper"]')).toHaveAttribute('src', /^data:image\/png;base64,/)
+  await expect(page.getByTestId('appearance-settings')).toBeVisible()
+  await page.keyboard.press('Escape')
+  await expect(page.locator('.nt-page')).toHaveCSS('background-color', 'rgb(16, 17, 20)')
+  await expect(page.locator('img[alt="background wallpaper"]')).toHaveCount(0)
   expect(pageErrors).toEqual([])
 })
 
-test('local wallpaper rejects invalid files, can be reselected, and clears cleanly', async ({ page, extensionId }) => {
-  await page.route('https://wallhaven.cc/api/v1/search**', route =>
-    route.fulfill({ status: 500, contentType: 'application/json', body: '{}' }),
-  )
+test('theme setting card opens its menu on the first press', async ({ page, extensionId }) => {
   await openNewTab(page, extensionId)
   await openSettings(page)
   await page.getByTestId('settings-tab-appearance').click()
 
-  const input = page.getByTestId('local-wallpaper-input')
-  await input.setInputFiles({ name: 'wallpaper.txt', mimeType: 'text/plain', buffer: Buffer.from('not an image') })
-  await expect(page.getByTestId('local-wallpaper-error')).toContainText('Invalid file type')
-  await expect(page.getByTestId('local-wallpaper-preview')).toHaveCount(0)
+  const trigger = page.getByTestId('theme-toggle')
+  const bounds = await trigger.boundingBox()
+  expect(bounds).not.toBeNull()
+  expect(bounds!.width).toBeGreaterThan(300)
+  const centerX = bounds!.x + bounds!.width / 2
+  const centerY = bounds!.y + bounds!.height / 2
+  await page.mouse.move(centerX, centerY)
+  await page.mouse.down()
+  await page.mouse.move(centerX + 24, centerY, { steps: 2 })
+  await page.mouse.up()
 
-  await input.setInputFiles({
-    name: 'too-large.png',
-    mimeType: 'image/png',
-    buffer: Buffer.alloc(5 * 1024 * 1024 + 1),
-  })
-  await expect(page.getByTestId('local-wallpaper-error')).toContainText('File too large')
-
-  await input.setInputFiles({
-    name: 'valid.png',
-    mimeType: 'image/png',
-    buffer: Buffer.from(
-      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Y9ZpWQAAAAASUVORK5CYII=',
-      'base64',
-    ),
-  })
-  const preview = page.getByTestId('local-wallpaper-preview')
-  await expect(preview).toBeVisible()
-  await expect
-    .poll(() => readExtensionStorage<{ wallpaperType: string }>(page, SETTINGS_KEY))
-    .toMatchObject({
-      wallpaperType: 'local',
-    })
-
-  await page.getByTestId('wallpaper-url').fill('https://example.com/remote.jpg')
-  await expect
-    .poll(() => readExtensionStorage<{ wallpaperType: string }>(page, SETTINGS_KEY))
-    .toMatchObject({
-      wallpaperType: 'url',
-    })
-  await preview.focus()
-  await page.keyboard.press('Enter')
-  await expect
-    .poll(() => readExtensionStorage<{ wallpaperType: string }>(page, SETTINGS_KEY))
-    .toMatchObject({
-      wallpaperType: 'local',
-    })
-
-  await page.getByTestId('local-wallpaper-clear').click()
-  await expect(preview).toHaveCount(0)
-  await expect
-    .poll(() => readExtensionStorage<{ wallpaperType: string }>(page, SETTINGS_KEY))
-    .toMatchObject({
-      wallpaperType: 'url',
-    })
-})
-
-test('online wallpaper gallery paginates, sorts, refreshes, and manages history', async ({ page, extensionId }) => {
-  const pageErrors = collectPageErrors(page)
-  const apiRequests: string[] = []
-
-  await page.route('https://wallhaven.cc/api/v1/search**', async route => {
-    const url = new URL(route.request().url())
-    const pageNumber = Number(url.searchParams.get('page') ?? '1')
-    const sorting = url.searchParams.get('sorting') ?? 'toplist'
-    apiRequests.push(url.toString())
-
-    if (pageNumber === 2) {
-      await new Promise(resolve => setTimeout(resolve, 100))
-    }
-
-    await route.fulfill({
-      status: 200,
-      contentType: 'application/json',
-      json: createWallhavenPage(pageNumber, sorting),
-    })
-  })
-  await page.route('https://wallhaven.cc/w/**', route =>
-    route.fulfill({
-      status: 200,
-      contentType: 'image/png',
-      body: Buffer.from(WALLPAPER_THUMBNAIL.split(',')[1], 'base64'),
-    }),
-  )
-
-  await openNewTab(page, extensionId)
-  await openSettings(page)
-  await page.getByTestId('settings-tab-appearance').click()
-
-  await expect(page.getByTestId('wallpaper-card')).toHaveCount(12)
-  expect(apiRequests[0]).toContain('page=1')
-  expect(apiRequests[0]).toContain('sorting=toplist')
-
-  await scrollWallpaperGalleryToBottom(page)
-  await scrollWallpaperGalleryToBottom(page)
-  await scrollWallpaperGalleryToBottom(page)
-  await expect(page.getByTestId('wallpaper-card')).toHaveCount(24)
-  expect(apiRequests.filter(request => request.includes('page=2'))).toHaveLength(1)
-
-  await scrollWallpaperGalleryToBottom(page)
-  await expect(page.getByTestId('wallpaper-card')).toHaveCount(36)
-  await expect(page.getByTestId('wallpaper-end')).toBeVisible()
-
-  const firstWallpaper = page.getByTestId('wallpaper-card').first()
-  const selectedUrl = await firstWallpaper.getAttribute('data-wallpaper-id')
-  await firstWallpaper.click()
-  await expect
-    .poll(() => readExtensionStorage<{ wallpaperUrl: string }>(page, SETTINGS_KEY))
-    .toMatchObject({ wallpaperUrl: `https://wallhaven.cc/w/${selectedUrl}.jpg` })
-  await expect(page.getByTestId('wallpaper-history-card')).toHaveCount(1)
-
-  await page.getByTestId('wallpaper-sort').click()
-  await page.getByRole('option', { name: 'Random' }).click()
-  await expect(page.getByTestId('wallpaper-card')).toHaveCount(12)
-  await expect
-    .poll(() => readExtensionStorage<{ wallhavenSortMode: string }>(page, SETTINGS_KEY))
-    .toMatchObject({ wallhavenSortMode: 'random' })
-  expect(apiRequests.at(-1)).toContain('sorting=random')
-
-  const requestCountBeforeRefresh = apiRequests.length
-  await page.getByTestId('wallpaper-refresh').click()
-  await expect.poll(() => apiRequests.length).toBe(requestCountBeforeRefresh + 1)
-  expect(apiRequests.at(-1)).toContain('page=1')
-  expect(apiRequests.at(-1)).toContain('sorting=random')
-
-  await page.getByTestId('wallpaper-history-delete').click()
-  await expect(page.getByTestId('wallpaper-history-card')).toHaveCount(0)
-  await expect
-    .poll(() => readExtensionStorage<{ history: unknown[] }>(page, WALLPAPER_HISTORY_KEY))
-    .toEqual({ history: [] })
-  expect(pageErrors).toEqual([])
-})
-
-test('online wallpaper gallery recovers from rate limiting', async ({ page, extensionId }) => {
-  let requestCount = 0
-  await page.route('https://wallhaven.cc/api/v1/search**', async route => {
-    requestCount++
-    if (requestCount === 1) {
-      await route.fulfill({ status: 429, contentType: 'application/json', body: '{}' })
-      return
-    }
-
-    await route.fulfill({ status: 200, contentType: 'application/json', json: createWallhavenPage(1, 'toplist', 1) })
-  })
-
-  await openNewTab(page, extensionId)
-  await openSettings(page)
-  await page.getByTestId('settings-tab-appearance').click()
-
-  await expect(page.getByTestId('wallpaper-error')).toBeVisible()
-  await page.getByTestId('wallpaper-refresh').click()
-  await expect(page.getByTestId('wallpaper-error')).toHaveCount(0)
-  await expect(page.getByTestId('wallpaper-card')).toHaveCount(12)
-  await expect(page.getByTestId('wallpaper-end')).toBeVisible()
+  await expect(page.getByRole('menuitem', { name: 'Dark' })).toBeVisible({ timeout: 1000 })
+  await page.keyboard.press('Escape')
+  await trigger.focus()
+  await trigger.press('Enter')
+  await expect(page.getByRole('menuitem', { name: 'System' })).toBeVisible()
 })
 
 test('command palette resolves calculator and RMB commands', async ({ page, extensionId }) => {
@@ -449,6 +261,27 @@ test('command palette resolves calculator and RMB commands', async ({ page, exte
   await commandInput.fill('rmb 123.45')
   await expect(page.getByText('壹佰贰拾叁元肆角伍分', { exact: true })).toBeVisible()
   expect(pageErrors).toEqual([])
+})
+
+test('command results return after copying a calculator result and editing the input', async ({
+  page,
+  extensionId,
+}) => {
+  await openNewTab(page, extensionId)
+
+  const commandInput = page.getByTestId('command-input')
+  await commandInput.fill('1+1')
+  await expect(page.locator('[data-command-result-id="calc-result"]')).toContainText('1+1 = 2')
+  await commandInput.press('ArrowDown')
+  await commandInput.press('Enter')
+  await expect
+    .poll(() => page.evaluate(() => JSON.parse(localStorage.getItem('calculator_history') ?? '[]')))
+    .toContainEqual(expect.objectContaining({ expression: '1+1', result: '2' }))
+  await expect(commandInput).toBeFocused()
+  await commandInput.press('ControlOrMeta+A')
+  await page.keyboard.type('2+2')
+  await expect(page.locator('[data-command-result-id="calc-result"]')).toContainText('2+2 = 4')
+  await expect(page.locator('[data-command-result-id="calc-result"]')).toBeVisible()
 })
 
 test('command palette resolves history, bookmarks, open tabs, and web search', async ({
@@ -569,6 +402,24 @@ test('quick links support keyboard selection and opening', async ({ page, extens
   await expect(page).toHaveTitle('Opened quick link')
 })
 
+test('quick link row opens from its text area', async ({ page, extensionId }) => {
+  await page.route('https://row.example.com/', route =>
+    route.fulfill({ status: 200, contentType: 'text/html', body: '<title>Opened row</title>' }),
+  )
+  await openNewTab(page, extensionId)
+  await page.evaluate(
+    key =>
+      chrome.storage.local.set({
+        [key]: [{ id: 'row', title: 'Open this row', url: 'https://row.example.com/' }],
+      }),
+    QUICK_LINKS_KEY,
+  )
+
+  await page.getByRole('button', { name: 'Open this row — https://row.example.com/' }).click()
+  await expect(page).toHaveURL('https://row.example.com/')
+  await expect(page).toHaveTitle('Opened row')
+})
+
 test('quick links can be reordered by dragging', async ({ page, extensionId }) => {
   await openNewTab(page, extensionId)
   await page.evaluate(key => {
@@ -583,14 +434,29 @@ test('quick links can be reordered by dragging', async ({ page, extensionId }) =
 
   const cards = page.getByTestId('quick-link-card')
   await expect(cards).toHaveCount(3)
-  const source = await cards.nth(0).boundingBox()
+  const handle = cards.nth(0).getByTestId('quick-link-drag-handle')
+  await expect(handle).toHaveCSS('opacity', '0')
+
+  const source = await cards.nth(0).locator('.nt-link-open').boundingBox()
   const target = await cards.nth(2).boundingBox()
   expect(source).not.toBeNull()
   expect(target).not.toBeNull()
 
   await page.mouse.move(source!.x + source!.width / 2, source!.y + source!.height / 2)
   await page.mouse.down()
-  await page.waitForTimeout(450)
+  await page.mouse.move(target!.x + target!.width / 2, target!.y + target!.height / 2, { steps: 10 })
+  await page.mouse.up()
+  expect((await readExtensionStorage<Array<{ id: string }>>(page, QUICK_LINKS_KEY)).map(item => item.id)).toEqual([
+    'a',
+    'b',
+    'c',
+  ])
+
+  const handleBox = await handle.boundingBox()
+  expect(handleBox).not.toBeNull()
+  await page.mouse.move(handleBox!.x + handleBox!.width / 2, handleBox!.y + handleBox!.height / 2)
+  await expect(handle).toHaveCSS('opacity', '1')
+  await page.mouse.down()
   await page.mouse.move(target!.x + target!.width / 2, target!.y + target!.height / 2, { steps: 10 })
   await page.mouse.up()
 
@@ -599,6 +465,121 @@ test('quick links can be reordered by dragging', async ({ page, extensionId }) =
     .toEqual(['b', 'c', 'a'])
   await page.reload()
   await expect(page.getByTestId('quick-link-card').nth(0)).toHaveAttribute('data-quick-link-id', 'b')
+})
+
+test('quick link drag handle supports keyboard reordering', async ({ page, extensionId }) => {
+  await openNewTab(page, extensionId)
+  await page.evaluate(
+    key =>
+      chrome.storage.local.set({
+        [key]: [
+          { id: 'a', title: 'A', url: 'https://a.example.com/' },
+          { id: 'b', title: 'B', url: 'https://b.example.com/' },
+        ],
+      }),
+    QUICK_LINKS_KEY,
+  )
+
+  const handle = page.getByTestId('quick-link-card').nth(0).getByTestId('quick-link-drag-handle')
+  await handle.focus()
+  await expect(handle).toHaveCSS('opacity', '1')
+  await handle.press('ArrowDown')
+  await expect
+    .poll(async () => (await readExtensionStorage<Array<{ id: string }>>(page, QUICK_LINKS_KEY)).map(item => item.id))
+    .toEqual(['b', 'a'])
+})
+
+test('quick link rows stay aligned and reorder across responsive layouts', async ({ page, extensionId }) => {
+  await openNewTab(page, extensionId)
+  await page.evaluate(key => {
+    return chrome.storage.local.set({
+      [key]: Array.from({ length: 24 }, (_, index) => ({
+        id: `item-${index}`,
+        title: `Link ${index}`,
+        url: `https://example.com/${index}`,
+      })),
+    })
+  }, QUICK_LINKS_KEY)
+
+  const cards = page.getByTestId('quick-link-card')
+  await expect(cards).toHaveCount(24)
+
+  for (const [width, columns] of [
+    [1440, 3],
+    [800, 3],
+    [640, 2],
+    [390, 1],
+    [320, 1],
+  ]) {
+    await page.setViewportSize({ width, height: 1000 })
+    const layout = await page.evaluate(() => {
+      const grid = document.querySelector<HTMLElement>('.nt-links-grid')!
+      const card = document.querySelector<HTMLElement>('.nt-link')!
+      const icon = document.querySelector<HTMLElement>('.nt-link-icon')!
+      const label = document.querySelector<HTMLElement>('.nt-link-label')!
+      const gridRect = grid.getBoundingClientRect()
+      const cardRect = card.getBoundingClientRect()
+      const iconRect = icon.getBoundingClientRect()
+      const labelRect = label.getBoundingClientRect()
+      return {
+        columns: getComputedStyle(grid).gridTemplateColumns.split(' ').length,
+        gridInset: cardRect.left - gridRect.left,
+        iconCenterOffset: Math.abs(iconRect.top + iconRect.height / 2 - (cardRect.top + cardRect.height / 2)),
+        labelCenterOffset: Math.abs(labelRect.top + labelRect.height / 2 - (cardRect.top + cardRect.height / 2)),
+        cardHeight: cardRect.height,
+        horizontalOverflow: document.documentElement.scrollWidth > window.innerWidth,
+        shortcutVisible: getComputedStyle(document.querySelector<HTMLElement>('.nt-command kbd')!).display !== 'none',
+      }
+    })
+    expect(layout.columns).toBe(columns)
+    expect(Math.abs(layout.gridInset)).toBeLessThan(2)
+    expect(layout.iconCenterOffset).toBeLessThan(2)
+    expect(layout.labelCenterOffset).toBeLessThan(2)
+    expect(layout.cardHeight).toBe(60)
+    expect(layout.horizontalOverflow).toBe(false)
+    expect(layout.shortcutVisible).toBe(width > 360)
+  }
+
+  await page.setViewportSize({ width: 390, height: 1000 })
+  await cards.nth(11).scrollIntoViewIfNeeded()
+  const source = await cards.nth(8).getByTestId('quick-link-drag-handle').boundingBox()
+  const target = await cards.nth(11).boundingBox()
+  expect(source).not.toBeNull()
+  expect(target).not.toBeNull()
+
+  await page.mouse.move(source!.x + source!.width / 2, source!.y + source!.height / 2)
+  await page.mouse.down()
+  await page.mouse.move(target!.x + target!.width / 2, target!.y + target!.height / 2, { steps: 12 })
+  await page.mouse.up()
+
+  await expect
+    .poll(async () =>
+      (await readExtensionStorage<Array<{ id: string }>>(page, QUICK_LINKS_KEY)).findIndex(
+        item => item.id === 'item-8',
+      ),
+    )
+    .toBe(11)
+
+  await page.reload()
+  await expect(cards).toHaveCount(24)
+  await page.setViewportSize({ width: 390, height: 700 })
+  await cards.nth(20).scrollIntoViewIfNeeded()
+  const scrolledSource = await cards.nth(20).getByTestId('quick-link-drag-handle').boundingBox()
+  const scrolledTarget = await cards.nth(17).boundingBox()
+  expect(scrolledSource).not.toBeNull()
+  expect(scrolledTarget).not.toBeNull()
+  await page.mouse.move(scrolledSource!.x + scrolledSource!.width / 2, scrolledSource!.y + scrolledSource!.height / 2)
+  await page.mouse.down()
+  await page.mouse.move(scrolledTarget!.x + scrolledTarget!.width / 2, scrolledTarget!.y + 20, { steps: 12 })
+  await page.mouse.up()
+
+  await expect
+    .poll(async () =>
+      (await readExtensionStorage<Array<{ id: string }>>(page, QUICK_LINKS_KEY)).findIndex(
+        item => item.id === 'item-20',
+      ),
+    )
+    .toBe(17)
 })
 
 test('quick link context menu shows related bookmarks and open tabs', async ({ page, context, extensionId }) => {
@@ -626,8 +607,10 @@ test('quick link context menu shows related bookmarks and open tabs', async ({ p
 
   const card = page.getByTestId('quick-link-card')
   await expect(card).toHaveCount(1)
+  await page.bringToFront()
   await card.click({ button: 'right' })
 
+  await expect(page.getByTestId('quick-link-edit')).toBeVisible()
   await expect(page.getByTestId('related-bookmark')).toHaveCount(1)
   await expect(page.getByTestId('related-bookmark')).toContainText('Related Bookmark')
   await expect(page.getByTestId('related-tab')).toHaveCount(1)
@@ -730,8 +713,8 @@ test('command and server settings update nested storage', async ({ page, extensi
     .poll(() => page.evaluate(() => chrome.permissions.contains({ origins: ['wss://broker.emqx.io:8084/*'] })))
     .toBe(false)
   await serverPanel.getByRole('switch').click()
-  await serverPanel.locator('input').nth(0).fill('TEST-SECRET')
-  await serverPanel.locator('input').nth(1).fill('test-user')
+  await serverPanel.locator('input:not([type="checkbox"])').nth(0).fill('TEST-SECRET')
+  await serverPanel.locator('input:not([type="checkbox"])').nth(1).fill('test-user')
 
   await expect
     .poll(() => readExtensionStorage<Record<string, unknown>>(page, SETTINGS_KEY))
@@ -857,6 +840,53 @@ test('popup renders and shares quick links through extension storage', async ({ 
   await page.reload()
   await expect(page.getByTestId('popup-quick-link')).toHaveCount(1)
   expect(pageErrors).toEqual([])
+})
+
+test('popup quick links use compact rows and remain scrollable with many sites', async ({ page, extensionId }) => {
+  await page.goto(`chrome-extension://${extensionId}/popup.html`)
+  await page.evaluate(
+    key =>
+      chrome.storage.local.set({
+        [key]: Array.from({ length: 30 }, (_, index) => ({
+          id: `popup-${index}`,
+          title: `Site ${index}`,
+          url: `https://example.com/${index}`,
+        })),
+      }),
+    QUICK_LINKS_KEY,
+  )
+
+  const links = page.getByTestId('popup-quick-link')
+  await expect(links).toHaveCount(30)
+  const layout = await page.evaluate(() => {
+    const scrollArea = document.querySelector<HTMLElement>('.popup-content')!
+    const grid = document.querySelector<HTMLElement>('.quick-url-grid')!
+    const firstLink = document.querySelector<HTMLElement>('.popup-quick-link')!
+    const header = document.querySelector<HTMLElement>('.popup-header')!
+    return {
+      columns: getComputedStyle(grid).gridTemplateColumns.split(' ').length,
+      cardHeight: firstLink.getBoundingClientRect().height,
+      headerBorder: getComputedStyle(header).borderBottomWidth,
+      scrollable: scrollArea.scrollHeight > scrollArea.clientHeight,
+    }
+  })
+  expect(layout).toEqual({ columns: 2, cardHeight: 60, headerBorder: '0px', scrollable: true })
+
+  await page.locator('.popup-content').evaluate(element => {
+    element.scrollTop = element.scrollHeight
+  })
+  await expect(links.last()).toBeInViewport()
+  await expect(page.getByTestId('add-current-page')).toBeVisible()
+
+  await page.evaluate(key => chrome.storage.local.set({ [key]: 'dark' }), THEME_KEY)
+  await expect(page.locator('html')).toHaveClass(/dark/)
+  await expect(page.locator('.popup-container')).toHaveCSS('background-color', 'rgb(16, 17, 20)')
+
+  // Chrome initially measures action popups in a very narrow viewport. The popup
+  // itself must establish its width instead of inheriting that viewport width.
+  await page.setViewportSize({ width: 25, height: 600 })
+  await expect(page.locator('body')).toHaveCSS('width', '480px')
+  await expect(page.locator('.quick-url-grid')).toHaveCSS('grid-template-columns', /\d+px \d+px/)
 })
 
 test('popup warns for a same-host page but only blocks exact duplicates', async ({ page, extensionId }) => {
