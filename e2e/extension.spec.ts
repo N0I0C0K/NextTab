@@ -720,7 +720,10 @@ test('quick link context menu shows related bookmarks and open tabs', async ({ p
   await openNewTab(page, extensionId)
   await page.evaluate(async key => {
     await chrome.storage.local.set({
-      [key]: [{ id: 'related', title: 'Related', url: 'https://related.example.com/current' }],
+      [key]: [
+        { id: 'related', title: 'Related', url: 'https://related.example.com/current' },
+        { id: 'plain', title: 'Plain', url: 'https://plain.example.com/' },
+      ],
     })
     await chrome.bookmarks.create({ title: 'Current Bookmark', url: 'https://related.example.com/current' })
     await chrome.bookmarks.create({ title: 'Related Bookmark', url: 'https://related.example.com/bookmarked' })
@@ -737,15 +740,37 @@ test('quick link context menu shows related bookmarks and open tabs', async ({ p
     .toBe('https://related.example.com/open')
 
   const card = page.getByTestId('quick-link-card')
-  await expect(card).toHaveCount(1)
+  await expect(card).toHaveCount(2)
   await page.bringToFront()
-  await card.click({ button: 'right' })
+  await card.filter({ hasText: 'Related' }).click({ button: 'right' })
 
   await expect(page.getByTestId('quick-link-edit')).toBeVisible()
   await expect(page.getByTestId('related-bookmark')).toHaveCount(1)
   await expect(page.getByTestId('related-bookmark')).toContainText('Related Bookmark')
   await expect(page.getByTestId('related-tab')).toHaveCount(1)
   await expect(page.getByTestId('related-tab')).toContainText('related.example.com')
+
+  const menu = page.locator('[data-slot="context-menu-content"]')
+  const relatedMenuWidth = await menu.evaluate(element => parseFloat(getComputedStyle(element).width))
+  await page.keyboard.press('Escape')
+  await expect(menu).toHaveCount(0)
+
+  const plainCard = card.filter({ hasText: 'Plain' })
+  await plainCard.click({ button: 'right' })
+  await expect(page.getByTestId('related-bookmark')).toHaveCount(0)
+  await expect(page.getByTestId('related-tab')).toHaveCount(0)
+  const plainMenuWidth = await menu.evaluate(element => parseFloat(getComputedStyle(element).width))
+  expect(plainMenuWidth).toBe(relatedMenuWidth)
+
+  await page.keyboard.press('Escape')
+  await expect(menu).toHaveCount(0)
+  await page.setViewportSize({ width: 280, height: 700 })
+  await plainCard.click({ button: 'right' })
+  await expect.poll(() => menu.evaluate(element => element.getBoundingClientRect().width)).toBeGreaterThan(255)
+  const narrowMenu = await menu.boundingBox()
+  expect(narrowMenu).not.toBeNull()
+  expect(narrowMenu!.x).toBeGreaterThanOrEqual(0)
+  expect(narrowMenu!.x + narrowMenu!.width).toBeLessThanOrEqual(280)
 })
 
 test('domain history dialog filters exact-domain history', async ({ page, extensionId }) => {

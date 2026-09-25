@@ -122,7 +122,9 @@ export const LinkCardContextMenuContent = ({
                     e.currentTarget.style.display = 'none'
                   }}
                 />
-                <span className="truncate flex-1">{bookmark.title || bookmark.url}</span>
+                <span className="min-w-0 flex-1 truncate" title={bookmark.title || bookmark.url}>
+                  {bookmark.title || bookmark.url}
+                </span>
               </ContextMenuItem>
             ))}
           </ContextMenuGroup>
@@ -158,7 +160,9 @@ export const LinkCardContextMenuContent = ({
                     e.currentTarget.style.display = 'none'
                   }}
                 />
-                <span className="truncate flex-1">{tab.title || tab.url}</span>
+                <span className="min-w-0 flex-1 truncate" title={tab.title || tab.url}>
+                  {tab.title || tab.url}
+                </span>
               </ContextMenuItem>
             ))}
           </ContextMenuGroup>

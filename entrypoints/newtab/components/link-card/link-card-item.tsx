@@ -93,7 +93,7 @@ export const SortableLinkCardItem: FC<LinkCardProps> = ({
           </button>
         )}
       </ContextMenuTrigger>
-      <ContextMenuContent className="max-w-xs">
+      <ContextMenuContent className="w-72 max-w-[calc(100vw-24px)]">
         <LinkCardContextMenuContent
           id={id}
           title={title}
