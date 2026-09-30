@@ -6,6 +6,7 @@ import { useStorage } from '@/utils'
 import { settingStorage } from '@/utils/storage'
 import { t } from '@/utils/i18n'
 import { QuickLinkSortMenu } from './components/link-card/quick-link-sort-menu'
+import { RecentPages } from './components/recent-pages'
 
 function TimeDisplay() {
   const [time, setTime] = useState(() => new Date())
@@ -53,6 +54,7 @@ export default function NewTab() {
         <section className="nt-search-section" aria-label={t('searchCommandPlaceholder')}>
           <CommandModule ref={commandRef} className="nt-command" />
         </section>
+        {settings.showRecentPages !== false && <RecentPages />}
         <section className="nt-links-section" aria-labelledby="nt-links-title">
           <div className="nt-section-heading">
             <h2 id="nt-links-title">{t('quickLinksHeading')}</h2>

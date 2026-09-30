@@ -10,6 +10,7 @@ import { LinkCardIcon } from './link-card-icon'
 import { LinkCardContextMenuContent } from './link-card-context-menu'
 import { useRelatedBookmarks } from './use-related-bookmarks'
 import { useRelatedTabs } from './use-related-tabs'
+import { useDomainRecommendations } from './use-domain-recommendations'
 
 interface LinkCardProps extends QuickUrlItem {
   index: number
@@ -33,6 +34,7 @@ export const SortableLinkCardItem: FC<LinkCardProps> = ({
 
   const { relatedBookmarks, showBookmarks } = useRelatedBookmarks(url, contextMenuOpen)
   const { relatedTabs, showOpenTabs } = useRelatedTabs(url, contextMenuOpen)
+  const recommendedPages = useDomainRecommendations(url, contextMenuOpen, relatedBookmarks, relatedTabs)
   const handleOpen = useCallback(
     (ev: MouseEvent<HTMLButtonElement>) => {
       if (ev.ctrlKey || ev.metaKey) {
@@ -102,6 +104,7 @@ export const SortableLinkCardItem: FC<LinkCardProps> = ({
           showBookmarks={showBookmarks}
           relatedTabs={relatedTabs}
           showOpenTabs={showOpenTabs}
+          recommendedPages={recommendedPages}
           globalDialog={globalDialog}
         />
       </ContextMenuContent>

@@ -1,7 +1,7 @@
 import { useStorage } from '@/utils'
 import { settingStorage, updateSettings } from '@/utils/storage'
 import { Stack, Text, Switch, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/shared'
-import { Bookmark, NotebookTabs, Folder } from 'lucide-react'
+import { Bookmark, NotebookTabs, Folder, History } from 'lucide-react'
 import type { FC } from 'react'
 import { useEffect, useState } from 'react'
 import { t } from '@/utils/i18n'
@@ -95,6 +95,18 @@ export const HomepageSettings: FC = () => {
           <Switch
             checked={settings.showOpenTabsInQuickUrlMenu}
             onCheckedChange={val => updateSettings({ showOpenTabsInQuickUrlMenu: val })}
+          />
+        }
+      />
+      <SettingItem
+        IconClass={History}
+        title={t('showRecentPages')}
+        description={t('showRecentPagesDescription')}
+        control={
+          <Switch
+            aria-label={t('showRecentPages')}
+            checked={settings.showRecentPages !== false}
+            onCheckedChange={val => updateSettings({ showRecentPages: val })}
           />
         }
       />

@@ -166,7 +166,7 @@ test('settings navigation and cards stay aligned while long descriptions remain 
   }
 
   const cards = page.getByTestId('homepage-settings').locator('.nt-setting-item')
-  await expect(cards).toHaveCount(3)
+  await expect(cards).toHaveCount(4)
   const heights = await cards.evaluateAll(elements => elements.map(element => element.getBoundingClientRect().height))
   expect(Math.max(...heights) - Math.min(...heights)).toBeLessThan(2)
 
@@ -243,7 +243,7 @@ test('homepage settings persist after reload', async ({ page, extensionId }) => 
   await openSettings(page)
 
   const switches = page.getByTestId('homepage-settings').getByRole('switch')
-  await expect(switches).toHaveCount(2)
+  await expect(switches).toHaveCount(3)
   await switches.nth(0).click()
   await switches.nth(1).click()
 
@@ -368,6 +368,10 @@ test('command palette resolves history, bookmarks, open tabs, and web search', a
   )
 
   const commandInput = page.getByTestId('command-input')
+  await commandInput.fill('h History Regression')
+  await expect(page.getByTestId('command-result').filter({ hasText: 'History Regression Page' })).toBeVisible()
+  await commandInput.fill('h ')
+  await expect(page.getByTestId('command-result').filter({ hasText: 'History Regression Page' })).toHaveCount(0)
   await commandInput.fill('h History Regression')
   await expect(page.getByTestId('command-result').filter({ hasText: 'History Regression Page' })).toBeVisible()
 
@@ -1095,7 +1099,7 @@ test('data settings export, import, and restart onboarding', async ({ page, exte
     buffer: Buffer.from(
       JSON.stringify({
         theme: 'light',
-        settings: { useHistorySuggestion: true, wallpaperType: 'url' },
+        settings: { autoFocusCommandInput: true, wallpaperType: 'url' },
         quickUrls: [{ id: 'imported', title: 'Imported Link', url: 'https://example.com/' }],
       }),
     ),

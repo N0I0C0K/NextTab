@@ -4,8 +4,6 @@ import moment from 'moment'
 import { t } from '@/utils/i18n'
 import { Clock } from 'lucide-react'
 
-import { historySuggestStorage } from '@/utils/storage'
-
 function convertHistoryItemToCommandResult(item: chrome.history.HistoryItem): ICommandResult {
   const formatLastDate = moment(item.lastVisitTime).format('MM/DD HH:mm')
   return {
@@ -31,8 +29,7 @@ export const historyResolver: ICommandResolver = {
     icon: Clock,
   },
   resolve: async params => {
-    if (params.query.length === 0)
-      return (await historySuggestStorage.getValue()).slice(0, 10).map(convertHistoryItemToCommandResult)
+    if (params.query.trim().length === 0) return null
     const result = await chrome.history.search({
       text: params.query,
       maxResults: 10,

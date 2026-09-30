@@ -8,6 +8,8 @@
     "message": "NextTab"
   },
   "quickLinksHeading": { "message": "Quick links" },
+  "recentPagesHeading": { "message": "Recently used" },
+  "recentPagesSource": { "message": "Updates automatically" },
   "sortQuickLinks": { "message": "Sort" },
   "sortQuickLinksManual": { "message": "Original order" },
   "sortQuickLinksAlphabetical": { "message": "Alphabetical" },
@@ -144,14 +146,6 @@
     "description": "Theme setting description",
     "message": "Change dark/light theme."
   },
-  "historySuggestion": {
-    "description": "History suggestion setting title",
-    "message": "History Suggestion"
-  },
-  "historySuggestionDescription": {
-    "description": "History suggestion setting description",
-    "message": "Use history for recommendations."
-  },
   "autoFocusCommandInput": {
     "description": "Auto focus command input setting title",
     "message": "Auto Focus Command Input"
@@ -192,6 +186,7 @@
     "description": "Related bookmarks section label in context menu",
     "message": "Bookmarks"
   },
+  "domainRecommendedPages": { "message": "Frequently visited pages" },
   "showOpenTabsInQuickUrlMenu": {
     "description": "Show open tabs in quick URL context menu setting title",
     "message": "Show Open Tabs in Quick URL Menu"
@@ -200,6 +195,8 @@
     "description": "Show open tabs in quick URL context menu setting description",
     "message": "Display related open tabs when right-clicking quick URL items."
   },
+  "showRecentPages": { "message": "Show recently used sites" },
+  "showRecentPagesDescription": { "message": "Show new tab suggestions based on recent browsing history." },
   "relatedOpenTabs": {
     "description": "Related open tabs section label in context menu",
     "message": "Tabs"

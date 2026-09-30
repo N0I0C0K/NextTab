@@ -17,11 +17,11 @@ export type WallhavenSortMode = 'toplist' | 'random'
 export type QuickUrlSortMode = 'manual' | 'alphabetical'
 
 export type SettingProps = {
-  useHistorySuggestion: boolean
   autoFocusCommandInput: boolean
   doubleClickBackgroundFocusCommand: boolean
   showBookmarksInQuickUrlMenu: boolean
   showOpenTabsInQuickUrlMenu: boolean
+  showRecentPages: boolean
   quickUrlSortMode: QuickUrlSortMode
   bookmarkFolderId: string | null
   wallpaperUrl: string | null
@@ -33,11 +33,11 @@ export type SettingProps = {
 export type DeepPartial<T> = T extends object ? { [K in keyof T]?: DeepPartial<T[K]> } : T
 
 export const defaultSetting: SettingProps = {
-  useHistorySuggestion: false,
   autoFocusCommandInput: false,
   doubleClickBackgroundFocusCommand: false,
   showBookmarksInQuickUrlMenu: true,
   showOpenTabsInQuickUrlMenu: true,
+  showRecentPages: true,
   quickUrlSortMode: 'manual',
   bookmarkFolderId: null,
   wallpaperUrl: null,

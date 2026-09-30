@@ -97,6 +97,59 @@
 .nt-links-section {
   margin-top: 34px;
 }
+.nt-recent-section {
+  margin-top: 26px;
+}
+.nt-recent-section + .nt-links-section {
+  margin-top: 40px;
+}
+.nt-recent-source {
+  color: hsl(var(--muted-foreground));
+  font-size: 11px;
+}
+.nt-recent-strip {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 8px;
+}
+.nt-recent-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-width: 0;
+  height: 86px;
+  padding: 8px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: hsl(var(--muted) / 0.65);
+  color: inherit;
+  text-align: center;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease;
+}
+.nt-recent-item:hover,
+.nt-recent-item:focus-visible {
+  background: hsl(var(--accent) / 0.8);
+  border-color: hsl(var(--ring) / 0.35);
+}
+.nt-recent-item:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+}
+.nt-recent-label {
+  display: block;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+  line-height: 1.2;
+}
 .nt-section-heading {
   display: flex;
   align-items: center;
@@ -225,6 +278,31 @@
 @media (max-width: 360px) {
   .nt-command kbd {
     display: none;
+  }
+}
+@media (max-width: 650px) {
+  .nt-recent-strip {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .nt-recent-item {
+    height: 78px;
+    gap: 4px;
+  }
+}
+@media (max-width: 400px) {
+  .nt-recent-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-height: 500px) {
+  .nt-page {
+    padding-top: 16px;
+  }
+  .nt-main {
+    margin-top: 16px;
+  }
+  .nt-time-block {
+    margin-bottom: 16px;
   }
 }
 

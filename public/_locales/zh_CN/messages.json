@@ -8,6 +8,8 @@
     "message": "NextTab"
   },
   "quickLinksHeading": { "message": "常用网站" },
+  "recentPagesHeading": { "message": "最近常用" },
+  "recentPagesSource": { "message": "自动更新" },
   "sortQuickLinks": { "message": "排序" },
   "sortQuickLinksManual": { "message": "原始顺序" },
   "sortQuickLinksAlphabetical": { "message": "按字母排序" },
@@ -144,14 +146,6 @@
     "description": "Theme setting description",
     "message": "切换深色/浅色主题。"
   },
-  "historySuggestion": {
-    "description": "History suggestion setting title",
-    "message": "历史建议"
-  },
-  "historySuggestionDescription": {
-    "description": "History suggestion setting description",
-    "message": "使用历史记录进行推荐。"
-  },
   "autoFocusCommandInput": {
     "description": "Auto focus command input setting title",
     "message": "自动聚焦命令输入"
@@ -192,6 +186,7 @@
     "description": "Related bookmarks section label in context menu",
     "message": "收藏"
   },
+  "domainRecommendedPages": { "message": "常去页面" },
   "showOpenTabsInQuickUrlMenu": {
     "description": "Show open tabs in quick URL context menu setting title",
     "message": "在快捷链接菜单中显示打开的页面"
@@ -200,6 +195,8 @@
     "description": "Show open tabs in quick URL context menu setting description",
     "message": "右键快捷链接时显示相关打开的标签页。"
   },
+  "showRecentPages": { "message": "显示最近常用" },
+  "showRecentPagesDescription": { "message": "在新标签页显示根据最近浏览记录生成的推荐入口。" },
   "relatedOpenTabs": {
     "description": "Related open tabs section label in context menu",
     "message": "标签页"
