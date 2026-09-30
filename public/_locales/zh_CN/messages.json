@@ -232,6 +232,10 @@
     "description": "Search in domain placeholder",
     "message": "在此域名下搜索..."
   },
+  "clearSearch": {
+    "description": "Clear search button aria label",
+    "message": "清空搜索"
+  },
   "wallpaperUrl": {
     "description": "Wallpaper URL setting title",
     "message": "壁纸 URL"
@@ -664,6 +668,15 @@
     "description": "Delete",
     "message": "删除"
   },
+  "deleteQuickItemConfirm": {
+    "description": "Quick-link deletion confirmation title",
+    "message": "删除“$NAME$”？",
+    "placeholders": { "name": { "content": "$1", "example": "Github" } }
+  },
+  "deleteQuickItemWarning": { "message": "删除后无法恢复。" },
+  "confirm": { "message": "确认" },
+  "cancel": { "message": "取消" },
+  "close": { "message": "关闭" },
   "onboardingTitle": {
     "description": "Onboarding dialog title",
     "message": "欢迎使用 NextTab"

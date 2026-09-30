@@ -79,7 +79,12 @@ export const LinkCardContextMenuContent = ({
         IconType={History}
         onClick={() => {
           const domain = getDomainFromUrl(url)
-          globalDialog.show(<DomainHistoryDialog domain={domain} />, t('domainHistory'), undefined)
+          globalDialog.show(
+            <DomainHistoryDialog domain={domain} />,
+            t('domainHistory'),
+            undefined,
+            'w-[calc(100%-2rem)] sm:max-w-4xl max-h-[calc(100dvh-2rem)] gap-5 p-5 sm:p-6',
+          )
         }}>
         {t('viewRecentHistory')}
       </ContextMenuItemWitchIcon>
@@ -88,7 +93,7 @@ export const LinkCardContextMenuContent = ({
         className="text-red-800"
         IconType={Trash}
         onClick={() => {
-          globalDialog.confirm(`Continue delete ${title}?`, 'Delete can not recover', () => {
+          globalDialog.confirm(t('deleteQuickItemConfirm', title), t('deleteQuickItemWarning'), () => {
             removeQuickUrlById(id)
             globalDialog.close()
           })

@@ -415,7 +415,14 @@ test('quick links can be added, edited, persisted, and deleted', async ({ page, 
 
   await card.click({ button: 'right' })
   await page.getByTestId('quick-link-delete').click()
-  await page.getByRole('dialog').getByRole('button', { name: 'Yes' }).click()
+  const deleteDialog = page.getByRole('dialog')
+  await expect(deleteDialog.getByRole('heading')).toHaveText('Delete "Example Updated"?')
+  await expect(deleteDialog).toContainText('This cannot be undone.')
+  await deleteDialog.getByRole('button', { name: 'Cancel', exact: true }).click()
+  await expect(card).toHaveCount(1)
+  await card.click({ button: 'right' })
+  await page.getByTestId('quick-link-delete').click()
+  await page.getByRole('dialog').getByRole('button', { name: 'Confirm', exact: true }).click()
   await expect(page.getByTestId('quick-link-card')).toHaveCount(0)
   await expect.poll(() => readExtensionStorage<unknown[]>(page, QUICK_LINKS_KEY)).toEqual([])
 })
@@ -795,6 +802,188 @@ test('domain history dialog filters exact-domain history', async ({ page, extens
   await page.getByTestId('domain-history-search').fill('keyword')
   await expect(page.getByTestId('domain-history-item')).toHaveCount(1)
   await expect(page.getByTestId('domain-history-item')).toContainText('newest-keyword')
+})
+
+test('domain history keeps rows aligned and supports keyboard selection from search', async ({
+  page,
+  extensionId,
+}, testInfo) => {
+  await openNewTab(page, extensionId)
+  await page.evaluate(async key => {
+    await chrome.storage.local.set({
+      [key]: [{ id: 'history-domain', title: 'History Domain', url: 'https://history.example.com/current' }],
+      'domain-history-opened': [],
+    })
+    await chrome.history.deleteAll()
+    for (let index = 0; index < 12; index++) {
+      await chrome.history.addUrl({ url: `https://history.example.com/entry-${index}` })
+    }
+    const search = chrome.history.search.bind(chrome.history)
+    chrome.history.search = async query =>
+      (await search(query)).map(item => ({
+        ...item,
+        title: `A long history title that should truncate rather than push metadata below: ${item.url}`,
+        visitCount: 5,
+      }))
+    const opened: { kind: string; url?: string }[] = []
+    chrome.tabs.update = async properties => {
+      if (typeof properties !== 'number') opened.push({ kind: 'current', url: properties.url })
+      await chrome.storage.local.set({ 'domain-history-opened': opened })
+      return {} as chrome.tabs.Tab
+    }
+    chrome.tabs.create = async properties => {
+      opened.push({ kind: 'new', url: properties.url })
+      await chrome.storage.local.set({ 'domain-history-opened': opened })
+      return {} as chrome.tabs.Tab
+    }
+  }, QUICK_LINKS_KEY)
+
+  await page.getByTestId('quick-link-card').click({ button: 'right' })
+  await page.getByTestId('quick-link-history').click()
+  const search = page.getByTestId('domain-history-search')
+  const items = page.getByTestId('domain-history-item')
+  const selected = page.locator('[data-testid="domain-history-item"][aria-selected="true"]')
+  await expect(items).toHaveCount(12)
+  await expect(search).toBeFocused()
+  await expect(items.first()).toHaveAttribute('aria-selected', 'true')
+
+  const layout = await items.first().evaluate(row => {
+    const icon = row.querySelector('img')!.getBoundingClientRect()
+    const text = row.children[1].getBoundingClientRect()
+    const metadata = row.children[2].getBoundingClientRect()
+    return {
+      display: getComputedStyle(row).display,
+      iconRight: icon.right,
+      textLeft: text.left,
+      textRight: text.right,
+      metadataLeft: metadata.left,
+      textTop: text.top,
+      textBottom: text.bottom,
+      metadataTop: metadata.top,
+      metadataBottom: metadata.bottom,
+      textWidth: text.width,
+      truncated: row.children[1].children[0].scrollWidth > row.children[1].children[0].clientWidth,
+    }
+  })
+  expect(layout.display).toBe('grid')
+  expect(layout.textLeft).toBeGreaterThan(layout.iconRight)
+  expect(layout.metadataLeft).toBeGreaterThan(layout.textRight)
+  expect(layout.metadataTop).toBeLessThan(layout.textBottom)
+  expect(layout.metadataBottom).toBeGreaterThan(layout.textTop)
+  expect(layout.truncated).toBe(true)
+  expect(layout.textWidth).toBeGreaterThan(560)
+  const popup = page.locator('[data-slot="dialog-content"]')
+  await expect.poll(() => popup.evaluate(element => element.getBoundingClientRect().width)).toBeGreaterThan(800)
+  await page.mouse.move(10, 10)
+  await page.screenshot({ path: testInfo.outputPath('desktop.png'), animations: 'disabled' })
+
+  for (const viewport of [
+    { width: 768, height: 700 },
+    { width: 420, height: 700 },
+    { width: 320, height: 600 },
+    { width: 900, height: 360 },
+  ]) {
+    await page.setViewportSize(viewport)
+    await expect
+      .poll(() =>
+        popup.evaluate(element => {
+          const bounds = element.getBoundingClientRect()
+          return (
+            bounds.left >= 15 &&
+            bounds.right <= innerWidth - 15 &&
+            bounds.top >= 15 &&
+            bounds.bottom <= innerHeight - 15 &&
+            element.scrollWidth <= element.clientWidth
+          )
+        }),
+      )
+      .toBe(true)
+    if (viewport.width < 640) {
+      const row = await items.first().evaluate(element => {
+        const text = element.children[1].getBoundingClientRect()
+        const metadata = element.children[2].getBoundingClientRect()
+        return {
+          textWidth: text.width,
+          textBottom: text.bottom,
+          metadataTop: metadata.top,
+          metadataLeft: metadata.left,
+          textLeft: text.left,
+        }
+      })
+      expect(row.textWidth).toBeGreaterThan(180)
+      expect(row.metadataTop).toBeGreaterThanOrEqual(row.textBottom)
+      expect(row.metadataLeft).toBe(row.textLeft)
+    }
+    await expect(search).toBeInViewport()
+    await expect(popup.locator('[data-slot="dialog-close"]')).toBeInViewport()
+    await page.screenshot({
+      path: testInfo.outputPath(`${viewport.width}x${viewport.height}.png`),
+      animations: 'disabled',
+    })
+  }
+  await page.setViewportSize({ width: 1440, height: 1000 })
+  await page.evaluate(key => chrome.storage.local.set({ [key]: 'dark' }), THEME_KEY)
+  await expect(page.locator('html')).toHaveClass(/dark/)
+  await page.screenshot({ path: testInfo.outputPath('desktop-dark.png'), animations: 'disabled' })
+  await page.evaluate(key => chrome.storage.local.set({ [key]: 'light' }), THEME_KEY)
+  await expect(page.locator('html')).not.toHaveClass(/dark/)
+  await page.setViewportSize({ width: 420, height: 700 })
+
+  await search.press('ArrowDown')
+  await expect(items.nth(1)).toHaveAttribute('aria-selected', 'true')
+  await search.press('ArrowDown')
+  await expect(items.nth(2)).toHaveAttribute('aria-selected', 'true')
+  await search.press('ArrowUp')
+  await expect(items.nth(1)).toHaveAttribute('aria-selected', 'true')
+  const selectedUrl = await selected.locator('.truncate').last().textContent()
+  await search.press('Enter')
+  await expect
+    .poll(() => readExtensionStorage(page, 'domain-history-opened'))
+    .toEqual([{ kind: 'current', url: selectedUrl }])
+
+  for (let index = 0; index < 9; index++) await search.press('ArrowDown')
+  await expect(items.nth(10)).toHaveAttribute('aria-selected', 'true')
+  await expect(search).toBeFocused()
+  await expect
+    .poll(() =>
+      selected.evaluate(row => {
+        const bounds = row.getBoundingClientRect()
+        const list = row.closest('[role="listbox"]')!.getBoundingClientRect()
+        return bounds.top >= list.top && bounds.bottom <= list.bottom
+      }),
+    )
+    .toBe(true)
+
+  await search.fill('entry-3')
+  await expect(items).toHaveCount(1)
+  await expect(items.first()).toHaveAttribute('aria-selected', 'true')
+  await search.press('Enter')
+  await expect
+    .poll(() => readExtensionStorage(page, 'domain-history-opened'))
+    .toEqual([
+      { kind: 'current', url: selectedUrl },
+      { kind: 'current', url: 'https://history.example.com/entry-3' },
+    ])
+  await search.fill('no-matching-history')
+  await expect(items).toHaveCount(0)
+  await search.press('ArrowDown')
+  await search.press('Enter')
+  expect(await readExtensionStorage<unknown[]>(page, 'domain-history-opened')).toHaveLength(2)
+
+  const clear = page.getByRole('button', { name: 'Clear search', exact: true })
+  await clear.focus()
+  await clear.press('Enter')
+  await expect(search).toHaveValue('')
+  await expect(items).toHaveCount(12)
+  const firstUrl = await items.first().locator('.truncate').last().textContent()
+  await items.first().click({ modifiers: ['Control'] })
+  await expect
+    .poll(() => readExtensionStorage(page, 'domain-history-opened'))
+    .toEqual([
+      { kind: 'current', url: selectedUrl },
+      { kind: 'current', url: 'https://history.example.com/entry-3' },
+      { kind: 'new', url: firstUrl },
+    ])
 })
 
 test('command plugins react to disabled, global, and custom trigger settings', async ({ page, extensionId }) => {

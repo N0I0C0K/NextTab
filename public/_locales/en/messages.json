@@ -232,6 +232,10 @@
     "description": "Search in domain placeholder",
     "message": "Search in this domain..."
   },
+  "clearSearch": {
+    "description": "Clear search button aria label",
+    "message": "Clear search"
+  },
   "wallpaperUrl": {
     "description": "Wallpaper URL setting title",
     "message": "Wallpaper URL"
@@ -664,6 +668,15 @@
     "description": "Delete",
     "message": "Delete"
   },
+  "deleteQuickItemConfirm": {
+    "description": "Quick-link deletion confirmation title",
+    "message": "Delete \"$NAME$\"?",
+    "placeholders": { "name": { "content": "$1", "example": "Github" } }
+  },
+  "deleteQuickItemWarning": { "message": "This cannot be undone." },
+  "confirm": { "message": "Confirm" },
+  "cancel": { "message": "Cancel" },
+  "close": { "message": "Close" },
   "onboardingTitle": {
     "description": "Onboarding dialog title",
     "message": "Welcome to NextTab"

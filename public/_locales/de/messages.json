@@ -232,6 +232,10 @@
     "description": "Search in domain placeholder",
     "message": "In dieser Domain suchen..."
   },
+  "clearSearch": {
+    "description": "Clear search button aria label",
+    "message": "Suche löschen"
+  },
   "wallpaperUrl": {
     "description": "Wallpaper URL setting title",
     "message": "Hintergrundbild-URL"
@@ -664,6 +668,15 @@
     "description": "Delete",
     "message": "Löschen"
   },
+  "deleteQuickItemConfirm": {
+    "description": "Quick-link deletion confirmation title",
+    "message": "„$NAME$“ löschen?",
+    "placeholders": { "name": { "content": "$1", "example": "Github" } }
+  },
+  "deleteQuickItemWarning": { "message": "Dieser Vorgang kann nicht rückgängig gemacht werden." },
+  "confirm": { "message": "Bestätigen" },
+  "cancel": { "message": "Abbrechen" },
+  "close": { "message": "Schließen" },
   "onboardingTitle": {
     "description": "Onboarding dialog title",
     "message": "Willkommen bei NextTab"

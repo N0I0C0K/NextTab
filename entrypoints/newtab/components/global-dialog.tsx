@@ -1,4 +1,3 @@
-import { cn } from '@/entrypoints/newtab/lib/utils'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/shared'
 import type { GlobalDialogInnerProps } from '@/entrypoints/newtab/providers'
 import { GlobalDialogContext } from '@/entrypoints/newtab/providers/global-dialog'
@@ -16,14 +15,12 @@ export const GlobalDialog: FC<{
         onOpenChange={open => {
           setDialogState({ open })
         }}>
-        <DialogContent>
+        <DialogContent className={dialogState.className}>
           <DialogHeader>
             {dialogState.title && <DialogTitle>{dialogState.title}</DialogTitle>}
             {dialogState.description && <DialogDescription>{dialogState.description}</DialogDescription>}
           </DialogHeader>
-          <div className={cn('min-w-[20rem] max-w-screen-xl', dialogState.className)}>
-            {dialogState.showElement ?? null}
-          </div>
+          <div className="w-full min-w-0">{dialogState.showElement ?? null}</div>
         </DialogContent>
       </Dialog>
     </>
