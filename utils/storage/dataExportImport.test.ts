@@ -21,7 +21,7 @@ describe('settings import', () => {
       JSON.stringify({
         version: '0.1.0',
         settings: {
-          useHistorySuggestion: true,
+          showBookmarksInQuickUrlMenu: false,
           wallpaperType: 'local',
           mqttSettings: { enabled: true },
         },
@@ -30,7 +30,7 @@ describe('settings import', () => {
 
     expect(result.warnings).toEqual([])
     expect(await settingStorage.getValue()).toMatchObject({
-      useHistorySuggestion: true,
+      showBookmarksInQuickUrlMenu: false,
       autoFocusCommandInput: true,
       wallpaperType: 'url',
       mqttSettings: { enabled: true, username: 'preserved-user' },
@@ -41,14 +41,14 @@ describe('settings import', () => {
     const result = await importAllDataFromText(
       JSON.stringify({
         theme: 'dark',
-        settings: { useHistorySuggestion: 'yes' },
+        settings: { autoFocusCommandInput: 'yes' },
         quickUrls: [{ id: 'invalid', title: 'Invalid URL', url: 'not a URL' }],
       }),
     )
 
     expect(await exampleThemeStorage.getValue()).toBe('dark')
     expect(await quickUrlItemsStorage.getValue()).toEqual([])
-    expect((await settingStorage.getValue()).useHistorySuggestion).toBe(false)
+    expect((await settingStorage.getValue()).autoFocusCommandInput).toBe(false)
     expect(result.warnings).toHaveLength(2)
     expect(result.warnings[0]).toContain('settings:')
     expect(result.warnings[1]).toContain('quickUrls:')
@@ -64,6 +64,28 @@ describe('settings import', () => {
     expect(result.warnings).toEqual([])
     expect((await settingStorage.getValue()).quickUrlSortMode).toBe('alphabetical')
     expect((await quickUrlItemsStorage.getValue()).map(item => item.id)).toEqual(['z', 'a'])
+  })
+
+  it('imports the recent pages visibility setting', async () => {
+    const result = await importAllDataFromText(JSON.stringify({ settings: { showRecentPages: false } }))
+
+    expect(result.warnings).toEqual([])
+    expect((await settingStorage.getValue()).showRecentPages).toBe(false)
+  })
+
+  it('ignores retired settings in older backup files', async () => {
+    const result = await importAllDataFromText(
+      JSON.stringify({
+        settings: {
+          retiredFeature: true,
+          autoFocusCommandInput: true,
+        },
+      }),
+    )
+
+    expect(result.warnings).toEqual([])
+    expect((await settingStorage.getValue()).autoFocusCommandInput).toBe(true)
+    expect(await settingStorage.getValue()).not.toHaveProperty('retiredFeature')
   })
 
   it.each([

@@ -1,11 +1,12 @@
 import { getDefaultIconUrl } from '@/entrypoints/newtab/lib/url'
-import { ScrollArea, Text, Input } from '@/components/shared'
+import { command, Text } from '@/components/shared'
 import { t } from '@/utils/i18n'
 import { useMemo, useState, useEffect, type FC } from 'react'
 import { cn } from '@/entrypoints/newtab/lib/utils'
 import { useDebounce } from '@/utils'
 import moment from 'moment'
-import { Search, X } from 'lucide-react'
+import { X } from 'lucide-react'
+import { Command } from 'cmdk'
 
 interface DomainHistoryItem {
   id: string
@@ -34,12 +35,15 @@ export const DomainHistoryDialog: FC<DomainHistoryDialogProps> = ({ domain }) =>
   const [historyItems, setHistoryItems] = useState<DomainHistoryItem[]>([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
+  const [selectedItem, setSelectedItem] = useState('')
   const debouncedSearchQuery = useDebounce(searchQuery, 300)
 
   useEffect(() => {
+    let cancelled = false
     const fetchDomainHistory = async () => {
       try {
         setLoading(true)
+        setSelectedItem('')
         // Combine domain and search query for Chrome history search
         const searchText = debouncedSearchQuery ? `${domain} ${debouncedSearchQuery}` : domain
 
@@ -71,22 +75,36 @@ export const DomainHistoryDialog: FC<DomainHistoryDialogProps> = ({ domain }) =>
           // Sort by last visit time (most recent first)
           .sort((a, b) => (b.lastVisitTime || 0) - (a.lastVisitTime || 0))
 
-        setHistoryItems(domainHistory)
+        if (!cancelled) {
+          setHistoryItems(domainHistory)
+          setSelectedItem(domainHistory[0]?.id ?? '')
+        }
       } catch (error) {
         console.error('Failed to fetch domain history:', error)
+        if (!cancelled) {
+          setHistoryItems([])
+          setSelectedItem('')
+        }
       } finally {
-        setLoading(false)
+        if (!cancelled) setLoading(false)
       }
     }
 
     fetchDomainHistory()
+    return () => {
+      cancelled = true
+    }
   }, [domain, debouncedSearchQuery])
 
   return (
-    <div
-      className="flex flex-col gap-3 w-[50rem] min-h-[20em] max-h-[46rem] h-[50vh] max-w-full"
+    <Command
+      label={t('domainHistory')}
+      shouldFilter={false}
+      value={selectedItem}
+      onValueChange={setSelectedItem}
+      className="flex w-full min-w-0 flex-col gap-4 h-[min(36rem,calc(100dvh-10rem))]"
       data-testid="domain-history-dialog">
-      <div className="flex items-center gap-2 min-w-0">
+      <div className="flex items-center gap-2 min-w-0 shrink-0">
         <Text level="md" className="font-semibold truncate">
           {domain}
         </Text>
@@ -96,19 +114,21 @@ export const DomainHistoryDialog: FC<DomainHistoryDialogProps> = ({ domain }) =>
       </div>
 
       {/* Search input */}
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-        <Input
+      <div className="relative shrink-0">
+        <command.CommandInput
           data-testid="domain-history-search"
-          type="text"
+          aria-label={t('searchInDomain')}
           placeholder={t('searchInDomain')}
           value={searchQuery}
-          onChange={e => setSearchQuery(e.target.value)}
-          className="pl-9 pr-9"
+          onValueChange={setSearchQuery}
+          className="pr-9 placeholder:text-muted-foreground"
         />
         {searchQuery && (
           <button
+            type="button"
+            aria-label={t('clearSearch')}
             onClick={() => setSearchQuery('')}
+            onKeyDown={e => e.stopPropagation()}
             className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground
               transition-colors">
             <X className="size-4" />
@@ -116,76 +136,69 @@ export const DomainHistoryDialog: FC<DomainHistoryDialogProps> = ({ domain }) =>
         )}
       </div>
 
-      {loading ? (
-        <div className="flex items-center justify-center flex-1">
-          <Text className="text-muted-foreground">{t('loading')}</Text>
-        </div>
-      ) : historyItems.length === 0 ? (
-        <div className="flex items-center justify-center flex-1">
-          <Text className="text-muted-foreground">{t('noHistoryFound')}</Text>
-        </div>
-      ) : (
-        <ScrollArea className="flex-1 min-h-0 [&>div>div]:!block">
-          {historyItems.map(item => (
-            <DomainHistoryItem key={item.id} {...item} />
-          ))}
-        </ScrollArea>
-      )}
-    </div>
+      <Command.List
+        label={t('domainHistory')}
+        className="flex-1 min-h-0 overflow-x-hidden overflow-y-auto scroll-py-1 outline-none">
+        {loading ? (
+          <div className="flex items-center justify-center min-h-40">
+            <Text className="text-muted-foreground">{t('loading')}</Text>
+          </div>
+        ) : historyItems.length === 0 ? (
+          <div className="flex items-center justify-center min-h-40">
+            <Text className="text-muted-foreground">{t('noHistoryFound')}</Text>
+          </div>
+        ) : (
+          historyItems.map(item => <DomainHistoryItem key={item.id} {...item} />)
+        )}
+      </Command.List>
+    </Command>
   )
 }
 
-interface DomainHistoryItemProps extends DomainHistoryItem {}
-
-const DomainHistoryItem: FC<DomainHistoryItemProps> = ({ title, url, lastVisitTime, visitCount }) => {
+const DomainHistoryItem: FC<DomainHistoryItem> = ({ id, title, url, lastVisitTime, visitCount }) => {
   const relativeTime = useMemo(() => {
     if (!lastVisitTime) return ''
     return moment(lastVisitTime).fromNow()
   }, [lastVisitTime])
 
-  const handleClick = (ev: React.MouseEvent<HTMLDivElement>) => {
+  const handleClickCapture = (ev: React.MouseEvent<HTMLDivElement>) => {
     if (ev.ctrlKey || ev.metaKey) {
-      chrome.tabs.create({ url: url, active: true })
-    } else {
-      chrome.tabs.update({ url: url })
-    }
-  }
-
-  const handleKeyDown = (ev: React.KeyboardEvent<HTMLDivElement>) => {
-    if (ev.key === 'Enter' || ev.key === ' ') {
       ev.preventDefault()
-      chrome.tabs.update({ url: url })
+      ev.stopPropagation()
+      chrome.tabs.create({ url: url, active: true })
     }
   }
 
   return (
-    <div
-      role="button"
-      tabIndex={0}
+    <Command.Item
+      value={id}
       data-testid="domain-history-item"
       className={cn(
-        'flex items-center gap-3 py-2.5 px-3 cursor-pointer group',
-        'hover:bg-muted rounded-md transition-colors duration-200',
+        `grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-3 gap-y-1 py-3 px-3 cursor-pointer group
+        sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:py-3.5`,
+        'hover:bg-muted data-[selected=true]:bg-muted rounded-md outline-none transition-colors duration-200',
       )}
-      onClick={handleClick}
-      onKeyDown={handleKeyDown}>
+      onClickCapture={handleClickCapture}
+      onSelect={() => chrome.tabs.update({ url })}>
       <img
         src={getDefaultIconUrl(url)}
-        alt="favicon"
+        alt=""
         className="size-5 rounded-sm flex-shrink-0"
         onError={e => {
           e.currentTarget.style.display = 'none'
         }}
       />
-      <div className="flex flex-col flex-1 min-w-0 gap-0.5">
-        <Text level="s" className="font-medium truncate">
+      <div className="flex flex-col min-w-0 gap-1">
+        <Text level="s" className="font-medium truncate" title={title}>
           {title}
         </Text>
-        <Text level="xs" className="text-muted-foreground truncate">
+        <Text level="xs" className="text-muted-foreground truncate" title={url}>
           {url}
         </Text>
       </div>
-      <div className="flex flex-col items-end gap-0.5 flex-shrink-0">
+      <div
+        className="col-start-2 flex items-center gap-3 sm:col-start-3 sm:row-start-1 sm:flex-col sm:items-end
+          sm:gap-0.5">
         <Text level="xs" className="text-muted-foreground whitespace-nowrap">
           {relativeTime}
         </Text>
@@ -195,6 +208,6 @@ const DomainHistoryItem: FC<DomainHistoryItemProps> = ({ title, url, lastVisitTi
           </Text>
         )}
       </div>
-    </div>
+    </Command.Item>
   )
 }

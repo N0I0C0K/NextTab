@@ -8,6 +8,8 @@
     "message": "NextTab"
   },
   "quickLinksHeading": { "message": "Schnellzugriffe" },
+  "recentPagesHeading": { "message": "Zuletzt genutzt" },
+  "recentPagesSource": { "message": "Automatisch aktualisiert" },
   "sortQuickLinks": { "message": "Sortieren" },
   "sortQuickLinksManual": { "message": "Ursprüngliche Reihenfolge" },
   "sortQuickLinksAlphabetical": { "message": "Alphabetisch" },
@@ -144,14 +146,6 @@
     "description": "Theme setting description",
     "message": "Dunkles/helles Design wechseln."
   },
-  "historySuggestion": {
-    "description": "History suggestion setting title",
-    "message": "Verlaufsvorschläge"
-  },
-  "historySuggestionDescription": {
-    "description": "History suggestion setting description",
-    "message": "Verlauf für Empfehlungen verwenden."
-  },
   "autoFocusCommandInput": {
     "description": "Auto focus command input setting title",
     "message": "Befehlseingabe automatisch fokussieren"
@@ -192,6 +186,7 @@
     "description": "Related bookmarks section label in context menu",
     "message": "Lesezeichen"
   },
+  "domainRecommendedPages": { "message": "Häufig besuchte Seiten" },
   "showOpenTabsInQuickUrlMenu": {
     "description": "Show open tabs in quick URL context menu setting title",
     "message": "Geöffnete Tabs im Schnell-URL-Menü anzeigen"
@@ -199,6 +194,10 @@
   "showOpenTabsInQuickUrlMenuDescription": {
     "description": "Show open tabs in quick URL context menu setting description",
     "message": "Zugehörige geöffnete Tabs beim Rechtsklick auf Schnell-URL-Elemente anzeigen."
+  },
+  "showRecentPages": { "message": "Zuletzt genutzte Seiten anzeigen" },
+  "showRecentPagesDescription": {
+    "message": "Vorschläge aus dem Browserverlauf auf der Seite für neue Tabs anzeigen."
   },
   "relatedOpenTabs": {
     "description": "Related open tabs section label in context menu",
@@ -231,6 +230,10 @@
   "searchInDomain": {
     "description": "Search in domain placeholder",
     "message": "In dieser Domain suchen..."
+  },
+  "clearSearch": {
+    "description": "Clear search button aria label",
+    "message": "Suche löschen"
   },
   "wallpaperUrl": {
     "description": "Wallpaper URL setting title",
@@ -664,6 +667,15 @@
     "description": "Delete",
     "message": "Löschen"
   },
+  "deleteQuickItemConfirm": {
+    "description": "Quick-link deletion confirmation title",
+    "message": "„$NAME$“ löschen?",
+    "placeholders": { "name": { "content": "$1", "example": "Github" } }
+  },
+  "deleteQuickItemWarning": { "message": "Dieser Vorgang kann nicht rückgängig gemacht werden." },
+  "confirm": { "message": "Bestätigen" },
+  "cancel": { "message": "Abbrechen" },
+  "close": { "message": "Schließen" },
   "onboardingTitle": {
     "description": "Onboarding dialog title",
     "message": "Willkommen bei NextTab"

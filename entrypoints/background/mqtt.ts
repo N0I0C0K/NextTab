@@ -105,6 +105,9 @@ export function startMqttService() {
   })
 
   const heartBeatEvent = mqttProvider.getOrCreateTopicEvent<MqttBasePayload>('heart-beat')
+  heartBeatEvent.subscribe(payload => {
+    console.log('MQTT heart-beat received:', payload)
+  })
 
   // Drink water event handler - defined before usage
   const drinkWaterEvent = mqttProvider.getOrCreateTopicEvent<MqttBasePayload>('drink-water')
@@ -134,7 +137,9 @@ export function startMqttService() {
       if (!mqttProvider.connected) {
         return
       }
-      await heartBeatEvent.emit(payloadBuilder.buildPayload({}))
+      const payload = payloadBuilder.buildPayload({})
+      await heartBeatEvent.emit(payload)
+      console.log('MQTT heart-beat sent:', payload)
     }
   })
 

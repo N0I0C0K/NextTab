@@ -1,4 +1,5 @@
 import { Button } from '@/components/shared'
+import { t } from '@/utils/i18n'
 import type { FC, ReactElement } from 'react'
 import { createContext, useCallback, useContext } from 'react'
 
@@ -15,9 +16,9 @@ const RenderDefaultConfirmDialog: FC<{
   return (
     <div className="flex w-full flex-row-reverse gap-3">
       <Button variant={'secondary'} onClick={onConfirm}>
-        Yes
+        {t('confirm')}
       </Button>
-      <Button onClick={onCancel}>No</Button>
+      <Button onClick={onCancel}>{t('cancel')}</Button>
     </div>
   )
 }
@@ -58,6 +59,7 @@ export interface GlobalDialogInnerProps {
   showElement?: ReactElement
   title?: string
   description?: string
+  /** Classes for the outer DialogContent, including responsive sizing. */
   className?: string
   open: boolean
 }

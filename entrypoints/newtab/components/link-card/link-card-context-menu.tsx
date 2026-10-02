@@ -12,6 +12,7 @@ import type { GlobalDialogProps } from '@/entrypoints/newtab/providers'
 import { Pencil, Trash, History } from 'lucide-react'
 import { t } from '@/utils/i18n'
 import type { ReactNode } from 'react'
+import type { RecentPage } from '../../recent-page-recommendations'
 import { DomainHistoryDialog } from './domain-history-dialog'
 
 interface LinkCardContextMenuContentProps {
@@ -22,6 +23,7 @@ interface LinkCardContextMenuContentProps {
   showBookmarks: boolean
   relatedTabs: chrome.tabs.Tab[]
   showOpenTabs: boolean
+  recommendedPages: RecentPage[]
   globalDialog: GlobalDialogProps
 }
 
@@ -48,6 +50,7 @@ export const LinkCardContextMenuContent = ({
   showBookmarks,
   relatedTabs,
   showOpenTabs,
+  recommendedPages,
   globalDialog,
 }: LinkCardContextMenuContentProps): ReactNode => {
   return (
@@ -79,7 +82,12 @@ export const LinkCardContextMenuContent = ({
         IconType={History}
         onClick={() => {
           const domain = getDomainFromUrl(url)
-          globalDialog.show(<DomainHistoryDialog domain={domain} />, t('domainHistory'), undefined)
+          globalDialog.show(
+            <DomainHistoryDialog domain={domain} />,
+            t('domainHistory'),
+            undefined,
+            'w-[calc(100%-2rem)] sm:max-w-4xl max-h-[calc(100dvh-2rem)] gap-5 p-5 sm:p-6',
+          )
         }}>
         {t('viewRecentHistory')}
       </ContextMenuItemWitchIcon>
@@ -88,13 +96,47 @@ export const LinkCardContextMenuContent = ({
         className="text-red-800"
         IconType={Trash}
         onClick={() => {
-          globalDialog.confirm(`Continue delete ${title}?`, 'Delete can not recover', () => {
+          globalDialog.confirm(t('deleteQuickItemConfirm', title), t('deleteQuickItemWarning'), () => {
             removeQuickUrlById(id)
             globalDialog.close()
           })
         }}>
         {t('deleteQuickItem')}
       </ContextMenuItemWitchIcon>
+
+      {recommendedPages.length > 0 && (
+        <>
+          <ContextMenuSeparator />
+          <ContextMenuGroup>
+            <ContextMenuLabel>{t('domainRecommendedPages')}</ContextMenuLabel>
+            {recommendedPages.map(page => (
+              <ContextMenuItem
+                key={page.url}
+                data-testid="domain-recommended-page"
+                className="flex min-w-0 items-center gap-2"
+                onClick={event => {
+                  if (event.ctrlKey || event.metaKey) {
+                    void chrome.tabs.create({ url: page.url, active: true })
+                  } else {
+                    void chrome.tabs.update({ url: page.url })
+                  }
+                }}>
+                <img
+                  src={getDefaultIconUrl(page.url)}
+                  alt=""
+                  className="size-4 shrink-0 rounded-sm"
+                  onError={event => {
+                    event.currentTarget.style.display = 'none'
+                  }}
+                />
+                <span className="min-w-0 flex-1 truncate" title={`${page.title}\n${page.url}`}>
+                  {page.title}
+                </span>
+              </ContextMenuItem>
+            ))}
+          </ContextMenuGroup>
+        </>
+      )}
 
       {/* Related Bookmarks Section */}
       {showBookmarks && relatedBookmarks.length > 0 && (

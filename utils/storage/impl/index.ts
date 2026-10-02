@@ -1,6 +1,5 @@
 export * from './exampleThemeStorage'
 export * from './quickUrlStorage'
-export * from './historySuggestStorage'
 export * from './settingsStorage'
 export * from './mqtt-state-storage'
 export * from './dataExportImport'

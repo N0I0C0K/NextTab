@@ -2,7 +2,7 @@
 
 ## Architecture Overview
 
-This is a **Chrome extension** built as a **pnpm monorepo** using **Turbo** for orchestration. The extension replaces the new tab page with a customizable start interface featuring search, quick links, history suggestions, and MQTT-based event notifications.
+This is a **Chrome extension** built as a **pnpm monorepo** using **Turbo** for orchestration. The extension replaces the new tab page with a customizable start interface featuring search, quick links, history search, and MQTT-based event notifications.
 
 ### Monorepo Structure
 
@@ -70,7 +70,7 @@ pnpm update-version 1.2.3 # Update version in all packages
 All storage uses custom wrappers from `@extension/storage`:
 
 ```typescript
-import { settingStorage, quickUrlStorage, historySuggestStorage } from '@extension/storage'
+import { settingStorage, quickUrlStorage } from '@extension/storage'
 import { useStorage } from '@extension/shared'
 
 // In React components

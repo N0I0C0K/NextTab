@@ -8,6 +8,8 @@
     "message": "NextTab"
   },
   "quickLinksHeading": { "message": "常用網站" },
+  "recentPagesHeading": { "message": "最近常用" },
+  "recentPagesSource": { "message": "自動更新" },
   "sortQuickLinks": { "message": "排序" },
   "sortQuickLinksManual": { "message": "原始順序" },
   "sortQuickLinksAlphabetical": { "message": "依字母排序" },
@@ -144,14 +146,6 @@
     "description": "Theme setting description",
     "message": "切換深色/淺色主題。"
   },
-  "historySuggestion": {
-    "description": "History suggestion setting title",
-    "message": "歷史建議"
-  },
-  "historySuggestionDescription": {
-    "description": "History suggestion setting description",
-    "message": "使用歷史記錄進行推薦。"
-  },
   "autoFocusCommandInput": {
     "description": "Auto focus command input setting title",
     "message": "自動聚焦命令輸入"
@@ -192,6 +186,7 @@
     "description": "Related bookmarks section label in context menu",
     "message": "收藏"
   },
+  "domainRecommendedPages": { "message": "常去頁面" },
   "showOpenTabsInQuickUrlMenu": {
     "description": "Show open tabs in quick URL context menu setting title",
     "message": "在快捷連結選單中顯示開啟的頁面"
@@ -200,6 +195,8 @@
     "description": "Show open tabs in quick URL context menu setting description",
     "message": "右鍵快捷連結時顯示相關開啟的標籤頁。"
   },
+  "showRecentPages": { "message": "顯示最近常用" },
+  "showRecentPagesDescription": { "message": "在新分頁顯示根據最近瀏覽紀錄產生的推薦入口。" },
   "relatedOpenTabs": {
     "description": "Related open tabs section label in context menu",
     "message": "標籤頁"
@@ -231,6 +228,10 @@
   "searchInDomain": {
     "description": "Search in domain placeholder",
     "message": "在此域名下搜尋..."
+  },
+  "clearSearch": {
+    "description": "Clear search button aria label",
+    "message": "清空搜尋"
   },
   "wallpaperUrl": {
     "description": "Wallpaper URL setting title",
@@ -664,6 +665,15 @@
     "description": "Delete",
     "message": "刪除"
   },
+  "deleteQuickItemConfirm": {
+    "description": "Quick-link deletion confirmation title",
+    "message": "刪除「$NAME$」？",
+    "placeholders": { "name": { "content": "$1", "example": "Github" } }
+  },
+  "deleteQuickItemWarning": { "message": "刪除後無法復原。" },
+  "confirm": { "message": "確認" },
+  "cancel": { "message": "取消" },
+  "close": { "message": "關閉" },
   "onboardingTitle": {
     "description": "Onboarding dialog title",
     "message": "歡迎使用 NextTab"

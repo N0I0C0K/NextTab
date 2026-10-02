@@ -22,11 +22,11 @@ const mqttSettingSchema = z
   .partial()
 
 const settingsSchema = z.object({
-  useHistorySuggestion: z.boolean().optional(),
   autoFocusCommandInput: z.boolean().optional(),
   doubleClickBackgroundFocusCommand: z.boolean().optional(),
   showBookmarksInQuickUrlMenu: z.boolean().optional(),
   showOpenTabsInQuickUrlMenu: z.boolean().optional(),
+  showRecentPages: z.boolean().optional(),
   quickUrlSortMode: z.union([z.literal('manual'), z.literal('alphabetical')]).optional(),
   bookmarkFolderId: z.string().nullable().optional(),
   wallpaperUrl: z.string().nullable().optional(),
@@ -86,7 +86,7 @@ function formatZodError(error: z.ZodError): string {
  * Export all user data as JSON and download it
  */
 export async function exportAllData(): Promise<void> {
-  const settings = await settingStorage.getValue()
+  const settings = settingsSchema.parse(await settingStorage.getValue())
   const quickUrls = await quickUrlItemsStorage.getValue()
   const theme = await exampleThemeStorage.getValue()
   const commandSettings = await commandSettingsStorage.getValue()
