@@ -47,7 +47,7 @@ export const OnboardingDialog: FC = () => {
         if (nextOpen) setOpen(true)
       }}>
       <DialogContent
-        className="w-[calc(100vw-32px)] max-w-[36rem] max-h-[90vh] overflow-y-auto flex flex-col rounded-xl"
+        className="w-[calc(100vw-32px)] max-w-[36rem] overflow-y-auto flex flex-col rounded-xl"
         showCloseButton={false}>
         <DialogHeader className="sr-only">
           <DialogTitle>{t('onboardingTitle')}</DialogTitle>

@@ -13,7 +13,7 @@ export const test = base.extend<ExtensionFixtures>({
   extensionLocale: ['en-US', { option: true }],
   missingMessages: [[], { option: true }],
   // Playwright requires the first fixture argument to use object destructuring.
-  context: async ({ extensionLocale, missingMessages }, use, testInfo) => {
+  context: async ({ headless, extensionLocale, missingMessages }, use, testInfo) => {
     let extensionPath = path.resolve(import.meta.dirname, '../.output/chrome-mv3-test')
     if (missingMessages.length > 0) {
       const staleExtensionPath = testInfo.outputPath('stale-locales-extension')
@@ -29,6 +29,7 @@ export const test = base.extend<ExtensionFixtures>({
     }
     const context = await chromium.launchPersistentContext('', {
       channel: 'chromium',
+      headless,
       locale: extensionLocale,
       viewport: { width: 1440, height: 1000 },
       args: [

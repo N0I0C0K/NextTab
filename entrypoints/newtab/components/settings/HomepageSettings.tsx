@@ -1,7 +1,8 @@
 import { useStorage } from '@/utils'
-import { settingStorage, updateSettings } from '@/utils/storage'
+import { settingStorage, updateSettings, returnPagePreferencesStorage } from '@/utils/storage'
 import { Stack, Text, Switch, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/shared'
 import { Bookmark, NotebookTabs, Folder, History } from 'lucide-react'
+import { Button } from '@/components/shared'
 import type { FC } from 'react'
 import { useEffect, useState } from 'react'
 import { t } from '@/utils/i18n'
@@ -52,11 +53,39 @@ export const HomepageSettings: FC = () => {
         {t('configureHomepageSettings')}
       </Text>
       <SettingItem
+        IconClass={History}
+        title={t('showReturnPages')}
+        description={t('showReturnPagesDescription')}
+        control={
+          <Switch
+            data-testid="show-return-pages"
+            aria-label={t('showReturnPages')}
+            checked={settings.showRecentPages ?? true}
+            onCheckedChange={value => updateSettings({ showRecentPages: value })}
+          />
+        }
+      />
+      <SettingItem
+        IconClass={History}
+        title={t('resetReturnPages')}
+        description={t('resetReturnPagesDescription')}
+        control={
+          <Button
+            variant="outline"
+            size="sm"
+            data-testid="reset-return-pages"
+            onClick={() => returnPagePreferencesStorage.setValue({ hiddenUrls: [], excludedHosts: [] })}>
+            {t('resetAction')}
+          </Button>
+        }
+      />
+      <SettingItem
         IconClass={Bookmark}
         title={t('showBookmarksInQuickUrlMenu')}
         description={t('showBookmarksInQuickUrlMenuDescription')}
         control={
           <Switch
+            aria-label={t('showBookmarksInQuickUrlMenu')}
             checked={settings.showBookmarksInQuickUrlMenu}
             onCheckedChange={val => updateSettings({ showBookmarksInQuickUrlMenu: val })}
           />
@@ -93,20 +122,9 @@ export const HomepageSettings: FC = () => {
         description={t('showOpenTabsInQuickUrlMenuDescription')}
         control={
           <Switch
+            aria-label={t('showOpenTabsInQuickUrlMenu')}
             checked={settings.showOpenTabsInQuickUrlMenu}
             onCheckedChange={val => updateSettings({ showOpenTabsInQuickUrlMenu: val })}
-          />
-        }
-      />
-      <SettingItem
-        IconClass={History}
-        title={t('showRecentPages')}
-        description={t('showRecentPagesDescription')}
-        control={
-          <Switch
-            aria-label={t('showRecentPages')}
-            checked={settings.showRecentPages !== false}
-            onCheckedChange={val => updateSettings({ showRecentPages: val })}
           />
         }
       />

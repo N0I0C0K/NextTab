@@ -7,19 +7,45 @@
     "description": "Extension name",
     "message": "NextTab"
   },
-  "quickLinksHeading": { "message": "常用網站" },
-  "recentPagesHeading": { "message": "最近常用" },
-  "recentPagesSource": { "message": "自動更新" },
-  "sortQuickLinks": { "message": "排序" },
-  "sortQuickLinksManual": { "message": "原始順序" },
-  "sortQuickLinksAlphabetical": { "message": "依字母排序" },
-  "addSite": { "message": "新增網站" },
-  "addQuickLinkTitle": { "message": "新增常用網站" },
-  "addQuickLinkDescription": { "message": "將常用網站放到新分頁，一鍵即可開啟。" },
-  "siteName": { "message": "網站名稱" },
-  "siteNameDescription": { "message": "顯示在新分頁上的名稱。" },
-  "websiteUrl": { "message": "網站網址" },
-  "emptyQuickLinks": { "message": "還沒有常用網站，新增一個開始使用吧。" },
+  "quickLinksHeading": {
+    "message": "常用網站"
+  },
+  "recentPagesHeading": {
+    "message": "最近常用"
+  },
+  "recentPagesSource": {
+    "message": "自動更新"
+  },
+  "sortQuickLinks": {
+    "message": "排序"
+  },
+  "sortQuickLinksManual": {
+    "message": "原始順序"
+  },
+  "sortQuickLinksAlphabetical": {
+    "message": "依字母排序"
+  },
+  "addSite": {
+    "message": "新增網站"
+  },
+  "addQuickLinkTitle": {
+    "message": "新增常用網站"
+  },
+  "addQuickLinkDescription": {
+    "message": "將常用網站放到新分頁，一鍵即可開啟。"
+  },
+  "siteName": {
+    "message": "網站名稱"
+  },
+  "siteNameDescription": {
+    "message": "顯示在新分頁上的名稱。"
+  },
+  "websiteUrl": {
+    "message": "網站網址"
+  },
+  "emptyQuickLinks": {
+    "message": "還沒有常用網站，新增一個開始使用吧。"
+  },
   "toggleTheme": {
     "message": "切換主題"
   },
@@ -186,7 +212,9 @@
     "description": "Related bookmarks section label in context menu",
     "message": "收藏"
   },
-  "domainRecommendedPages": { "message": "常去頁面" },
+  "domainRecommendedPages": {
+    "message": "常去頁面"
+  },
   "showOpenTabsInQuickUrlMenu": {
     "description": "Show open tabs in quick URL context menu setting title",
     "message": "在快捷連結選單中顯示開啟的頁面"
@@ -195,8 +223,12 @@
     "description": "Show open tabs in quick URL context menu setting description",
     "message": "右鍵快捷連結時顯示相關開啟的標籤頁。"
   },
-  "showRecentPages": { "message": "顯示最近常用" },
-  "showRecentPagesDescription": { "message": "在新分頁顯示根據最近瀏覽紀錄產生的推薦入口。" },
+  "showRecentPages": {
+    "message": "顯示最近常用"
+  },
+  "showRecentPagesDescription": {
+    "message": "在新分頁顯示根據最近瀏覽紀錄產生的推薦入口。"
+  },
   "relatedOpenTabs": {
     "description": "Related open tabs section label in context menu",
     "message": "標籤頁"
@@ -668,12 +700,25 @@
   "deleteQuickItemConfirm": {
     "description": "Quick-link deletion confirmation title",
     "message": "刪除「$NAME$」？",
-    "placeholders": { "name": { "content": "$1", "example": "Github" } }
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Github"
+      }
+    }
   },
-  "deleteQuickItemWarning": { "message": "刪除後無法復原。" },
-  "confirm": { "message": "確認" },
-  "cancel": { "message": "取消" },
-  "close": { "message": "關閉" },
+  "deleteQuickItemWarning": {
+    "message": "刪除後無法復原。"
+  },
+  "confirm": {
+    "message": "確認"
+  },
+  "cancel": {
+    "message": "取消"
+  },
+  "close": {
+    "message": "關閉"
+  },
   "onboardingTitle": {
     "description": "Onboarding dialog title",
     "message": "歡迎使用 NextTab"
@@ -821,5 +866,276 @@
   "mqttPermissionDescription": {
     "description": "Description for MQTT broker permission",
     "message": "需要授權才能連線到 MQTT 伺服器"
+  },
+  "returnPagesHeading": {
+    "message": "回到頁面"
+  },
+  "returnRecent": {
+    "message": "最近回訪"
+  },
+  "returnFrequent": {
+    "message": "最近常用"
+  },
+  "returnRecentRules": {
+    "message": "結合最近 7 天每天的進入次數、單次停留中位數、累計前景停留和活躍天數計分，每天的貢獻分別衰減後相加。次數和時長使用對數增長，不設最低門檻或上限。目前仍有開啟分頁的頁面，使用分乘以 1.3，同路徑多個分頁只乘一次。沒有前景記錄的基礎分為 0，乘後仍為 0，同分依最近造訪排序。"
+  },
+  "returnFrequentRules": {
+    "message": "選取最近 30 個自然日造訪過的頁面；先依造訪天數，再依最近造訪時間排序。"
+  },
+  "returnCommonRules": {
+    "message": "同一網站的相同路徑合併為一條，忽略查詢參數和片段。使用者主動隱藏的頁面或不推薦的網站不再顯示。"
+  },
+  "returnSelectionRules": {
+    "message": "網頁選取規則"
+  },
+  "returnCloseTab": {
+    "message": "關閉分頁"
+  },
+  "returnTabClosed": {
+    "message": "已關閉分頁"
+  },
+  "returnCloseTabFailed": {
+    "message": "無法關閉分頁，請重試。"
+  },
+  "returnRecentEmpty": {
+    "message": "最近 7 天沒有可返回的頁面。"
+  },
+  "returnFrequentEmpty": {
+    "message": "還沒有在多天造訪過的頁面。"
+  },
+  "returnHistoryError": {
+    "message": "無法讀取頁面紀錄，請重新開啟頁面或切換來源重試。"
+  },
+  "returnViewAll": {
+    "message": "查看全部"
+  },
+  "returnExportEvents": {
+    "message": "匯出事件記錄"
+  },
+  "returnExportingEvents": {
+    "message": "正在匯出…"
+  },
+  "returnExportEventsFailed": {
+    "message": "匯出事件記錄失敗，請重試。"
+  },
+  "returnPagination": {
+    "message": "頁面清單分頁"
+  },
+  "returnPreviousPage": {
+    "message": "上一頁"
+  },
+  "returnNextPage": {
+    "message": "下一頁"
+  },
+  "returnPageRange": {
+    "message": "$1–$2 筆，共 $3 筆"
+  },
+  "returnSwitchTab": {
+    "message": "切換至分頁"
+  },
+  "returnOpenPage": {
+    "message": "開啟頁面"
+  },
+  "returnCopyLink": {
+    "message": "複製連結"
+  },
+  "returnDetails": {
+    "message": "詳細資訊"
+  },
+  "returnRefreshFailed": {
+    "message": "無法更新推薦，仍顯示上一次結果。"
+  },
+  "returnDetailsDescription": {
+    "message": "查看此頁面的造訪和前景使用紀錄。"
+  },
+  "returnDetailsForeground": {
+    "message": "最近 7 天的前景使用"
+  },
+  "returnDetailsViews": {
+    "message": "查看次數"
+  },
+  "returnDetailsSwitches": {
+    "message": "分頁啟用次數"
+  },
+  "returnDetailsTotalTime": {
+    "message": "累計前景停留"
+  },
+  "returnDetailsMedianTime": {
+    "message": "典型單次停留（中位數）"
+  },
+  "returnDetailsActiveDays": {
+    "message": "活躍天數"
+  },
+  "returnDetailsLastUsed": {
+    "message": "最近使用"
+  },
+  "returnDetailsActivityError": {
+    "message": "暫時無法讀取停留紀錄，請關閉後重試。"
+  },
+  "returnDetailsNoActivity": {
+    "message": "尚無前景使用紀錄。"
+  },
+  "returnDetailsHistory": {
+    "message": "近 $VALUE$ 天的瀏覽紀錄",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
+  },
+  "returnDetailsHistoryVisits": {
+    "message": "造訪次數"
+  },
+  "returnDetailsLastVisit": {
+    "message": "最近造訪"
+  },
+  "returnDetailsHistoryLimited": {
+    "message": "同一路徑合併查詢參數和片段；造訪紀錄包含重新整理，不包含僅切回已開啟分頁。紀錄較多，次數可能不完整。"
+  },
+  "returnDetailsHistoryNote": {
+    "message": "同一路徑合併查詢參數和片段。造訪次數可能包含重新整理，不包含僅切回已開啟分頁。"
+  },
+  "returnDetailsHistoryError": {
+    "message": "暫時無法讀取瀏覽紀錄，請關閉後重試。"
+  },
+  "returnDetailsAsOf": {
+    "message": "統計截至 $VALUE$",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
+  },
+  "returnLinkCopied": {
+    "message": "已複製連結"
+  },
+  "returnCopyFailed": {
+    "message": "無法複製連結"
+  },
+  "returnVisitDays": {
+    "message": "近 30 天造訪 $VALUE$ 天",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
+  },
+  "returnJustNow": {
+    "message": "剛剛"
+  },
+  "returnAlreadyOpen": {
+    "message": "已開啟"
+  },
+  "returnSaved": {
+    "message": "已儲存"
+  },
+  "returnOpenFailed": {
+    "message": "無法開啟頁面，請重試。"
+  },
+  "returnPageActions": {
+    "message": "更多操作：$VALUE$",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
+  },
+  "returnHidePage": {
+    "message": "隱藏這個頁面"
+  },
+  "returnExcludeSite": {
+    "message": "不再推薦這個網站"
+  },
+  "returnHidden": {
+    "message": "已隱藏頁面"
+  },
+  "returnExcluded": {
+    "message": "已排除這個網站的推薦"
+  },
+  "undoAction": {
+    "message": "復原"
+  },
+  "showReturnPages": {
+    "message": "回到頁面"
+  },
+  "showReturnPagesDescription": {
+    "message": "顯示最近造訪或常用的具體頁面，最多四條，隨視窗高度調整。紀錄保留在目前瀏覽器 Profile 內。"
+  },
+  "resetReturnPages": {
+    "message": "重設頁面推薦"
+  },
+  "resetReturnPagesDescription": {
+    "message": "允許已隱藏的頁面與已排除的網站重新出現在推薦中。"
+  },
+  "resetAction": {
+    "message": "重設"
+  },
+  "returnAllDescription": {
+    "message": "搜尋此列表，切換到已開分頁，或開啟頁面。"
+  },
+  "chooseOpenTab": {
+    "message": "選擇已開分頁"
+  },
+  "chooseOpenTabDescription": {
+    "message": "這個頁面在多個分頁中開啟，請選擇要返回的分頁。"
+  },
+  "tabWindow": {
+    "message": "視窗 $VALUE$",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
+  },
+  "tabPosition": {
+    "message": "分頁 $VALUE$",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
+  },
+  "expandSitePages": {
+    "message": "展開 $VALUE$ 的頁面",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
+  },
+  "siteOpenCount": {
+    "message": "已開啟 $VALUE$ 個分頁",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
+  },
+  "siteOneOpenTab": {
+    "message": "已開啟 1 個分頁"
+  },
+  "siteSavedPages": {
+    "message": "已儲存的頁面"
+  },
+  "siteRecentPages": {
+    "message": "最近造訪"
+  },
+  "sitePagesEmpty": {
+    "message": "還沒有這個網站的相關頁面。"
+  },
+  "siteOpenHome": {
+    "message": "開啟網站"
+  },
+  "returnToSitePages": {
+    "message": "返回網站頁面"
+  },
+  "returnDetailsUsageHelp": {
+    "message": "使用紀錄說明"
+  },
+  "returnDetailsHistoryHelp": {
+    "message": "瀏覽紀錄說明"
+  },
+  "returnDetailsActivityNote": {
+    "message": "重新進入或切回分頁都會獨立記錄，包含短暫停留；視窗失焦或切開期間不計時。僅重疊停留合併去重，跨午夜的停留分配到各天。記錄從啟用此功能後開始，瀏覽歷史無法還原前景停留。"
   }
 }

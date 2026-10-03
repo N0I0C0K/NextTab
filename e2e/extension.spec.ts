@@ -166,11 +166,12 @@ test('settings navigation and cards stay aligned while long descriptions remain 
   }
 
   const cards = page.getByTestId('homepage-settings').locator('.nt-setting-item')
-  await expect(cards).toHaveCount(4)
+  await expect(cards).toHaveCount(5)
   const heights = await cards.evaluateAll(elements => elements.map(element => element.getBoundingClientRect().height))
   expect(Math.max(...heights) - Math.min(...heights)).toBeLessThan(2)
 
-  const description = cards.nth(1).locator('.nt-setting-description')
+  const folderCard = page.getByTestId('homepage-settings').locator('.nt-setting-item-stacked')
+  const description = folderCard.locator('.nt-setting-description')
   const fullDescription = await description.getAttribute('aria-label')
   expect(fullDescription?.length).toBeGreaterThan(30)
   await description.hover()
@@ -180,8 +181,8 @@ test('settings navigation and cards stay aligned while long descriptions remain 
   await expect(page.locator('[data-slot="tooltip-content"]')).toHaveText(fullDescription!)
 
   await page.setViewportSize({ width: 390, height: 844 })
-  const cardBounds = await cards.nth(1).boundingBox()
-  const selectBounds = await cards.nth(1).locator('[data-slot="select-trigger"]').boundingBox()
+  const cardBounds = await folderCard.boundingBox()
+  const selectBounds = await folderCard.locator('[data-slot="select-trigger"]').boundingBox()
   expect(cardBounds).not.toBeNull()
   expect(selectBounds).not.toBeNull()
   expect(cardBounds!.x + cardBounds!.width).toBeLessThanOrEqual(390)
@@ -244,8 +245,8 @@ test('homepage settings persist after reload', async ({ page, extensionId }) => 
 
   const switches = page.getByTestId('homepage-settings').getByRole('switch')
   await expect(switches).toHaveCount(3)
-  await switches.nth(0).click()
   await switches.nth(1).click()
+  await switches.nth(2).click()
 
   await expect
     .poll(() => readExtensionStorage<Record<string, boolean>>(page, SETTINGS_KEY))
@@ -257,8 +258,8 @@ test('homepage settings persist after reload', async ({ page, extensionId }) => 
   await page.reload()
   await openSettings(page)
   const persistedSwitches = page.getByTestId('homepage-settings').getByRole('switch')
-  await expect(persistedSwitches.nth(0)).toHaveAttribute('aria-checked', 'false')
   await expect(persistedSwitches.nth(1)).toHaveAttribute('aria-checked', 'false')
+  await expect(persistedSwitches.nth(2)).toHaveAttribute('aria-checked', 'false')
 })
 
 test('appearance keeps the theme readable without a wallpaper', async ({ page, extensionId }) => {
@@ -650,15 +651,15 @@ test('quick link rows stay aligned and reorder across responsive layouts', async
     [1440, 3],
     [800, 3],
     [640, 2],
-    [390, 1],
-    [320, 1],
+    [390, 2],
+    [320, 2],
   ]) {
     await page.setViewportSize({ width, height: 1000 })
     const layout = await page.evaluate(() => {
       const grid = document.querySelector<HTMLElement>('.nt-links-grid')!
       const card = document.querySelector<HTMLElement>('.nt-link')!
       const icon = document.querySelector<HTMLElement>('.nt-link-icon')!
-      const label = document.querySelector<HTMLElement>('.nt-link-label')!
+      const label = document.querySelector<HTMLElement>('.nt-link-copy')!
       const gridRect = grid.getBoundingClientRect()
       const cardRect = card.getBoundingClientRect()
       const iconRect = icon.getBoundingClientRect()
@@ -677,7 +678,7 @@ test('quick link rows stay aligned and reorder across responsive layouts', async
     expect(Math.abs(layout.gridInset)).toBeLessThan(2)
     expect(layout.iconCenterOffset).toBeLessThan(2)
     expect(layout.labelCenterOffset).toBeLessThan(2)
-    expect(layout.cardHeight).toBe(60)
+    expect(layout.cardHeight).toBe(64)
     expect(layout.horizontalOverflow).toBe(false)
     expect(layout.shortcutVisible).toBe(width > 360)
   }

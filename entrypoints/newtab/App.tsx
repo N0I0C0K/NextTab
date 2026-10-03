@@ -1,12 +1,13 @@
 import './App.css'
-import { useEffect, useRef, useState } from 'react'
+import { Suspense, useEffect, useRef, useState } from 'react'
 import { CommandModule, SettingPanel, ScrollLinkCardPage, OnboardingDialog, AddButton } from './components'
 import type { CommandModuleRef } from './components/command'
 import { useStorage } from '@/utils'
 import { settingStorage } from '@/utils/storage'
 import { t } from '@/utils/i18n'
 import { QuickLinkSortMenu } from './components/link-card/quick-link-sort-menu'
-import { RecentPages } from './components/recent-pages'
+import { ReturnPagesSection } from './components/return-pages'
+import { useOpenTabs } from './hooks/useOpenTabs'
 
 function TimeDisplay() {
   const [time, setTime] = useState(() => new Date())
@@ -20,10 +21,10 @@ function TimeDisplay() {
   return (
     <div className="nt-time-block">
       <time className="nt-clock" dateTime={time.toTimeString().slice(0, 5)}>
-        {time.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', hour12: false })}
+        {time.toLocaleTimeString(chrome.i18n.getUILanguage(), { hour: '2-digit', minute: '2-digit', hour12: false })}
       </time>
       <p className="nt-date">
-        {time.toLocaleDateString(undefined, { month: 'long', day: 'numeric', weekday: 'long' })}
+        {time.toLocaleDateString(chrome.i18n.getUILanguage(), { month: 'long', day: 'numeric', weekday: 'long' })}
       </p>
     </div>
   )
@@ -32,6 +33,7 @@ function TimeDisplay() {
 export default function NewTab() {
   const settings = useStorage(settingStorage)
   const commandRef = useRef<CommandModuleRef>(null)
+  const tabs = useOpenTabs((settings.showRecentPages ?? true) || settings.showOpenTabsInQuickUrlMenu)
 
   return (
     <div
@@ -54,7 +56,11 @@ export default function NewTab() {
         <section className="nt-search-section" aria-label={t('searchCommandPlaceholder')}>
           <CommandModule ref={commandRef} className="nt-command" />
         </section>
-        {settings.showRecentPages !== false && <RecentPages />}
+        {(settings.showRecentPages ?? true) && (
+          <Suspense fallback={null}>
+            <ReturnPagesSection tabs={tabs} />
+          </Suspense>
+        )}
         <section className="nt-links-section" aria-labelledby="nt-links-title">
           <div className="nt-section-heading">
             <h2 id="nt-links-title">{t('quickLinksHeading')}</h2>
@@ -63,7 +69,7 @@ export default function NewTab() {
               <AddButton />
             </div>
           </div>
-          <ScrollLinkCardPage />
+          <ScrollLinkCardPage tabs={tabs} />
         </section>
       </main>
       <OnboardingDialog />
