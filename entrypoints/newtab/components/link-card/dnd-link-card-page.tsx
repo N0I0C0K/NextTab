@@ -12,7 +12,8 @@ import { t } from '@/utils/i18n'
 
 export const DndLinkCardPage: FC<{
   className?: string
-}> = ({ className }) => {
+  tabs?: chrome.tabs.Tab[]
+}> = ({ className, tabs = [] }) => {
   const userStorageItems = useStorage(quickUrlItemsStorage)
   const settings = useStorage(settingStorage)
   const canReorder = (settings.quickUrlSortMode ?? 'manual') === 'manual'
@@ -56,6 +57,7 @@ export const DndLinkCardPage: FC<{
             index={index}
             canReorder={canReorder}
             selected={selectedIndex === index}
+            tabs={tabs}
           />
         ))}
       </div>

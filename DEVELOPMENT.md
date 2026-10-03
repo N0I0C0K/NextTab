@@ -23,6 +23,7 @@ pnpm lint
 pnpm format
 pnpm test            # Vitest 单元测试
 pnpm test:e2e        # 构建后用 Playwright 测试真实 Chromium 扩展
+pnpm test:perf       # 生产构建 + 推荐与长列表性能测量（原速／6 倍 CPU 降速）
 pnpm build
 pnpm build:firefox
 pnpm zip
@@ -37,6 +38,14 @@ pnpm exec playwright install chromium
 ```
 
 ## 项目结构
+
+界面实现遵循 [界面设计要求](doc/DESIGN_REQUIREMENTS.md)，包括说明默认收起、信息按钮交互和页面详情的数据口径。
+
+推荐计算、日志存储与长列表的复杂度和测量边界见 [推荐性能评估](doc/RECOMMENDATION_PERFORMANCE.md)。
+
+性能复测流程已固化为项目 skill：[nexttab-performance](.agents/skills/nexttab-performance/SKILL.md)。可运行 `pnpm test:perf <唯一标签>` 保留独立测量结果，覆盖评分、真实 IndexedDB 和大量标签结果下的生产界面。
+
+代码审查流程见 [nexttab-code-review](.agents/skills/nexttab-code-review/SKILL.md)：检查正确性、事件竞态、数据隔离和失败恢复，按授权修复并复核；复杂度取舍另用 [ponytail-review](.agents/skills/ponytail-review/SKILL.md)。
 
 ```text
 entrypoints/          WXT 入口：background、newtab、popup
@@ -77,3 +86,34 @@ React 组件用 `useStorage(item)` 订阅。涉及“读取后更新”的业务
 - CI 会运行单测、Chrome E2E 和 Firefox 构建。
 
 代码使用 TypeScript、Tailwind CSS、shadcn/ui 和 Prettier；提交前建议运行 `pnpm check`。
+
+## 推荐日志排查
+
+开发／测试构建中，“回到页面”标题右侧有“导出事件日志”按钮。点击下载 `nexttab-events-<时间>.json`，包含当前 Profile 保留的完整页面映射、原始事件、活动 view、统计时刻、当前打开页面 `openTabs` 和评分参数；记录按既有 10 天／2 MiB 规则保留。`openTabs` 用于复现 1.3 的打开标签系数；旧导出缺少此字段时只能回放使用分。生产构建不显示此入口。
+
+开发／测试构建的 Console 中，`[NextTab:return-pages]` 分为评分和显示两个阶段。评分日志包含最多 5 个候选和最近最多 5 个无可配对记录的页面，检查 `reason`、`rawSegments`、`mergedViews`、`observed`、`lastEvent` 和 `breakdown.days` 的每日贡献及衰减；候选的 `usageScore` 是使用分，`openTabMultiplier` 是本次打开状态的系数（打开 1.3、关闭 1），`score` 是最终排序分。显示阶段只应用用户隐藏页面和排除站点的偏好，不再过滤已保存网站首页。评分公式见 [界面设计要求](doc/DESIGN_REQUIREMENTS.md#推荐评分)。
+
+需要核对原始进入／离开事件时，在扩展新标签页的 DevTools Console 中执行以下代码。替换 `target` 为待排查的页面地址，按站点和路径匹配；结果复制到剪贴板，只包含该页面的事件。不要把完整 Profile 的事件加入自动 Console 输出。
+
+```js
+{
+  const target = new URL('https://github.com/N0I0C0K')
+  const s = await chrome.runtime.sendMessage({ type: 'nexttab:page-activity-snapshot' })
+  if (!s?.pages || !s?.events) throw new Error('未取得日志快照')
+  const page = s.pages.find(p => p.key === `${target.origin}${target.pathname}`)
+  copy(
+    JSON.stringify(
+      {
+        now: s.now,
+        activeViewId: s.activeViewId,
+        page: page ?? null,
+        events: page ? s.events.filter(e => e.pageId === page.id) : [],
+      },
+      null,
+      2,
+    ),
+  )
+}
+```
+
+快照请求会校正当前前台状态；它不会清空或改写已有事件。推荐日志只展示筛选后的摘要，不能据此推断未输出的页面没有被记录。

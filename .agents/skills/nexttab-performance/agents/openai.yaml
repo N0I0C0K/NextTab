@@ -1,0 +1,4 @@
+interface:
+  display_name: 'NextTab Performance'
+  short_description: 'Benchmark NextTab scoring, event storage and browser UI'
+  default_prompt: 'Use $nexttab-performance to benchmark the current recommendation changes and explain the results and measurement limits.'

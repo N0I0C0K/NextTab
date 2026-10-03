@@ -172,6 +172,8 @@ export const useKeyboardNavigation = ({ items, enabled, containerRef }: UseKeybo
   // Using a combined handler to reduce duplication
   const handleArrowKey = useCallback(
     (e: KeyboardEvent, direction: 'up' | 'down' | 'left' | 'right') => {
+      const target = e.target as HTMLElement
+      if (target.closest('button, a, [role="dialog"], [role="menu"]')) return
       e.preventDefault()
       handleNavigation(direction)
     },
@@ -188,6 +190,7 @@ export const useKeyboardNavigation = ({ items, enabled, containerRef }: UseKeybo
   useHotkeys(
     'Enter',
     e => {
+      if ((e.target as HTMLElement).closest('button, a, [role="dialog"], [role="menu"]')) return
       if (selectedIndex !== -1) {
         e.preventDefault()
         handleEnter()

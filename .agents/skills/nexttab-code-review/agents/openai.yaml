@@ -1,0 +1,4 @@
+interface:
+  display_name: 'NextTab Code Review'
+  short_description: 'Review NextTab correctness, races and failure recovery'
+  default_prompt: 'Use $nexttab-code-review to review the current changes, report evidence-backed findings, and apply fixes only when authorized.'

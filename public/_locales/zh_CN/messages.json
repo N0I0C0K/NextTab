@@ -7,19 +7,45 @@
     "description": "Extension name",
     "message": "NextTab"
   },
-  "quickLinksHeading": { "message": "常用网站" },
-  "recentPagesHeading": { "message": "最近常用" },
-  "recentPagesSource": { "message": "自动更新" },
-  "sortQuickLinks": { "message": "排序" },
-  "sortQuickLinksManual": { "message": "原始顺序" },
-  "sortQuickLinksAlphabetical": { "message": "按字母排序" },
-  "addSite": { "message": "添加网站" },
-  "addQuickLinkTitle": { "message": "添加常用网站" },
-  "addQuickLinkDescription": { "message": "把常用网站放到新标签页，一键即可打开。" },
-  "siteName": { "message": "网站名称" },
-  "siteNameDescription": { "message": "显示在新标签页上的名称。" },
-  "websiteUrl": { "message": "网站地址" },
-  "emptyQuickLinks": { "message": "还没有常用网站，添加一个开始使用吧。" },
+  "quickLinksHeading": {
+    "message": "常用网站"
+  },
+  "recentPagesHeading": {
+    "message": "最近常用"
+  },
+  "recentPagesSource": {
+    "message": "自动更新"
+  },
+  "sortQuickLinks": {
+    "message": "排序"
+  },
+  "sortQuickLinksManual": {
+    "message": "原始顺序"
+  },
+  "sortQuickLinksAlphabetical": {
+    "message": "按字母排序"
+  },
+  "addSite": {
+    "message": "添加网站"
+  },
+  "addQuickLinkTitle": {
+    "message": "添加常用网站"
+  },
+  "addQuickLinkDescription": {
+    "message": "把常用网站放到新标签页，一键即可打开。"
+  },
+  "siteName": {
+    "message": "网站名称"
+  },
+  "siteNameDescription": {
+    "message": "显示在新标签页上的名称。"
+  },
+  "websiteUrl": {
+    "message": "网站地址"
+  },
+  "emptyQuickLinks": {
+    "message": "还没有常用网站，添加一个开始使用吧。"
+  },
   "toggleTheme": {
     "message": "切换主题"
   },
@@ -186,7 +212,9 @@
     "description": "Related bookmarks section label in context menu",
     "message": "收藏"
   },
-  "domainRecommendedPages": { "message": "常去页面" },
+  "domainRecommendedPages": {
+    "message": "常去页面"
+  },
   "showOpenTabsInQuickUrlMenu": {
     "description": "Show open tabs in quick URL context menu setting title",
     "message": "在快捷链接菜单中显示打开的页面"
@@ -195,8 +223,12 @@
     "description": "Show open tabs in quick URL context menu setting description",
     "message": "右键快捷链接时显示相关打开的标签页。"
   },
-  "showRecentPages": { "message": "显示最近常用" },
-  "showRecentPagesDescription": { "message": "在新标签页显示根据最近浏览记录生成的推荐入口。" },
+  "showRecentPages": {
+    "message": "显示最近常用"
+  },
+  "showRecentPagesDescription": {
+    "message": "在新标签页显示根据最近浏览记录生成的推荐入口。"
+  },
   "relatedOpenTabs": {
     "description": "Related open tabs section label in context menu",
     "message": "标签页"
@@ -668,12 +700,25 @@
   "deleteQuickItemConfirm": {
     "description": "Quick-link deletion confirmation title",
     "message": "删除“$NAME$”？",
-    "placeholders": { "name": { "content": "$1", "example": "Github" } }
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Github"
+      }
+    }
   },
-  "deleteQuickItemWarning": { "message": "删除后无法恢复。" },
-  "confirm": { "message": "确认" },
-  "cancel": { "message": "取消" },
-  "close": { "message": "关闭" },
+  "deleteQuickItemWarning": {
+    "message": "删除后无法恢复。"
+  },
+  "confirm": {
+    "message": "确认"
+  },
+  "cancel": {
+    "message": "取消"
+  },
+  "close": {
+    "message": "关闭"
+  },
   "onboardingTitle": {
     "description": "Onboarding dialog title",
     "message": "欢迎使用 NextTab"
@@ -821,5 +866,276 @@
   "mqttPermissionDescription": {
     "description": "Description for MQTT broker permission",
     "message": "需要授权才能连接 MQTT 服务器"
+  },
+  "returnPagesHeading": {
+    "message": "回到页面"
+  },
+  "returnRecent": {
+    "message": "最近回访"
+  },
+  "returnFrequent": {
+    "message": "最近常用"
+  },
+  "returnRecentRules": {
+    "message": "结合最近 7 天每天的进入次数、单次停留中位数、累计前台停留和活跃天数计分，每天的贡献分别衰减后相加。次数和时长使用对数增长，不设最低门槛或上限。当前仍有打开标签的页面，使用分乘以 1.3，同路径多个标签只乘一次。没有前台记录的基础分为 0，乘后仍为 0，同分按最近访问排序。"
+  },
+  "returnFrequentRules": {
+    "message": "选取最近 30 个自然日访问过的页面；先按访问天数，再按最近访问时间排序。"
+  },
+  "returnCommonRules": {
+    "message": "同一网站的相同路径合并为一条，忽略查询参数和片段。用户主动隐藏的页面或不推荐的网站不再展示。"
+  },
+  "returnSelectionRules": {
+    "message": "网页选取规则"
+  },
+  "returnCloseTab": {
+    "message": "关闭标签页"
+  },
+  "returnTabClosed": {
+    "message": "已关闭标签页"
+  },
+  "returnCloseTabFailed": {
+    "message": "无法关闭标签页，请重试。"
+  },
+  "returnRecentEmpty": {
+    "message": "最近 7 天没有可返回的页面。"
+  },
+  "returnFrequentEmpty": {
+    "message": "还没有在多天访问过的页面。"
+  },
+  "returnHistoryError": {
+    "message": "无法读取页面记录，请重新打开页面或切换来源重试。"
+  },
+  "returnViewAll": {
+    "message": "查看全部"
+  },
+  "returnExportEvents": {
+    "message": "导出事件日志"
+  },
+  "returnExportingEvents": {
+    "message": "正在导出…"
+  },
+  "returnExportEventsFailed": {
+    "message": "导出事件日志失败，请重试。"
+  },
+  "returnPagination": {
+    "message": "页面列表分页"
+  },
+  "returnPreviousPage": {
+    "message": "上一页"
+  },
+  "returnNextPage": {
+    "message": "下一页"
+  },
+  "returnPageRange": {
+    "message": "$1–$2 条，共 $3 条"
+  },
+  "returnSwitchTab": {
+    "message": "切换至标签"
+  },
+  "returnOpenPage": {
+    "message": "打开页面"
+  },
+  "returnCopyLink": {
+    "message": "复制链接"
+  },
+  "returnDetails": {
+    "message": "详细信息"
+  },
+  "returnRefreshFailed": {
+    "message": "未能更新推荐，仍展示上一次结果。"
+  },
+  "returnDetailsDescription": {
+    "message": "查看这个页面的访问和前台使用记录。"
+  },
+  "returnDetailsForeground": {
+    "message": "最近 7 天的前台使用"
+  },
+  "returnDetailsViews": {
+    "message": "查看次数"
+  },
+  "returnDetailsSwitches": {
+    "message": "标签激活次数"
+  },
+  "returnDetailsTotalTime": {
+    "message": "累计前台停留"
+  },
+  "returnDetailsMedianTime": {
+    "message": "典型单次停留（中位数）"
+  },
+  "returnDetailsActiveDays": {
+    "message": "活跃天数"
+  },
+  "returnDetailsLastUsed": {
+    "message": "最近使用"
+  },
+  "returnDetailsActivityError": {
+    "message": "暂时无法读取停留记录，请关闭后重试。"
+  },
+  "returnDetailsNoActivity": {
+    "message": "尚无前台使用记录。"
+  },
+  "returnDetailsHistory": {
+    "message": "近 $VALUE$ 天的浏览记录",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
+  },
+  "returnDetailsHistoryVisits": {
+    "message": "访问次数"
+  },
+  "returnDetailsLastVisit": {
+    "message": "最近访问"
+  },
+  "returnDetailsHistoryLimited": {
+    "message": "同一路径合并查询参数和片段；访问记录包含刷新，不包含仅切回已有标签。记录较多，次数可能不完整。"
+  },
+  "returnDetailsHistoryNote": {
+    "message": "同一路径合并查询参数和片段。访问次数可能包含刷新，不包含仅切回已有标签。"
+  },
+  "returnDetailsHistoryError": {
+    "message": "暂时无法读取浏览记录，请关闭后重试。"
+  },
+  "returnDetailsAsOf": {
+    "message": "统计截至 $VALUE$",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
+  },
+  "returnLinkCopied": {
+    "message": "已复制链接"
+  },
+  "returnCopyFailed": {
+    "message": "未能复制链接"
+  },
+  "returnVisitDays": {
+    "message": "近 30 天访问 $VALUE$ 天",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
+  },
+  "returnJustNow": {
+    "message": "刚刚"
+  },
+  "returnAlreadyOpen": {
+    "message": "已打开"
+  },
+  "returnSaved": {
+    "message": "已保存"
+  },
+  "returnOpenFailed": {
+    "message": "无法打开页面，请重试。"
+  },
+  "returnPageActions": {
+    "message": "更多操作：$VALUE$",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
+  },
+  "returnHidePage": {
+    "message": "隐藏这个页面"
+  },
+  "returnExcludeSite": {
+    "message": "不再推荐这个网站"
+  },
+  "returnHidden": {
+    "message": "已隐藏页面"
+  },
+  "returnExcluded": {
+    "message": "已排除这个网站的推荐"
+  },
+  "undoAction": {
+    "message": "撤销"
+  },
+  "showReturnPages": {
+    "message": "回到页面"
+  },
+  "showReturnPagesDescription": {
+    "message": "显示最近访问或常用的具体页面，最多四条，随窗口高度调整。记录保留在当前浏览器 Profile 内。"
+  },
+  "resetReturnPages": {
+    "message": "重置页面推荐"
+  },
+  "resetReturnPagesDescription": {
+    "message": "允许已隐藏的页面和已排除的网站重新出现在推荐中。"
+  },
+  "resetAction": {
+    "message": "重置"
+  },
+  "returnAllDescription": {
+    "message": "搜索此列表，切换到已开标签，或打开页面。"
+  },
+  "chooseOpenTab": {
+    "message": "选择已开标签"
+  },
+  "chooseOpenTabDescription": {
+    "message": "这个页面在多个标签中打开，请选择要返回的标签。"
+  },
+  "tabWindow": {
+    "message": "窗口 $VALUE$",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
+  },
+  "tabPosition": {
+    "message": "标签 $VALUE$",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
+  },
+  "expandSitePages": {
+    "message": "展开 $VALUE$ 的页面",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
+  },
+  "siteOpenCount": {
+    "message": "已打开 $VALUE$ 个标签页",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
+  },
+  "siteOneOpenTab": {
+    "message": "已打开 1 个标签页"
+  },
+  "siteSavedPages": {
+    "message": "已保存的页面"
+  },
+  "siteRecentPages": {
+    "message": "最近访问"
+  },
+  "sitePagesEmpty": {
+    "message": "还没有这个网站的相关页面。"
+  },
+  "siteOpenHome": {
+    "message": "打开网站"
+  },
+  "returnToSitePages": {
+    "message": "返回站点页面"
+  },
+  "returnDetailsUsageHelp": {
+    "message": "使用记录说明"
+  },
+  "returnDetailsHistoryHelp": {
+    "message": "浏览记录说明"
+  },
+  "returnDetailsActivityNote": {
+    "message": "重新进入或切回标签都会独立记录，包含短暂停留；窗口失焦或切开期间不计时。仅重叠停留合并去重，跨午夜的停留分配到各天。记录从启用此功能后开始，浏览器历史无法还原前台停留。"
   }
 }

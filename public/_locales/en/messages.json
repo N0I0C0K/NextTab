@@ -7,19 +7,45 @@
     "description": "Extension name",
     "message": "NextTab"
   },
-  "quickLinksHeading": { "message": "Quick links" },
-  "recentPagesHeading": { "message": "Recently used" },
-  "recentPagesSource": { "message": "Updates automatically" },
-  "sortQuickLinks": { "message": "Sort" },
-  "sortQuickLinksManual": { "message": "Original order" },
-  "sortQuickLinksAlphabetical": { "message": "Alphabetical" },
-  "addSite": { "message": "Add site" },
-  "addQuickLinkTitle": { "message": "Add a quick link" },
-  "addQuickLinkDescription": { "message": "Keep a frequently used website one click away." },
-  "siteName": { "message": "Site name" },
-  "siteNameDescription": { "message": "The name shown on your new tab." },
-  "websiteUrl": { "message": "Website URL" },
-  "emptyQuickLinks": { "message": "No quick links yet. Add a site to get started." },
+  "quickLinksHeading": {
+    "message": "Quick links"
+  },
+  "recentPagesHeading": {
+    "message": "Recently used"
+  },
+  "recentPagesSource": {
+    "message": "Updates automatically"
+  },
+  "sortQuickLinks": {
+    "message": "Sort"
+  },
+  "sortQuickLinksManual": {
+    "message": "Original order"
+  },
+  "sortQuickLinksAlphabetical": {
+    "message": "Alphabetical"
+  },
+  "addSite": {
+    "message": "Add site"
+  },
+  "addQuickLinkTitle": {
+    "message": "Add a quick link"
+  },
+  "addQuickLinkDescription": {
+    "message": "Keep a frequently used website one click away."
+  },
+  "siteName": {
+    "message": "Site name"
+  },
+  "siteNameDescription": {
+    "message": "The name shown on your new tab."
+  },
+  "websiteUrl": {
+    "message": "Website URL"
+  },
+  "emptyQuickLinks": {
+    "message": "No quick links yet. Add a site to get started."
+  },
   "toggleTheme": {
     "message": "Toggle theme"
   },
@@ -186,7 +212,9 @@
     "description": "Related bookmarks section label in context menu",
     "message": "Bookmarks"
   },
-  "domainRecommendedPages": { "message": "Frequently visited pages" },
+  "domainRecommendedPages": {
+    "message": "Frequently visited pages"
+  },
   "showOpenTabsInQuickUrlMenu": {
     "description": "Show open tabs in quick URL context menu setting title",
     "message": "Show Open Tabs in Quick URL Menu"
@@ -195,8 +223,12 @@
     "description": "Show open tabs in quick URL context menu setting description",
     "message": "Display related open tabs when right-clicking quick URL items."
   },
-  "showRecentPages": { "message": "Show recently used sites" },
-  "showRecentPagesDescription": { "message": "Show new tab suggestions based on recent browsing history." },
+  "showRecentPages": {
+    "message": "Show recently used sites"
+  },
+  "showRecentPagesDescription": {
+    "message": "Show new tab suggestions based on recent browsing history."
+  },
   "relatedOpenTabs": {
     "description": "Related open tabs section label in context menu",
     "message": "Tabs"
@@ -668,12 +700,25 @@
   "deleteQuickItemConfirm": {
     "description": "Quick-link deletion confirmation title",
     "message": "Delete \"$NAME$\"?",
-    "placeholders": { "name": { "content": "$1", "example": "Github" } }
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Github"
+      }
+    }
   },
-  "deleteQuickItemWarning": { "message": "This cannot be undone." },
-  "confirm": { "message": "Confirm" },
-  "cancel": { "message": "Cancel" },
-  "close": { "message": "Close" },
+  "deleteQuickItemWarning": {
+    "message": "This cannot be undone."
+  },
+  "confirm": {
+    "message": "Confirm"
+  },
+  "cancel": {
+    "message": "Cancel"
+  },
+  "close": {
+    "message": "Close"
+  },
   "onboardingTitle": {
     "description": "Onboarding dialog title",
     "message": "Welcome to NextTab"
@@ -821,5 +866,276 @@
   "mqttPermissionDescription": {
     "description": "Description for MQTT broker permission",
     "message": "Authorization required to connect to MQTT server"
+  },
+  "returnPagesHeading": {
+    "message": "Return to a page"
+  },
+  "returnRecent": {
+    "message": "Recent revisits"
+  },
+  "returnFrequent": {
+    "message": "Frequently visited"
+  },
+  "returnRecentRules": {
+    "message": "Scores use each day’s entries, median and total foreground time, and active days in the last 7 days. Daily contributions decay separately and are added together. Counts and durations grow logarithmically, without thresholds or caps. Pages still open in a tab have their usage score multiplied by 1.3, once per website and path. Pages without foreground records stay at 0; ties use the most recent visit."
+  },
+  "returnFrequentRules": {
+    "message": "Pages visited in the last 30 calendar days, sorted by days visited, then by most recent visit."
+  },
+  "returnCommonRules": {
+    "message": "Pages on the same website and path are combined, ignoring query parameters and fragments. Pages you hide and websites you exclude are omitted."
+  },
+  "returnSelectionRules": {
+    "message": "Page selection rules"
+  },
+  "returnCloseTab": {
+    "message": "Close tab"
+  },
+  "returnTabClosed": {
+    "message": "Tab closed"
+  },
+  "returnCloseTabFailed": {
+    "message": "Couldn't close the tab. Please try again."
+  },
+  "returnRecentEmpty": {
+    "message": "No pages to return to from the last 7 days."
+  },
+  "returnFrequentEmpty": {
+    "message": "No pages visited on multiple days yet."
+  },
+  "returnHistoryError": {
+    "message": "Couldn't load page records. Reopen the page or switch sources to retry."
+  },
+  "returnViewAll": {
+    "message": "View all"
+  },
+  "returnExportEvents": {
+    "message": "Export event logs"
+  },
+  "returnExportingEvents": {
+    "message": "Exporting…"
+  },
+  "returnExportEventsFailed": {
+    "message": "Couldn't export event logs. Please try again."
+  },
+  "returnPagination": {
+    "message": "Page navigation"
+  },
+  "returnPreviousPage": {
+    "message": "Previous page"
+  },
+  "returnNextPage": {
+    "message": "Next page"
+  },
+  "returnPageRange": {
+    "message": "$1–$2 of $3"
+  },
+  "returnSwitchTab": {
+    "message": "Switch to tab"
+  },
+  "returnOpenPage": {
+    "message": "Open page"
+  },
+  "returnCopyLink": {
+    "message": "Copy link"
+  },
+  "returnDetails": {
+    "message": "Page details"
+  },
+  "returnRefreshFailed": {
+    "message": "Couldn't update recommendations. Previous results are still shown."
+  },
+  "returnDetailsDescription": {
+    "message": "View this page's visits and foreground usage records."
+  },
+  "returnDetailsForeground": {
+    "message": "Foreground use in the last 7 days"
+  },
+  "returnDetailsViews": {
+    "message": "Views"
+  },
+  "returnDetailsSwitches": {
+    "message": "Tab activations"
+  },
+  "returnDetailsTotalTime": {
+    "message": "Total foreground time"
+  },
+  "returnDetailsMedianTime": {
+    "message": "Typical view duration (median)"
+  },
+  "returnDetailsActiveDays": {
+    "message": "Active days"
+  },
+  "returnDetailsLastUsed": {
+    "message": "Last used"
+  },
+  "returnDetailsActivityError": {
+    "message": "Foreground records are temporarily unavailable. Close and reopen to retry."
+  },
+  "returnDetailsNoActivity": {
+    "message": "No foreground records are available yet."
+  },
+  "returnDetailsHistory": {
+    "message": "Browsing records from the last $VALUE$ days",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
+  },
+  "returnDetailsHistoryVisits": {
+    "message": "Visits"
+  },
+  "returnDetailsLastVisit": {
+    "message": "Last visited"
+  },
+  "returnDetailsHistoryLimited": {
+    "message": "Query and fragment variants of this path are combined. Visits may include reloads, but not simply returning to an open tab. The history limit was reached, so counts may be incomplete."
+  },
+  "returnDetailsHistoryNote": {
+    "message": "Query and fragment variants of this path are combined. Visits may include reloads, but not simply returning to an open tab."
+  },
+  "returnDetailsHistoryError": {
+    "message": "Browser history is temporarily unavailable. Close and reopen to retry."
+  },
+  "returnDetailsAsOf": {
+    "message": "Statistics as of $VALUE$",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
+  },
+  "returnLinkCopied": {
+    "message": "Link copied"
+  },
+  "returnCopyFailed": {
+    "message": "Couldn't copy the link"
+  },
+  "returnVisitDays": {
+    "message": "Visited on $VALUE$ days in the last 30 days",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
+  },
+  "returnJustNow": {
+    "message": "Just now"
+  },
+  "returnAlreadyOpen": {
+    "message": "Already open"
+  },
+  "returnSaved": {
+    "message": "Saved"
+  },
+  "returnOpenFailed": {
+    "message": "Couldn't open this page. Please try again."
+  },
+  "returnPageActions": {
+    "message": "More actions for $VALUE$",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
+  },
+  "returnHidePage": {
+    "message": "Hide this page"
+  },
+  "returnExcludeSite": {
+    "message": "Don't suggest this website"
+  },
+  "returnHidden": {
+    "message": "Page hidden"
+  },
+  "returnExcluded": {
+    "message": "Website excluded from suggestions"
+  },
+  "undoAction": {
+    "message": "Undo"
+  },
+  "showReturnPages": {
+    "message": "Return to a page"
+  },
+  "showReturnPagesDescription": {
+    "message": "Show up to four recent or frequently visited pages, adapting to the window height. Records stay in this browser profile."
+  },
+  "resetReturnPages": {
+    "message": "Reset page suggestions"
+  },
+  "resetReturnPagesDescription": {
+    "message": "Allow hidden pages and excluded websites to appear in suggestions again."
+  },
+  "resetAction": {
+    "message": "Reset"
+  },
+  "returnAllDescription": {
+    "message": "Search this list, switch to an open tab, or open a page."
+  },
+  "chooseOpenTab": {
+    "message": "Choose an open tab"
+  },
+  "chooseOpenTabDescription": {
+    "message": "This page is open in several tabs. Choose which one to return to."
+  },
+  "tabWindow": {
+    "message": "Window $VALUE$",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
+  },
+  "tabPosition": {
+    "message": "Tab $VALUE$",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
+  },
+  "expandSitePages": {
+    "message": "Show pages from $VALUE$",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
+  },
+  "siteOpenCount": {
+    "message": "$VALUE$ open tabs",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
+  },
+  "siteOneOpenTab": {
+    "message": "1 open tab"
+  },
+  "siteSavedPages": {
+    "message": "Saved pages"
+  },
+  "siteRecentPages": {
+    "message": "Recently visited"
+  },
+  "sitePagesEmpty": {
+    "message": "No related pages for this website yet."
+  },
+  "siteOpenHome": {
+    "message": "Open website"
+  },
+  "returnToSitePages": {
+    "message": "Back to website pages"
+  },
+  "returnDetailsUsageHelp": {
+    "message": "About usage records"
+  },
+  "returnDetailsHistoryHelp": {
+    "message": "About browsing records"
+  },
+  "returnDetailsActivityNote": {
+    "message": "Reopening or returning to a tab is recorded independently, including brief views. Time away from the tab or an unfocused browser window is excluded. Only overlapping stays are combined; stays crossing midnight are split by day. Collection starts when this feature is enabled; browser history cannot reconstruct foreground time."
   }
 }
