@@ -1,4 +1,5 @@
 import { startMqttService } from './mqtt'
+import { startPageActivityService } from './page-activity'
 
 export default defineBackground({
   type: 'module',
@@ -10,6 +11,7 @@ export default defineBackground({
       console.log('background script unload was canceled')
     })
 
+    startPageActivityService()
     startMqttService()
   },
 })
