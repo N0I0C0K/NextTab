@@ -505,28 +505,27 @@ test('return pages stay before horizontal sites and adapt to the real viewport',
     [900, 550, 'short'],
   ] as const) {
     await page.setViewportSize({ width, height })
-    await expect
-      .poll(async () =>
-        page.evaluate(() => {
-          const section = document.querySelector<HTMLElement>('.nt-return-section')!
-          const sites = document.querySelector<HTMLElement>('.nt-links-section')!
-          const firstSite = document.querySelector<HTMLElement>('.nt-link')!
-          const rows = document.querySelectorAll('[data-home-return-row][data-visible="true"]')
-          return {
-            count: rows.length,
-            ordered: section.getBoundingClientRect().bottom < sites.getBoundingClientRect().top,
-            overflow: document.documentElement.scrollWidth > innerWidth,
-            siteBottom: firstSite.getBoundingClientRect().bottom,
-          }
-        }),
-      )
-      .toMatchObject({ ordered: true, overflow: false })
-    const count = await visibleRows(page).count()
-    expect(count).toBeGreaterThanOrEqual(1)
-    expect(count).toBeLessThanOrEqual(4)
-    if (height <= 550) expect(count).toBeLessThan(4)
-    const firstSite = await page.getByTestId('quick-link-card').first().boundingBox()
-    if (count > 1) expect(firstSite!.y + firstSite!.height).toBeLessThanOrEqual(height)
+    // Resizing schedules the row fitting on the next frame. Check the fitted layout too.
+    await expect(async () => {
+      const layout = await page.evaluate(() => {
+        const section = document.querySelector<HTMLElement>('.nt-return-section')!
+        const sites = document.querySelector<HTMLElement>('.nt-links-section')!
+        const firstSite = document.querySelector<HTMLElement>('.nt-link')!
+        const rows = document.querySelectorAll('[data-home-return-row][data-visible="true"]')
+        return {
+          count: rows.length,
+          ordered: section.getBoundingClientRect().bottom < sites.getBoundingClientRect().top,
+          overflow: document.documentElement.scrollWidth > innerWidth,
+          siteBottom: firstSite.getBoundingClientRect().bottom,
+        }
+      })
+      expect(layout.ordered).toBe(true)
+      expect(layout.overflow).toBe(false)
+      expect(layout.count).toBeGreaterThanOrEqual(1)
+      expect(layout.count).toBeLessThanOrEqual(4)
+      if (height <= 550) expect(layout.count).toBeLessThan(4)
+      if (layout.count > 1) expect(layout.siteBottom).toBeLessThanOrEqual(height)
+    }).toPass({ timeout: 5000 })
     await page.screenshot({ path: test.info().outputPath(`return-${label}.png`), fullPage: true })
   }
   await page.setViewportSize({ width: 1440, height: 900 })
@@ -1057,7 +1056,9 @@ test('domain history keeps the focused search field outside its scrolling list',
   await dialog.getByRole('button', { name: 'View Recent History', exact: true }).click()
   const input = dialog.getByRole('textbox')
   const list = dialog.locator('.nt-site-pages-body')
-  await input.focus()
+  // Clicking waits for the history view to settle after its focused footer button unmounts.
+  await input.click()
+  await expect(input).toBeFocused()
   await expect(list.getByRole('textbox')).toHaveCount(0)
   for (const viewport of [
     { width: 1440, height: 1000 },

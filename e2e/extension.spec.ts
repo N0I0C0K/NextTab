@@ -285,9 +285,10 @@ test('theme setting card opens its menu on the first press', async ({ page, exte
   await page.getByTestId('settings-tab-appearance').click()
 
   const trigger = page.getByTestId('theme-toggle')
+  // The previous tab panel stays mounted until Base UI finishes its closing frame.
+  await expect.poll(async () => (await trigger.boundingBox())?.width ?? 0).toBeGreaterThan(300)
   const bounds = await trigger.boundingBox()
   expect(bounds).not.toBeNull()
-  expect(bounds!.width).toBeGreaterThan(300)
   const centerX = bounds!.x + bounds!.width / 2
   const centerY = bounds!.y + bounds!.height / 2
   await page.mouse.move(centerX, centerY)
