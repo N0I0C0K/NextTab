@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type RefObject } from 'react'
 import { ArrowLeft, ArrowUpRight, History } from 'lucide-react'
-import { Dialog, DialogContent, DialogDescription, DialogTitle, Input } from '@/components/shared'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Input } from '@/components/shared'
 import { useStorage } from '@/utils'
 import { quickUrlItemsStorage, settingStorage } from '@/utils/storage'
 import { t } from '@/utils/i18n'
@@ -142,16 +142,18 @@ export function SitePagesDialog({
         data-history-view={historyView ? 'true' : 'false'}
         initialFocus={titleRef}
         finalFocus={finalFocus}>
-        <DialogTitle
-          render={
-            <h2 ref={titleRef} tabIndex={-1}>
-              {title}
-            </h2>
-          }
-          className="outline-none">
-          {title}
-        </DialogTitle>
-        <DialogDescription>{host}</DialogDescription>
+        <DialogHeader>
+          <DialogTitle
+            render={
+              <h2 ref={titleRef} tabIndex={-1}>
+                {title}
+              </h2>
+            }
+            className="leading-tight outline-none">
+            {title}
+          </DialogTitle>
+          <DialogDescription>{host}</DialogDescription>
+        </DialogHeader>
         {historyView && (
           <div className="nt-site-history-toolbar">
             <button className="nt-view-all" type="button" onClick={() => setHistoryView(false)}>

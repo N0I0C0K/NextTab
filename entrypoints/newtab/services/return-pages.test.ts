@@ -3,10 +3,13 @@ import type { ActivitySnapshot } from '@/utils/page-activity/model'
 import type { ActivityScoreDiagnostic } from '@/utils/page-activity/scoring'
 import {
   buildReturnPages,
+  buildVisitedPages,
   fetchReturnPages,
   filterReturnPages,
+  groupPageTabs,
   isReturnablePage,
   logReturnPageDisplay,
+  matchingPageTabs,
   normalizePageUrl,
   OPEN_TAB_MULTIPLIER,
   rankRecentPages,
@@ -380,6 +383,79 @@ describe('return pages', () => {
     expect(await fetchReturnPages('recent')).toHaveLength(1)
     expect(getVisits).not.toHaveBeenCalled()
   })
+
+  it('orders recently visited pages by their latest logged enter without scoring or recommendation filters', async () => {
+    vi.spyOn(Date, 'now').mockReturnValue(now)
+    vi.spyOn(console, 'info').mockImplementation(() => {})
+    const urls = ['old', 'long-usage', 'closed', 'active', 'unvisited'].map(path => `https://site.example/${path}`)
+    const snapshot: ActivitySnapshot = {
+      now,
+      bytes: 0,
+      activeViewId: 'active',
+      pages: urls.map((url, index) => ({ id: index + 1, key: url, url, title: url })),
+      events: [
+        { id: 1, viewId: 'old', pageId: 1, type: 'enter', at: ago(9), source: 'tab' },
+        { id: 2, viewId: 'long', pageId: 2, type: 'enter', at: now - 3600_000, source: 'tab' },
+        { id: 3, viewId: 'closed', pageId: 3, type: 'enter', at: now - 2000, source: 'tab' },
+        { id: 4, viewId: 'closed', pageId: 3, type: 'leave', at: now - 1900, source: 'tab' },
+        { id: 5, viewId: 'active', pageId: 4, type: 'enter', at: now - 1000, source: 'window' },
+        { id: 6, viewId: 'long', pageId: 2, type: 'leave', at: now - 500, source: 'window' },
+        { id: 7, viewId: 'older-closed', pageId: 3, type: 'enter', at: ago(1), source: 'tab' },
+      ],
+    }
+    const search = vi.fn().mockResolvedValue([history('https://site.example/history-only')])
+    const getVisits = vi.fn()
+    const sendMessage = vi.fn().mockResolvedValue(snapshot)
+    const query = vi.fn()
+    vi.stubGlobal('chrome', {
+      extension: { inIncognitoContext: false },
+      history: { search, getVisits },
+      runtime: { sendMessage },
+      tabs: { query },
+    })
+    const pages = await fetchReturnPages('history')
+    expect(pages.map(page => page.url)).toEqual([urls[3], urls[2], urls[1], urls[0]])
+    expect(pages).toEqual(buildVisitedPages(snapshot))
+    expect(sendMessage).toHaveBeenCalledWith({ type: 'nexttab:page-activity-snapshot', incognito: false })
+    expect(search).not.toHaveBeenCalled()
+    expect(getVisits).not.toHaveBeenCalled()
+    expect(query).not.toHaveBeenCalled()
+    expect(pages.every(page => !page.usage && !page.openTabMultiplier && !page.rankingScore)).toBe(true)
+    expect(filterReturnPages(pages, { hiddenUrls: [pages[0].url], excludedHosts: ['site.example'] }, 'history')).toBe(
+      pages,
+    )
+    logReturnPageDisplay('history', pages, { hiddenUrls: [pages[0].url], excludedHosts: ['site.example'] }, 4)
+    const report = JSON.parse(vi.mocked(console.info).mock.calls[1][1])
+    expect(report).toMatchObject({ includedCount: pages.length, excludedCount: 0 })
+  })
+
+  it('matches history rows by their full URL while recommendations still match paths', async () => {
+    const first = 'https://site.example/page?id=1#intro'
+    const second = 'https://site.example/page?id=2#intro'
+    const tabs = [tab(first), tab(second), tab('file:///C:/example/report.html')]
+    vi.stubGlobal('chrome', {
+      tabs: { query: vi.fn().mockResolvedValue(tabs), getCurrent: vi.fn().mockResolvedValue(undefined) },
+    })
+    expect(groupPageTabs(tabs, true).get(first)).toEqual([tabs[0]])
+    expect(groupPageTabs(tabs, true).get('file:///C:/example/report.html')).toEqual([tabs[2]])
+    expect(await matchingPageTabs(first, true)).toEqual([tabs[0]])
+    expect(await matchingPageTabs(first)).toEqual(tabs.slice(0, 2))
+  })
+
+  it.each([undefined, { pages: [] }, new Error('Activity log unavailable')])(
+    'reports an unavailable event log instead of falling back to browser history (%s)',
+    async result => {
+      const sendMessage =
+        result instanceof Error ? vi.fn().mockRejectedValue(result) : vi.fn().mockResolvedValue(result)
+      const search = vi.fn().mockResolvedValue([history('https://site.example/history-only')])
+      vi.stubGlobal('chrome', {
+        history: { search },
+        runtime: { sendMessage },
+      })
+      await expect(fetchReturnPages('history')).rejects.toThrow('Activity log unavailable')
+      expect(search).not.toHaveBeenCalled()
+    },
+  )
 
   it('compacts lifetime visit records to in-window days without changing cross-variant ranking', async () => {
     vi.spyOn(Date, 'now').mockReturnValue(now)

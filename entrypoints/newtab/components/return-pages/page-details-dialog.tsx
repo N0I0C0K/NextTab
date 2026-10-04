@@ -126,7 +126,11 @@ export function PageDetailsDialog({
           }
         }}
         initialFocus={titleRef}
-        finalFocus={finalFocus}>
+        finalFocus={() => {
+          // Base UI restores focus without scrolling; a resized parent list may clip its target.
+          finalFocus.current?.scrollIntoView({ block: 'nearest', inline: 'nearest' })
+          return finalFocus.current
+        }}>
         <DialogTitle
           render={
             <h2 ref={titleRef} tabIndex={-1} className="outline-none">

@@ -29,6 +29,7 @@ export function PageRow({
   matchingTabs,
   frequent = false,
   feedback = false,
+  exactUrl = false,
   tabId,
   onTabClosed,
 }: {
@@ -37,6 +38,7 @@ export function PageRow({
   matchingTabs: chrome.tabs.Tab[]
   frequent?: boolean
   feedback?: boolean
+  exactUrl?: boolean
   tabId?: number
   onTabClosed?: (tabId: number) => void
 }) {
@@ -48,7 +50,8 @@ export function PageRow({
   const moreRef = useRef<HTMLButtonElement>(null)
   const [closingTab, setClosingTab] = useState(false)
   const normalized = normalizePageUrl(page.url)!
-  const host = new URL(page.url).hostname
+  const parsedUrl = new URL(page.url)
+  const host = parsedUrl.hostname || parsedUrl.protocol
   const openedTab = tabId === undefined ? undefined : matchingTabs.find(tab => tab.id === tabId)
   const isOpen = tabId === undefined ? matchingTabs.length > 0 : !!openedTab
   const action = t(isOpen ? 'returnSwitchTab' : 'returnOpenPage')
@@ -60,7 +63,9 @@ export function PageRow({
         return
       }
       // Resolve at click time, so a tab closed since the snapshot does not break the action.
-      const matches = (await matchingPageTabs(page.url)).filter(tab => tabId === undefined || tab.id === tabId)
+      const matches = (await matchingPageTabs(page.url, exactUrl)).filter(
+        tab => tabId === undefined || tab.id === tabId,
+      )
       if (matches.length > 1) setChoices(matches)
       else if (matches.length) await switchToPageTab(matches[0])
       else await chrome.tabs.update({ url: page.url })
@@ -127,8 +132,11 @@ export function PageRow({
             {action} <ArrowUpRight size={14} />
           </span>
         </TooltipTrigger>
-        <TooltipContent className="max-w-sm flex-col items-start gap-1 break-words">
+        <TooltipContent
+          className="flex-col items-start gap-1 break-words"
+          style={{ maxWidth: 'min(24rem, calc(100vw - 24px))' }}>
           <span>{page.title}</span>
+          {exactUrl && <span className="text-muted-foreground">{page.url}</span>}
           <span>{action}</span>
         </TooltipContent>
       </Tooltip>

@@ -1,4 +1,4 @@
-import type { ReturnPagePreferences } from '@/utils/storage'
+import type { ReturnPagePreferences, ReturnPageSource } from '@/utils/storage'
 import {
   ACTIVITY_SNAPSHOT_MESSAGE,
   ACTIVITY_WINDOW_MS,
@@ -17,8 +17,8 @@ import {
 
 export { isReturnablePage, normalizePageUrl } from '@/utils/page-activity/model'
 
-export type ReturnPageSource = 'recent' | 'frequent'
-export type ReturnPageRanking = 'foreground-usage' | 'recent-history' | 'frequent-history' | 'open-tab'
+export type { ReturnPageSource } from '@/utils/storage'
+export type ReturnPageRanking = 'foreground-usage' | 'recent-history' | 'frequent-history' | 'open-tab' | 'event-log'
 export const RETURN_PAGE_LOG_LIMIT = 5
 export const OPEN_TAB_MULTIPLIER = 1.3
 export type ReturnPage = {
@@ -34,10 +34,11 @@ export type ReturnPage = {
 }
 
 /** Parse each tab URL once, so page lists can reuse matches instead of scanning all tabs per row. */
-export function groupPageTabs(tabs: chrome.tabs.Tab[]): Map<string, chrome.tabs.Tab[]> {
+export function groupPageTabs(tabs: chrome.tabs.Tab[], exactUrl = false): Map<string, chrome.tabs.Tab[]> {
   const groups = new Map<string, chrome.tabs.Tab[]>()
   for (const tab of tabs) {
-    const key = normalizePageUrl(tab.url ?? tab.pendingUrl ?? '')
+    const url = tab.url ?? tab.pendingUrl ?? ''
+    const key = exactUrl ? url : normalizePageUrl(url)
     if (!key) continue
     const group = groups.get(key)
     if (group) group.push(tab)
@@ -81,7 +82,7 @@ export function getHistoryWindowStart(days: number, now = Date.now()): number {
 
 export function buildReturnPages(
   history: chrome.history.HistoryItem[],
-  source: ReturnPageSource,
+  source: Exclude<ReturnPageSource, 'history'>,
   visitsByUrl: Map<string, chrome.history.VisitItem[]> = new Map(),
   now = Date.now(),
   windowDays = source === 'recent' ? 7 : 30,
@@ -94,7 +95,7 @@ export function buildReturnPages(
     if (!item.url || !isReturnablePage(item.url)) continue
     const url = normalizePageUrl(item.url)!
     const lastVisitTime = item.lastVisitTime ?? 0
-    if (lastVisitTime < start || lastVisitTime > now) continue
+    if (!Number.isFinite(lastVisitTime) || lastVisitTime <= 0 || lastVisitTime < start || lastVisitTime > now) continue
     const existing = pages.get(url)
     if (!existing || lastVisitTime > existing.lastVisitTime) {
       pages.set(url, {
@@ -125,6 +126,31 @@ export function buildReturnPages(
     )
 }
 
+/** Read the latest enter for each logged page without usage scoring or recommendation filters. */
+export function buildVisitedPages(snapshot: ActivitySnapshot): ReturnPage[] {
+  const latest = new Map<number, number>()
+  for (const event of snapshot.events) {
+    if (event.type === 'enter' && event.at > (latest.get(event.pageId) ?? -Infinity)) latest.set(event.pageId, event.at)
+  }
+  return snapshot.pages
+    .flatMap(page => {
+      const at = latest.get(page.id)
+      return at === undefined
+        ? []
+        : [
+            {
+              id: page.key,
+              url: page.url,
+              title: page.title.trim() || page.url,
+              lastVisitTime: at,
+              activeDays: 0,
+              ranking: 'event-log' as const,
+            },
+          ]
+    })
+    .sort((a, b) => b.lastVisitTime - a.lastVisitTime)
+}
+
 function returnPageExclusion(preferences: ReturnPagePreferences) {
   const hidden = new Set(preferences.hiddenUrls.map(normalizePageUrl))
   const excluded = new Set(preferences.excludedHosts)
@@ -138,7 +164,12 @@ function returnPageExclusion(preferences: ReturnPagePreferences) {
   }
 }
 
-export function filterReturnPages(pages: ReturnPage[], preferences: ReturnPagePreferences): ReturnPage[] {
+export function filterReturnPages(
+  pages: ReturnPage[],
+  preferences: ReturnPagePreferences,
+  source: ReturnPageSource = 'recent',
+): ReturnPage[] {
+  if (source === 'history') return pages
   const exclusion = returnPageExclusion(preferences)
   return pages.filter(page => !exclusion(page))
 }
@@ -154,7 +185,7 @@ export function logReturnPageDisplay(
   const exclusion = returnPageExclusion(preferences)
   let rank = 0
   const entries = snapshot.map(page => {
-    const reason = exclusion(page)
+    const reason = source === 'history' ? null : exclusion(page)
     const displayRank = reason ? null : ++rank
     return {
       pageKey: page.id,
@@ -190,6 +221,32 @@ export function logReturnPageDisplay(
 }
 
 export async function fetchReturnPages(source: ReturnPageSource, signal?: AbortSignal): Promise<ReturnPage[]> {
+  if (source === 'history') {
+    const snapshot: ActivitySnapshot = await chrome.runtime.sendMessage({
+      type: ACTIVITY_SNAPSHOT_MESSAGE,
+      incognito: chrome.extension?.inIncognitoContext,
+    })
+    if (signal?.aborted) throw new DOMException('Aborted', 'AbortError')
+    if (!Array.isArray(snapshot?.pages) || !Array.isArray(snapshot?.events)) throw new Error('Activity log unavailable')
+    const pages = buildVisitedPages(snapshot)
+    if (import.meta.env.DEV || import.meta.env.MODE === 'test') {
+      console.info(
+        '[NextTab:return-pages]',
+        JSON.stringify({
+          stage: 'ranking',
+          source,
+          ranking: 'event-log',
+          explanation: '按 event log 中每个页面最近一次 enter 的时间倒序，不使用评分或推荐过滤。',
+          evaluatedAt: snapshot.now,
+          candidateCount: pages.length,
+          candidates: pages
+            .slice(0, RETURN_PAGE_LOG_LIMIT)
+            .map(page => ({ pageKey: page.id, url: page.url, lastVisitTime: page.lastVisitTime })),
+        }),
+      )
+    }
+    return pages
+  }
   const now = Date.now()
   const [historyResult, activityResult, tabsResult] = await Promise.allSettled([
     chrome.history.search({
@@ -387,8 +444,9 @@ export async function queryProfileTabs(): Promise<chrome.tabs.Tab[]> {
   return tabs.filter(tab => Boolean(tab.incognito) === incognito)
 }
 
-export async function matchingPageTabs(url: string): Promise<chrome.tabs.Tab[]> {
+export async function matchingPageTabs(url: string, exactUrl = false): Promise<chrome.tabs.Tab[]> {
   const tabs = await queryProfileTabs()
+  if (exactUrl) return tabs.filter(tab => (tab.url ?? tab.pendingUrl) === url)
   const normalized = normalizePageUrl(url)
   if (!normalized) return []
   return tabs.filter(tab => normalizePageUrl(tab.url ?? tab.pendingUrl ?? '') === normalized)

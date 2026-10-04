@@ -12,16 +12,18 @@ export function PageList({
   tabs,
   frequent = false,
   feedback = false,
+  exactUrl = false,
   onTabClosed,
 }: {
   pages: (ReturnPage & { tabId?: number })[]
   tabs: chrome.tabs.Tab[]
   frequent?: boolean
   feedback?: boolean
+  exactUrl?: boolean
   onTabClosed?: (tabId: number) => void
 }) {
   const [offset, setOffset] = useState(0)
-  const tabsByPage = useMemo(() => groupPageTabs(tabs), [tabs])
+  const tabsByPage = useMemo(() => groupPageTabs(tabs, exactUrl), [tabs, exactUrl])
   const list = useRef<HTMLDivElement>(null)
   const focusFirst = useRef(false)
   const start = Math.min(offset, Math.max(0, Math.ceil(pages.length / PAGE_SIZE) - 1) * PAGE_SIZE)
@@ -44,7 +46,8 @@ export function PageList({
           key={page.id}
           page={page}
           tabs={tabs}
-          matchingTabs={tabsByPage.get(normalizePageUrl(page.url)!) ?? []}
+          matchingTabs={tabsByPage.get(exactUrl ? page.url : normalizePageUrl(page.url)!) ?? []}
+          exactUrl={exactUrl}
           frequent={frequent}
           feedback={feedback}
           tabId={page.tabId}
