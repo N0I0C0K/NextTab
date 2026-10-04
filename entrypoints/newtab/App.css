@@ -300,15 +300,21 @@
 .nt-return-heading-actions {
   display: flex;
   flex-wrap: wrap;
+  min-width: 0;
+  max-width: 100%;
   align-items: center;
   justify-content: flex-end;
   gap: 8px;
 }
 .nt-return-section [data-slot='tabs-list'] {
   flex: none;
-  height: 34px;
+  flex-wrap: wrap;
+  max-width: 100%;
+  height: auto;
+  min-height: 34px;
 }
 .nt-return-section [data-slot='tabs-trigger'] {
+  min-height: 28px;
   font-size: 12px;
   padding-inline: 9px;
 }
@@ -502,6 +508,11 @@
   overflow-y: auto;
   overscroll-behavior: contain;
 }
+/* Keep the list's search, scroll position and focus target while a child dialog is open. */
+.nt-return-all-dialog[data-nested-dialog-open],
+.nt-site-pages-dialog[data-nested-dialog-open] {
+  visibility: hidden;
+}
 .nt-return-pagination {
   display: flex;
   align-items: center;
@@ -673,10 +684,16 @@
   padding-left: 34px;
 }
 .nt-site-pages-dialog {
-  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  grid-template-rows: auto minmax(0, 1fr) auto;
 }
 .nt-site-pages-dialog[data-history-view='true'] {
-  grid-template-rows: auto auto auto minmax(0, 1fr) auto;
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+}
+.nt-site-pages-dialog [data-slot='dialog-header'] {
+  gap: 2px;
+  min-width: 0;
+  padding-right: 32px;
+  overflow-wrap: anywhere;
 }
 .nt-site-history-toolbar {
   display: grid;

@@ -876,14 +876,23 @@
   "returnFrequent": {
     "message": "Häufig besucht"
   },
+  "returnHistory": {
+    "message": "Zuletzt besucht"
+  },
+  "returnHistoryRules": {
+    "message": "Seiten nach dem letzten Aufrufen, neueste zuerst."
+  },
+  "returnHistoryEmpty": {
+    "message": "Noch keine zuletzt besuchten Seiten."
+  },
   "returnRecentRules": {
-    "message": "Die Bewertung nutzt pro Tag Aufrufe, die mittlere und gesamte Vordergrunddauer sowie aktive Tage der letzten 7 Tage. Tagesbeiträge werden getrennt zeitlich abgeschwächt und addiert. Anzahl und Dauer wachsen logarithmisch, ohne Mindestwerte oder Obergrenzen. Bei noch in einem Tab geöffneten Seiten wird der Nutzungswert mit 1.3 multipliziert, einmal pro Website und Pfad. Seiten ohne Vordergrunddaten bleiben bei 0; bei Gleichstand zählt der letzte Besuch."
+    "message": "Seiten zum Wiederbesuchen, basierend auf deiner Nutzung in den letzten 7 Tagen."
   },
   "returnFrequentRules": {
-    "message": "Seiten aus den letzten 30 Kalendertagen, sortiert nach Besuchstagen und danach nach dem letzten Besuch."
+    "message": "Seiten, die du in den letzten 30 Tagen häufig besucht hast."
   },
   "returnCommonRules": {
-    "message": "Seiten mit derselben Website und demselben Pfad werden zusammengefasst; Abfrageparameter und Fragmente werden ignoriert. Ausgeblendete Seiten und ausgeschlossene Websites werden nicht angezeigt."
+    "message": "Doppelte Seiten werden zusammengefasst. Ausgeblendete Seiten und ausgeschlossene Websites werden nicht angezeigt."
   },
   "returnSelectionRules": {
     "message": "Regeln zur Seitenauswahl"

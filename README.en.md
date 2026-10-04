@@ -20,8 +20,11 @@ English | [简体中文](README.md)
 - [Introduction](#introduction)
 - [Key Features](#-key-features)
 - [Feature Showcase](#-feature-showcase)
+  - [Return to a Page](#return-to-a-page)
   - [Quick Links](#quick-links)
   - [Command Palette](#command-palette)
+  - [Popup Interface](#popup-interface)
+  - [Themes and Data Management](#themes-and-data-management)
 - [Installation](#installation)
 - [Development](#development)
 - [Browser Support](#browser-support)
@@ -29,56 +32,88 @@ English | [简体中文](README.md)
 
 ## Introduction
 
-NextTab is a new tab page extension focused on boosting browser efficiency with a clean and modern design. Find and access your target websites faster, and focus on what truly matters.
+NextTab is a new tab page extension focused on boosting browser efficiency with a clean and modern design. Keep pages you may want to revisit, frequently used websites, and search in one place. Pick up where you left off faster, and focus on what truly matters.
 
-![Main Screenshot](doc/images/main-screenshot.png)
+![Main Screenshot](doc/images/main-screenshot.en.png)
 
 ## ✨ Key Features
 
-- 🔗 **Efficient Quick Links** - Fast access to frequently used websites with drag-and-drop sorting and a context menu for quick actions
-- 🎨 **Personalized Backgrounds** - Custom wallpapers with integrated [Wallhaven](https://wallhaven.cc/) high-quality wallpapers by default
-- ⚡ **Powerful Command Palette** - Quick search for tabs, bookmarks, history, and more (continuously being developed)
+- 🕘 **Return to a Page** - Find pages you may want to revisit using local usage records, or browse frequently and recently visited pages
+- 🔗 **Efficient Quick Links** - Fast access to frequently used websites with drag-and-drop and alphabetical sorting. Expand a site to view related pages
+- ⚡ **Powerful Command Palette** - Search tabs, bookmarks, and history, with web search, a calculator, and uppercase RMB conversion
+- 🎨 **Clean Light and Dark Themes** - Choose light, dark, or system appearance for a clear and comfortable page
 - ⌨️ **Keyboard First** - Comprehensive keyboard shortcut support for efficient operation
 - 📱 **Responsive Design** - Adapts to various screen sizes for a consistent experience
-- 🔒 **Privacy Focused** - Runs locally, no user data collection
+- 🔒 **Privacy Focused** - Core features run locally. Page usage records and recommendation preferences stay in your browser, with no user data collection
+- 💾 **Data Backups** - Export and import quick links and settings for backups or migration
 - 🌐 **Cross-Device Sync** - Sync data across multiple devices via MQTT protocol (optional & WIP)
 
 ## 📸 Feature Showcase
 
+### Return to a Page
+
+Open a new tab to quickly return to content you were browsing:
+
+- **Recent revisits** - Find pages you may want to continue browsing based on the last 7 days of page usage
+- **Frequently visited** - View pages visited in the last 30 days, sorted by the number of days visited
+- **Recently visited** - View pages in reverse order of their latest entry time in local activity records
+
+Click a page to open it or return to a matching tab. If multiple matching tabs are open, you can choose which one to return to. Select **View all** to expand the full list and search by title or URL:
+
+![Return to a Page](doc/images/return-pages.en.png)
+
+The page menu includes details and link copying. In recommendation lists, you can also hide a page or stop recommending a website, with an option to undo.
+
 ### Quick Links
 
-Access frequently used websites with one click, easily reorder by dragging:
+Access frequently used websites with one click, easily reorder by dragging, or switch to alphabetical sorting. Choose **Original order** to restore your previous arrangement:
 
-![Drag and Drop Demo](doc/images/drag-and-drop-demo.gif)
+![Quick Link Sorting](doc/images/quick-link-sort.en.png)
+
+#### Expand Site Pages
+
+Click the expand button on a quick link to view the site's open tabs, saved pages, and recent visits in one place. Find your browsing progress without searching across windows and bookmarks:
+
+![Site Pages](doc/images/site-pages.en.png)
+
+Select **View Recent History** at the bottom to search more of the site's visit history.
 
 #### Smart Context Menu
 
-Right-click on quick links to quickly access related tabs, bookmarks, and history:
-
-![Context Menu](doc/images/context-menu.png)
-
-#### Quick View Recent History
-
-View recent visit history for a domain directly from the context menu, making it easy to return to previously browsed pages:
-
-![Quick History](doc/images/quick-history-demo.gif)
+Right-click on a quick link to edit or delete it, view recent history, or quickly access recommended pages, related bookmarks, and open tabs.
 
 ### Command Palette
 
-Press `Cmd/Ctrl + K` to open the command palette for quick search and actions:
+Click the homepage search box, or press `Alt + K` (Windows) / `⌘ + K` (macOS) to focus the command palette for quick search and actions:
 
-![Command Palette](doc/images/command-palette.png)
+![Command Palette](doc/images/command-palette.en.png)
 
-**History Search Feature**
+Type a keyword to search open tabs, bookmarks, and history, or use a default command to narrow the search:
 
-![History Search](doc/images/history-search-demo.gif)
+| Example       | Action                                                  |
+| ------------- | ------------------------------------------------------- |
+| `h NextTab`   | Search history                                          |
+| `b NextTab`   | Search bookmarks                                        |
+| `g NextTab`   | Search the web with the browser's default search engine |
+| `= 12 * 8`    | Calculate an expression; select the result to copy it   |
+| `rmb 1234.56` | Convert an amount to uppercase RMB notation             |
+
+An empty input shows available commands. In settings, you can enable or disable commands, change their trigger keys, and choose whether they appear in global search.
 
 ### Popup Interface
 
-![Popup Interface](doc/images/popup.jpg)
+<img src="doc/images/popup.en.png" alt="Popup Interface" width="480" />
 
 - Quickly access quick links without going to the New Tab page
 - One-click to add the current page to quick links
+- Shares quick links and sorting settings with the new tab page
+
+### Themes and Data Management
+
+- **Light and dark themes** - Choose light, dark, or system appearance in settings
+- **Homepage settings** - Configure Return to a Page, related bookmarks, open tabs, and search box focus behavior
+- **Data backups** - Export or import a JSON file to back up quick links and settings
+- **Multiple languages** - Interfaces available in Simplified Chinese, Traditional Chinese, English, and German
 
 ## Installation
 
@@ -90,7 +125,7 @@ Press `Cmd/Ctrl + K` to open the command palette for quick search and actions:
 
 ### Manual Installation (Development Build)
 
-Please refer to the [Development Guide](DEVELOPMENT.en.md#quick-start) for instructions on building and installing from source.
+Please refer to the [Development Guide](DEVELOPMENT.en.md#setup) for instructions on building and installing from source.
 
 ## Development
 
@@ -98,13 +133,15 @@ If you want to contribute to development or customize the extension, please see 
 
 The development guide includes:
 
-- Environment setup
-- Detailed project structure
-- Development workflow
-- Code standards
-- Build and testing
+- Requirements and setup
+- Project structure
+- Common development commands
+- Local storage
+- Builds, tests, and releases
 
 ### Quick Start
+
+Requires Node.js 20.19+ and pnpm 9.9.
 
 ```bash
 # Clone the project

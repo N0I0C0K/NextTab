@@ -200,7 +200,8 @@ test('open tabs multiply usage by 1.3 once and only re-rank on homepage entry', 
       Object.defineProperty(chrome.runtime, 'sendMessage', {
         value: (message: { type: string }) => {
           if (message.type !== 'nexttab:page-activity-snapshot') return sendMessage(message)
-          const now = Date.now()
+          // Compare tab multipliers within one local day, independent of midnight/day splitting.
+          const now = new Date().setHours(12, 0, 0, 0)
           return Promise.resolve({
             now,
             bytes: 0,
@@ -429,7 +430,7 @@ test('returning to an existing homepage refreshes recommendations once, preserve
   await expect(panel).toHaveAttribute('aria-busy', 'false')
 })
 
-test('window reentry refreshes the selected source and browser Back reloads recent recommendations', async ({
+test('window reentry refreshes the selected source and browser Back restores it', async ({
   page,
   context,
   extensionId,
@@ -481,9 +482,191 @@ test('window reentry refreshes the selected source and browser Back reloads rece
   await expect(page).toHaveTitle(fixturePages[0].title)
   await page.goBack()
   await expect(panel).toHaveAttribute('aria-busy', 'false')
-  await expect(page.getByRole('tab', { name: 'Recent revisits', exact: true })).toHaveAttribute('aria-selected', 'true')
-  await expect(visibleRows(page).first()).toContainText(fixturePages[0].title)
+  await expect(frequent).toHaveAttribute('aria-selected', 'true')
+  await expect(page.getByTestId('return-page-row').filter({ hasText: fixturePages[0].title }).first()).toBeVisible()
 })
+
+test('return source selection survives reloads and new tabs, and visits follow the latest logged enter', async ({
+  page,
+  context,
+  extensionId,
+}) => {
+  const visitor = await prepare(page, context, extensionId, 6, true)
+  await visitor.close()
+  const sources = [
+    ['Frequently visited', 'frequent'],
+    ['Recently visited', 'history'],
+    ['Recent revisits', 'recent'],
+  ] as const
+  for (const [label, source] of sources) {
+    await page.getByRole('tab', { name: label, exact: true }).click()
+    await expect(page.locator('.nt-return-pages')).toHaveAttribute('aria-busy', 'false')
+    await expect
+      .poll(() =>
+        page.evaluate(async () => (await chrome.storage.local.get('return-page-source'))['return-page-source']),
+      )
+      .toBe(source)
+    await page.reload()
+    await expect(page.getByRole('tab', { name: label, exact: true })).toHaveAttribute('aria-selected', 'true')
+    await expect(page.locator('.nt-return-pages')).toHaveAttribute('aria-busy', 'false')
+    const nextTab = await context.newPage()
+    await nextTab.goto(`chrome-extension://${extensionId}/newtab.html`)
+    await expect(nextTab.getByRole('tab', { name: label, exact: true })).toHaveAttribute('aria-selected', 'true')
+    await nextTab.close()
+  }
+
+  const recent = page.getByRole('tab', { name: 'Recent revisits', exact: true })
+  await recent.focus()
+  await recent.press('ArrowRight')
+  await page.keyboard.press('ArrowRight')
+  const history = page.getByRole('tab', { name: 'Recently visited', exact: true })
+  await expect(history).toBeFocused()
+  await history.press('Enter')
+  await expect(history).toHaveAttribute('aria-selected', 'true')
+  await expect(page.locator('.nt-return-pages')).toHaveAttribute('aria-busy', 'false')
+  const snapshot = await activitySnapshot(page)
+  const latestEnters = new Map<number, number>()
+  for (const event of snapshot.events) {
+    if (event.type === 'enter') latestEnters.set(event.pageId, Math.max(event.at, latestEnters.get(event.pageId) ?? 0))
+  }
+  const expectedTitles = snapshot.pages
+    .filter(item => latestEnters.has(item.id))
+    .sort((a, b) => latestEnters.get(b.id)! - latestEnters.get(a.id)!)
+    .map(item => item.title.trim() || item.url)
+  expect(expectedTitles).toHaveLength(6)
+  await expect(visibleRows(page).first()).toContainText(expectedTitles[0])
+  await page.getByTestId('return-view-all').click()
+  const dialog = page.getByRole('dialog', { name: 'Recently visited', exact: true })
+  await expect(dialog.locator('.nt-return-title')).toHaveText(expectedTitles)
+  await dialog.getByRole('textbox').fill('NextTab')
+  await expect(dialog.locator('.nt-return-title')).toHaveText(expectedTitles.filter(title => title.includes('NextTab')))
+  await page.keyboard.press('Escape')
+  await expect(page.getByTestId('return-view-all')).toBeFocused()
+  await page.evaluate(url => chrome.history.deleteUrl({ url }), fixturePages[5].url)
+  await expect(page.locator(`.nt-return-pages [data-page-url="${fixturePages[5].url}"]`)).toHaveCount(0)
+  await expect(page.locator(`.nt-return-pages [data-page-url="${fixturePages[4].url}"]`)).toBeVisible()
+})
+
+test('recent visits use background event logs, refresh on reentry and ignore recommendation filters', async ({
+  page,
+  context,
+  extensionId,
+}) => {
+  const visitor = await prepare(page, context, extensionId, 1, true)
+  await page.evaluate(
+    url =>
+      chrome.storage.local.set({
+        'return-page-preferences': { hiddenUrls: [url], excludedHosts: ['github.return.test'] },
+      }),
+    fixturePages[0].url,
+  )
+  await page.getByRole('tab', { name: 'Recently visited', exact: true }).click()
+  const panel = page.locator('.nt-return-pages')
+  await expect(panel).toHaveAttribute('aria-busy', 'false')
+  const originalRow = panel.locator(`[data-page-url="${fixturePages[0].url}"]`)
+  await expect(originalRow).toBeVisible()
+  await originalRow.locator('.nt-return-more').focus()
+  await page.keyboard.press('Enter')
+  await expect(page.getByRole('menuitem', { name: 'Hide this page', exact: true })).toHaveCount(0)
+  await expect(page.getByRole('menuitem', { name: "Don't suggest this website", exact: true })).toHaveCount(0)
+  await page.keyboard.press('Escape')
+
+  const historyOnly = 'https://github.return.test/NextTab/browser-history-only'
+  await page.evaluate(url => chrome.history.addUrl({ url }), historyOnly)
+  const first = 'https://github.return.test/NextTab/recent-one?id=1'
+  const second = 'https://github.return.test/NextTab/recent-two?id=2'
+  await visitor.bringToFront()
+  await visitor.goto(first)
+  await expect(visitor).toHaveTitle('NextTab 示例页面')
+  await page.bringToFront()
+  await expect(visibleRows(page).first().getByTestId('return-page-row')).toHaveAttribute('data-page-url', first)
+  await visitor.bringToFront()
+  await visitor.goto(second)
+  await expect(visitor).toHaveTitle('NextTab 示例页面')
+  await page.bringToFront()
+  await expect(visibleRows(page).first().getByTestId('return-page-row')).toHaveAttribute('data-page-url', second)
+  await expect(panel).toHaveAttribute('aria-busy', 'false')
+  await expect(panel.getByTestId('return-page-row')).toHaveCount(3)
+
+  await page.getByTestId('return-view-all').click()
+  const dialog = page.getByRole('dialog', { name: 'Recently visited', exact: true })
+  await expect(dialog.getByTestId('return-page-row')).toHaveCount(3)
+  await expect(dialog.locator(`[data-page-url="${historyOnly}"]`)).toHaveCount(0)
+  await dialog.getByRole('textbox').fill('?id=1')
+  await expect(dialog.getByTestId('return-page-row')).toHaveCount(1)
+  await expect(dialog.getByTestId('return-page-row')).toHaveAttribute('data-page-url', first)
+  await dialog.getByRole('button', { name: 'Page selection rules', exact: true }).hover()
+  await expect(page.locator('.nt-return-rules')).toContainText('newest first')
+  await expect(page.locator('.nt-return-rules')).not.toContainText('Hidden pages')
+  await page.mouse.move(0, 0)
+  await page.keyboard.press('Escape')
+
+  await visitor.close()
+  await page.bringToFront()
+  await expect(panel.locator(`[data-page-url="${first}"] .nt-return-open`)).toHaveAccessibleName(/Open page$/)
+  await expect(panel.locator(`[data-page-url="${second}"] .nt-return-open`)).toHaveAccessibleName(/Open page$/)
+  await page.evaluate(url => chrome.history.deleteUrl({ url }), first)
+  await expect(panel.locator(`[data-page-url="${first}"]`)).toHaveCount(0)
+  await expect(panel.locator(`[data-page-url="${second}"]`)).toBeVisible()
+  await page.screenshot({ path: test.info().outputPath('event-log-unfiltered-live.png'), fullPage: true })
+
+  // Collection continues in background while every new-tab page is closed.
+  const withoutNewTab = await context.newPage()
+  await withoutNewTab.goto('https://github.return.test/NextTab/while-open')
+  await page.close()
+  const latest = 'https://github.return.test/NextTab/without-newtab'
+  await withoutNewTab.goto(latest)
+  await expect(withoutNewTab).toHaveTitle('NextTab 示例页面')
+  const reopened = await context.newPage()
+  await reopened.goto(`chrome-extension://${extensionId}/newtab.html`)
+  await expect(reopened.getByRole('tab', { name: 'Recently visited', exact: true })).toHaveAttribute(
+    'aria-selected',
+    'true',
+  )
+  await expect(visibleRows(reopened).first().getByTestId('return-page-row')).toHaveAttribute('data-page-url', latest)
+  await expect(reopened.locator('.nt-return-pages')).toHaveAttribute('aria-busy', 'false')
+  expect((await activitySnapshot(reopened)).pages.some(item => item.url === latest)).toBe(true)
+})
+
+for (const locale of ['zh-CN', 'de']) {
+  test.describe(`localized return tabs (${locale})`, () => {
+    test.use({ extensionLocale: locale })
+
+    test('keeps all three tabs within the section in narrow and short windows', async ({
+      page,
+      context,
+      extensionId,
+    }) => {
+      await prepare(page, context, extensionId, 6, true)
+      const triggers = page.locator('.nt-return-section [data-slot="tabs-trigger"]')
+      await expect(triggers).toHaveCount(3)
+      await triggers.first().focus()
+      await page.keyboard.press('ArrowRight')
+      await page.keyboard.press('ArrowRight')
+      await expect(triggers.last()).toBeFocused()
+      await page.keyboard.press('Enter')
+      await expect(triggers.last()).toHaveAttribute('aria-selected', 'true')
+      await expect(page.locator('.nt-return-pages')).toHaveAttribute('aria-busy', 'false')
+      for (const viewport of [
+        { width: 1440, height: 1000 },
+        { width: 390, height: 700 },
+        { width: 320, height: 600 },
+        { width: 900, height: 360 },
+      ]) {
+        await page.setViewportSize(viewport)
+        const section = page.getByTestId('return-pages-section')
+        await expect.poll(() => section.evaluate(node => node.scrollWidth <= node.clientWidth)).toBe(true)
+        for (const trigger of await triggers.all()) {
+          await expect(trigger).toBeInViewport()
+          const bounds = (await trigger.boundingBox())!
+          expect(bounds.x).toBeGreaterThanOrEqual(0)
+          expect(bounds.x + bounds.width).toBeLessThanOrEqual(viewport.width)
+        }
+        await section.screenshot({ path: test.info().outputPath(`return-tabs-${viewport.width}.png`) })
+      }
+    })
+  })
+}
 
 test('return pages stay before horizontal sites and adapt to the real viewport', async ({
   page,
@@ -725,25 +908,67 @@ test('site expansion shows open, saved and recent pages and returns focus', asyn
   await expect(dialog).toContainText(fixturePages[5].title)
   await expect(dialog).toContainText('Saved NextTab architecture')
   await expect(dialog).toContainText(fixturePages[0].title)
-  await page.setViewportSize({ width: 320, height: 700 })
-  await expect
-    .poll(async () => {
-      const rectangle = await dialog.boundingBox()
-      return (
-        rectangle !== null &&
-        rectangle.x >= 0 &&
-        rectangle.x + rectangle.width <= 320 &&
-        rectangle.y + rectangle.height <= 700
-      )
-    })
-    .toBe(true)
-  const bounds = await dialog.boundingBox()
-  expect(bounds!.x).toBeGreaterThanOrEqual(0)
-  expect(bounds!.x + bounds!.width).toBeLessThanOrEqual(320)
-  expect(bounds!.y + bounds!.height).toBeLessThanOrEqual(700)
-  await page.screenshot({ path: test.info().outputPath('site-pages-narrow.png'), fullPage: true })
+  for (const viewport of [
+    { width: 1440, height: 1000 },
+    { width: 320, height: 700 },
+    { width: 900, height: 360 },
+  ]) {
+    await page.setViewportSize(viewport)
+    await expect
+      .poll(async () => {
+        const rectangle = await dialog.boundingBox()
+        return (
+          rectangle !== null &&
+          rectangle.x >= 0 &&
+          rectangle.x + rectangle.width <= viewport.width &&
+          rectangle.y >= 0 &&
+          rectangle.y + rectangle.height <= viewport.height
+        )
+      })
+      .toBe(true)
+    const heading = (await dialog.getByRole('heading', { name: 'GitHub', exact: true }).boundingBox())!
+    const description = (await dialog.locator('[data-slot="dialog-description"]').boundingBox())!
+    expect(description.y - heading.y - heading.height).toBeGreaterThanOrEqual(0)
+    expect(description.y - heading.y - heading.height).toBeLessThanOrEqual(2)
+    await expect(dialog.locator('[data-slot="dialog-close"]')).toBeInViewport()
+    expect(await dialog.evaluate(element => element.scrollWidth <= element.clientWidth)).toBe(true)
+    await page.screenshot({ path: test.info().outputPath(`site-pages-${viewport.width}.png`), fullPage: true })
+  }
   await page.keyboard.press('Escape')
   await expect(expand).toBeFocused()
+  const longTitle = 'NextTab 项目讨论、产品路线与设计资料 — 页面标题很长时仍能看清完整名称和网站地址'
+  const longHost = `${'long-project-name-'.repeat(3)}example.${'team-resources-'.repeat(3)}return.test`
+  await page.evaluate(
+    async ({ title, host }) => {
+      await chrome.storage.local.set({
+        'quick-url-item-storage-key': [{ id: 'long-site', title, url: `https://${host}/` }],
+      })
+      chrome.history.search = async () => [
+        { id: 'long-page', title, url: `https://${host}/docs/${'long-path/'.repeat(10)}`, lastVisitTime: Date.now() },
+      ]
+    },
+    { title: longTitle, host: longHost },
+  )
+  await page.getByRole('button', { name: `Show pages from ${longTitle}`, exact: true }).click()
+  for (const viewport of [
+    { width: 320, height: 700 },
+    { width: 900, height: 360 },
+  ]) {
+    await page.setViewportSize(viewport)
+    await expect(dialog.getByRole('heading', { name: longTitle, exact: true })).toBeInViewport()
+    await expect(dialog.locator('[data-slot="dialog-description"]')).toHaveText(longHost)
+    await expect(dialog.locator('[data-slot="dialog-close"]')).toBeInViewport()
+    await expect(dialog.getByRole('button', { name: 'Open website', exact: true })).toBeInViewport()
+    expect(await dialog.evaluate(element => element.scrollWidth <= element.clientWidth)).toBe(true)
+    await page.screenshot({ path: test.info().outputPath(`site-pages-long-${viewport.width}.png`), fullPage: true })
+  }
+  await page.evaluate(() => chrome.storage.local.set({ 'theme-storage-key': 'dark' }))
+  await expect(page.locator('html')).toHaveClass(/dark/)
+  await page.screenshot({
+    path: test.info().outputPath('site-pages-long-dark.png'),
+    fullPage: true,
+    animations: 'disabled',
+  })
 })
 
 test('multiple matching tabs prompt for a target instead of opening or closing tabs', async ({
@@ -855,7 +1080,7 @@ test('selection rules stay behind an accessible info control in view all', async
   await recent.hover()
   await expect(page.locator('[data-slot="tooltip-content"]')).toContainText('last 7 days')
   await frequent.hover()
-  await expect(page.locator('[data-slot="tooltip-content"]')).toContainText('last 30 calendar days')
+  await expect(page.locator('[data-slot="tooltip-content"]')).toContainText('last 30 days')
   await expect(recent).toHaveAttribute('aria-selected', 'true')
   await frequent.click()
   await expect(page.locator('.nt-return-pages')).toHaveAttribute('aria-busy', 'true')
@@ -868,8 +1093,8 @@ test('selection rules stay behind an accessible info control in view all', async
   await expect(dialog.getByRole('textbox')).toBeFocused()
   await expect(rules).not.toBeVisible()
   await info.hover()
-  await expect(rules).toContainText('sorted by days visited, then by most recent visit')
-  await expect(rules).toContainText('ignoring query parameters and fragments')
+  await expect(rules).toContainText('Pages you visit often in the last 30 days')
+  await expect(rules).toContainText('Duplicate pages are combined')
   await expect(rules).not.toContainText('up to 4 pages')
   await expect(rules).not.toContainText('window height')
   await expect(rules).not.toContainText('Ordering refreshes')
@@ -1352,9 +1577,15 @@ test('live brief tab returns are scored independently without altering event tim
   await expect(metric('Active days')).toHaveText('1')
   await expect(metric('Last used')).toContainText('now')
   await expect(page.locator('.nt-return-rules[data-open]')).toHaveCount(0)
-  const icon = (await details.locator('.nt-page-details-icon').boundingBox())!
-  const identity = (await details.locator('.nt-page-details-identity > div').boundingBox())!
-  expect(icon.y + icon.height / 2).toBeCloseTo(identity.y + identity.height / 2, 0)
+  await expect
+    .poll(() =>
+      details.evaluate(dialog => {
+        const icon = dialog.querySelector('.nt-page-details-icon')!.getBoundingClientRect()
+        const identity = dialog.querySelector('.nt-page-details-identity > div')!.getBoundingClientRect()
+        return Math.abs(icon.y + icon.height / 2 - identity.y - identity.height / 2)
+      }),
+    )
+    .toBeLessThan(1)
   await details.getByRole('button', { name: 'About usage records', exact: true }).click()
   await expect(page.locator('.nt-return-rules[data-open]')).toContainText('recorded independently')
   await page.keyboard.press('Escape')
@@ -1434,39 +1665,70 @@ test('page details distinguish missing usage from history, support nested dialog
   await expect(homeRow.locator('.nt-return-more')).toBeFocused()
   await page.getByTestId('return-view-all').click()
   const parent = page.locator('.nt-return-all-dialog')
-  const parentRow = parent.getByTestId('return-page-row').first()
-  await page.setViewportSize({ width: 320, height: 700 })
-  details = await openDetails(parentRow)
-  await page.evaluate(() =>
-    Promise.all(
-      document
-        .getAnimations()
-        .filter(animation => animation.effect?.getComputedTiming().iterations !== Infinity)
-        .map(animation => animation.finished.catch(() => {})),
-    ),
-  )
-  const bounds = (await details.boundingBox())!
-  expect(bounds.x).toBeGreaterThanOrEqual(0)
-  expect(bounds.x + bounds.width).toBeLessThanOrEqual(320)
-  expect(bounds.y).toBeGreaterThanOrEqual(41)
-  expect(700 - bounds.y - bounds.height).toBeGreaterThanOrEqual(41)
-  const titleBefore = (await details.getByRole('heading', { name: 'Page details', exact: true }).boundingBox())!
-  await details.locator('.nt-page-details-body').evaluate(element => {
-    element.scrollTop = element.scrollHeight
-  })
-  await expect(details.locator('.nt-page-details-asof')).toBeInViewport()
-  expect((await details.getByRole('heading', { name: 'Page details', exact: true }).boundingBox())!.y).toBeCloseTo(
-    titleBefore.y,
-  )
-  expect(await details.evaluate(element => element.scrollWidth <= element.clientWidth)).toBe(true)
-  await page.screenshot({ path: test.info().outputPath('page-details-narrow.png'), fullPage: true })
+  await parent.getByRole('textbox').fill('NextTab')
+  const parentRow = parent.getByTestId('return-page-row').last()
+  for (const viewport of [
+    { width: 1440, height: 1000 },
+    { width: 320, height: 700 },
+    { width: 900, height: 360 },
+  ]) {
+    // Resize while details are open so the parent focus target becomes clipped deterministically.
+    await page.setViewportSize({ ...viewport, height: viewport.height === 360 ? 700 : viewport.height })
+    await parentRow.locator('.nt-return-open').focus()
+    details = await openDetails(parentRow)
+    await page.setViewportSize(viewport)
+    const scrollBefore = await parent.locator('.nt-return-all-list').evaluate(element => element.scrollTop)
+    await expect(parent).not.toBeVisible()
+    await expect(page.getByRole('dialog')).toHaveCount(1)
+    await page.evaluate(() =>
+      Promise.all(
+        document
+          .getAnimations()
+          .filter(animation => animation.effect?.getComputedTiming().iterations !== Infinity)
+          .map(animation => animation.finished.catch(() => {})),
+      ),
+    )
+    const bounds = (await details.boundingBox())!
+    const margin = Math.min(64, Math.max(24, viewport.height * 0.06))
+    expect(bounds.x).toBeGreaterThanOrEqual(0)
+    expect(bounds.x + bounds.width).toBeLessThanOrEqual(viewport.width)
+    expect(bounds.y).toBeGreaterThanOrEqual(margin - 1)
+    expect(viewport.height - bounds.y - bounds.height).toBeGreaterThanOrEqual(margin - 1)
+    const titleBefore = (await details.getByRole('heading', { name: 'Page details', exact: true }).boundingBox())!
+    await details.locator('.nt-page-details-body').evaluate(element => {
+      element.scrollTop = element.scrollHeight
+    })
+    await expect(details.locator('.nt-page-details-asof')).toBeInViewport()
+    await expect(details.locator('[data-slot="dialog-close"]')).toBeInViewport()
+    expect((await details.getByRole('heading', { name: 'Page details', exact: true }).boundingBox())!.y).toBeCloseTo(
+      titleBefore.y,
+    )
+    expect(await details.evaluate(element => element.scrollWidth <= element.clientWidth)).toBe(true)
+    await page.screenshot({ path: test.info().outputPath(`page-details-${viewport.width}.png`), fullPage: true })
+    await page.keyboard.press('Escape')
+    await expect(parent).toBeVisible()
+    await expect(parentRow.locator('.nt-return-more')).toBeFocused()
+    await expect(parentRow.locator('.nt-return-more')).toBeInViewport({ ratio: 1 })
+    await expect(parent.getByRole('textbox')).toHaveValue('NextTab')
+    // Preserve the existing position when it fits; a shorter window reveals the restored focus target.
+    const scrollAfter = await parent.locator('.nt-return-all-list').evaluate(element => element.scrollTop)
+    if (viewport.height === 360) expect(scrollAfter).toBeGreaterThan(scrollBefore)
+    else expect(Math.abs(scrollAfter - scrollBefore)).toBeLessThan(16)
+  }
   await page.keyboard.press('Escape')
-  await expect(parent).toBeVisible()
-  await expect(parentRow.locator('.nt-return-more')).toBeFocused()
+  await page.getByRole('button', { name: 'Show pages from GitHub', exact: true }).click()
+  const site = page.getByTestId('site-pages-dialog')
+  const siteRow = site.getByTestId('return-page-row').first()
+  details = await openDetails(siteRow)
+  await expect(site).not.toBeVisible()
+  await expect(page.getByRole('dialog')).toHaveCount(1)
+  await page.keyboard.press('Escape')
+  await expect(site).toBeVisible()
+  await expect(siteRow.locator('.nt-return-more')).toBeFocused()
   await page.evaluate(() =>
     Object.defineProperty(chrome.history, 'search', { value: () => Promise.reject(new Error('History unavailable')) }),
   )
-  details = await openDetails(parentRow)
+  details = await openDetails(siteRow)
   await expect(details).toContainText('Browser history is temporarily unavailable')
   await expect(metric('Visits')).toHaveText('—')
   expect(errors).toEqual([])

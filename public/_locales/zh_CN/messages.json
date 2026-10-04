@@ -876,14 +876,23 @@
   "returnFrequent": {
     "message": "最近常用"
   },
+  "returnHistory": {
+    "message": "最近访问"
+  },
+  "returnHistoryRules": {
+    "message": "按最近进入页面的时间倒序显示。"
+  },
+  "returnHistoryEmpty": {
+    "message": "暂无最近访问的页面。"
+  },
   "returnRecentRules": {
-    "message": "结合最近 7 天每天的进入次数、单次停留中位数、累计前台停留和活跃天数计分，每天的贡献分别衰减后相加。次数和时长使用对数增长，不设最低门槛或上限。当前仍有打开标签的页面，使用分乘以 1.3，同路径多个标签只乘一次。没有前台记录的基础分为 0，乘后仍为 0，同分按最近访问排序。"
+    "message": "根据最近 7 天的使用情况，推荐你可能想回访的页面。"
   },
   "returnFrequentRules": {
-    "message": "选取最近 30 个自然日访问过的页面；先按访问天数，再按最近访问时间排序。"
+    "message": "展示最近 30 天常去的页面。"
   },
   "returnCommonRules": {
-    "message": "同一网站的相同路径合并为一条，忽略查询参数和片段。用户主动隐藏的页面或不推荐的网站不再展示。"
+    "message": "相同页面会合并，已隐藏的页面和已排除的网站不会显示。"
   },
   "returnSelectionRules": {
     "message": "网页选取规则"

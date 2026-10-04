@@ -876,14 +876,23 @@
   "returnFrequent": {
     "message": "Frequently visited"
   },
+  "returnHistory": {
+    "message": "Recently visited"
+  },
+  "returnHistoryRules": {
+    "message": "Pages ordered by their most recent entry, newest first."
+  },
+  "returnHistoryEmpty": {
+    "message": "No recently visited pages yet."
+  },
   "returnRecentRules": {
-    "message": "Scores use each day’s entries, median and total foreground time, and active days in the last 7 days. Daily contributions decay separately and are added together. Counts and durations grow logarithmically, without thresholds or caps. Pages still open in a tab have their usage score multiplied by 1.3, once per website and path. Pages without foreground records stay at 0; ties use the most recent visit."
+    "message": "Pages you may want to revisit, based on your use in the last 7 days."
   },
   "returnFrequentRules": {
-    "message": "Pages visited in the last 30 calendar days, sorted by days visited, then by most recent visit."
+    "message": "Pages you visit often in the last 30 days."
   },
   "returnCommonRules": {
-    "message": "Pages on the same website and path are combined, ignoring query parameters and fragments. Pages you hide and websites you exclude are omitted."
+    "message": "Duplicate pages are combined. Hidden pages and excluded websites are omitted."
   },
   "returnSelectionRules": {
     "message": "Page selection rules"

@@ -76,6 +76,9 @@ export function useReturnPages(source: ReturnPageSource) {
     const onPageShow = (event: PageTransitionEvent) => {
       if (event.persisted) returnToPage()
     }
+    // These page-scoped listeners only refresh this new tab on foreground reentry.
+    // Event logs are collected independently by background/page-activity.ts,
+    // even when no new-tab page is open; these handlers never write activity logs.
     const checkForegroundReturn = async (tab: chrome.tabs.Tab) => {
       try {
         const [window, [active]] = await Promise.all([
@@ -102,7 +105,7 @@ export function useReturnPages(source: ReturnPageSource) {
       })
     }
     load(false)
-    // Re-rank at page entry, not while the user is browsing the current list.
+    // Refresh at page entry, after background has committed the foreground log.
     // Deletions must still remove data immediately and cancel stale pending results.
     const onRemoved = (event: chrome.history.RemovedResult) => {
       cancelScheduled()

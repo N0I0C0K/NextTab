@@ -14,7 +14,7 @@ import {
 } from '@/components/shared'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/shared/ui/tabs'
 import { useStorage } from '@/utils'
-import { returnPagePreferencesStorage } from '@/utils/storage'
+import { returnPagePreferencesStorage, returnPageSourceStorage } from '@/utils/storage'
 import { t } from '@/utils/i18n'
 import { useReturnPages } from '../../hooks/useReturnPages'
 import {
@@ -30,12 +30,19 @@ import { EventExportButton } from './event-export-button'
 
 type LoadingLayout = { rowHeights: number[]; panelHeight: number; footerHeight: number }
 
+const sourceMessages = {
+  recent: { title: 'returnRecent', rules: 'returnRecentRules', empty: 'returnRecentEmpty' },
+  frequent: { title: 'returnFrequent', rules: 'returnFrequentRules', empty: 'returnFrequentEmpty' },
+  history: { title: 'returnHistory', rules: 'returnHistoryRules', empty: 'returnHistoryEmpty' },
+} as const
+
 export function ReturnPagesSection({ tabs }: { tabs: chrome.tabs.Tab[] }) {
-  const [source, setSource] = useState<ReturnPageSource>('recent')
+  const savedSource = useStorage(returnPageSourceStorage)
+  const [source, setSource] = useState<ReturnPageSource>(savedSource)
   const { pages: snapshot, loading, refreshing, error } = useReturnPages(source)
   const preferences = useStorage(returnPagePreferencesStorage)
-  const pages = useMemo(() => filterReturnPages(snapshot, preferences), [snapshot, preferences])
-  const tabsByPage = useMemo(() => groupPageTabs(tabs), [tabs])
+  const pages = useMemo(() => filterReturnPages(snapshot, preferences, source), [snapshot, preferences, source])
+  const tabsByPage = useMemo(() => groupPageTabs(tabs, source === 'history'), [tabs, source])
   const [visibleCount, setVisibleCount] = useState(4)
   const [query, setQuery] = useState('')
   const [rulesOpen, setRulesOpen] = useState(false)
@@ -112,7 +119,7 @@ export function ReturnPagesSection({ tabs }: { tabs: chrome.tabs.Tab[] }) {
     }
   }, [pages, source, loading, loadingLayout])
 
-  const status = error ? t('returnHistoryError') : t(source === 'recent' ? 'returnRecentEmpty' : 'returnFrequentEmpty')
+  const status = error ? t('returnHistoryError') : t(sourceMessages[source].empty)
   const skeletonHeights = loadingLayout?.rowHeights ?? Array<number | undefined>(4).fill(undefined)
   const allPages = pages.filter(page =>
     `${page.title} ${page.url}`.toLocaleLowerCase().includes(query.toLocaleLowerCase()),
@@ -140,6 +147,7 @@ export function ReturnPagesSection({ tabs }: { tabs: chrome.tabs.Tab[] }) {
             })
           }
           setSource(value as ReturnPageSource)
+          void returnPageSourceStorage.setValue(value as ReturnPageSource)
           setQuery('')
         }}
         className="nt-return-tabs">
@@ -148,12 +156,12 @@ export function ReturnPagesSection({ tabs }: { tabs: chrome.tabs.Tab[] }) {
           <div className="nt-return-heading-actions">
             {(import.meta.env.DEV || import.meta.env.MODE === 'test') && <EventExportButton />}
             <TabsList aria-label={t('returnPagesHeading')}>
-              {(['recent', 'frequent'] as const).map(value => (
+              {(['recent', 'frequent', 'history'] as const).map(value => (
                 <Tooltip key={value}>
                   <TabsTrigger value={value} render={<TooltipPrimitive.Trigger delay={350} />}>
-                    {t(value === 'recent' ? 'returnRecent' : 'returnFrequent')}
+                    {t(sourceMessages[value].title)}
                   </TabsTrigger>
-                  <TooltipContent>{t(value === 'recent' ? 'returnRecentRules' : 'returnFrequentRules')}</TooltipContent>
+                  <TooltipContent>{t(sourceMessages[value].rules)}</TooltipContent>
                 </Tooltip>
               ))}
             </TabsList>
@@ -196,9 +204,10 @@ export function ReturnPagesSection({ tabs }: { tabs: chrome.tabs.Tab[] }) {
                   <PageRow
                     page={page}
                     tabs={tabs}
-                    matchingTabs={tabsByPage.get(normalizePageUrl(page.url)!) ?? []}
+                    matchingTabs={tabsByPage.get(source === 'history' ? page.url : normalizePageUrl(page.url)!) ?? []}
                     frequent={source === 'frequent'}
-                    feedback
+                    exactUrl={source === 'history'}
+                    feedback={source !== 'history'}
                   />
                 </div>
               ))
@@ -238,7 +247,7 @@ export function ReturnPagesSection({ tabs }: { tabs: chrome.tabs.Tab[] }) {
                 className="nt-return-all-dialog"
                 initialFocus={() => document.querySelector<HTMLInputElement>('.nt-return-all-dialog input')}>
                 <div className="nt-return-dialog-heading">
-                  <DialogTitle>{t(source === 'recent' ? 'returnRecent' : 'returnFrequent')}</DialogTitle>
+                  <DialogTitle>{t(sourceMessages[source].title)}</DialogTitle>
                   <Tooltip open={rulesOpen} onOpenChange={setRulesOpen}>
                     <TooltipTrigger
                       delay={250}
@@ -250,8 +259,8 @@ export function ReturnPagesSection({ tabs }: { tabs: chrome.tabs.Tab[] }) {
                       <Info size={16} aria-hidden="true" />
                     </TooltipTrigger>
                     <TooltipContent side="bottom" align="start" className="nt-return-rules">
-                      <p>{t(source === 'recent' ? 'returnRecentRules' : 'returnFrequentRules')}</p>
-                      <p>{t('returnCommonRules')}</p>
+                      <p>{t(sourceMessages[source].rules)}</p>
+                      {source !== 'history' && <p>{t('returnCommonRules')}</p>}
                     </TooltipContent>
                   </Tooltip>
                 </div>
@@ -267,7 +276,14 @@ export function ReturnPagesSection({ tabs }: { tabs: chrome.tabs.Tab[] }) {
                 </div>
                 <div className="nt-return-all-list">
                   {allPages.length ? (
-                    <PageList key={query} pages={allPages} tabs={tabs} frequent={source === 'frequent'} feedback />
+                    <PageList
+                      key={query}
+                      pages={allPages}
+                      tabs={tabs}
+                      frequent={source === 'frequent'}
+                      exactUrl={source === 'history'}
+                      feedback={source !== 'history'}
+                    />
                   ) : (
                     <p className="nt-return-empty" role="status">
                       {t('noHistoryFound')}

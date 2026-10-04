@@ -876,14 +876,23 @@
   "returnFrequent": {
     "message": "最近常用"
   },
+  "returnHistory": {
+    "message": "最近造訪"
+  },
+  "returnHistoryRules": {
+    "message": "依最近進入頁面的時間由新到舊顯示。"
+  },
+  "returnHistoryEmpty": {
+    "message": "目前沒有最近造訪的頁面。"
+  },
   "returnRecentRules": {
-    "message": "結合最近 7 天每天的進入次數、單次停留中位數、累計前景停留和活躍天數計分，每天的貢獻分別衰減後相加。次數和時長使用對數增長，不設最低門檻或上限。目前仍有開啟分頁的頁面，使用分乘以 1.3，同路徑多個分頁只乘一次。沒有前景記錄的基礎分為 0，乘後仍為 0，同分依最近造訪排序。"
+    "message": "根據最近 7 天的使用情況，推薦你可能想回訪的頁面。"
   },
   "returnFrequentRules": {
-    "message": "選取最近 30 個自然日造訪過的頁面；先依造訪天數，再依最近造訪時間排序。"
+    "message": "顯示最近 30 天常去的頁面。"
   },
   "returnCommonRules": {
-    "message": "同一網站的相同路徑合併為一條，忽略查詢參數和片段。使用者主動隱藏的頁面或不推薦的網站不再顯示。"
+    "message": "相同頁面會合併，已隱藏的頁面和已排除的網站不會顯示。"
   },
   "returnSelectionRules": {
     "message": "網頁選取規則"
