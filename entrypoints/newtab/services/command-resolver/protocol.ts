@@ -2,6 +2,7 @@ export type CommandQueryParams = {
   query: string // Query with trigger key stripped (what the user actually wants to search)
   rawQuery: string // Original query as typed by the user
   changeQuery?: (newQuery: string) => void
+  resolverName?: string // Explicit mode ('all' for global search); query is already the user's search text
 }
 
 export interface ICommandResultGroup {

@@ -88,7 +88,7 @@ Click the homepage search box, or press `Alt + K` (Windows) / `⌘ + K` (macOS) 
 
 ![Command Palette](doc/images/command-palette.en.png)
 
-Type a keyword to search open tabs, bookmarks, and history, or use a default command to narrow the search:
+Type a keyword to search open tabs, bookmarks, and history. Click a function below the search box to choose a scope, or use a default command:
 
 | Example       | Action                                                  |
 | ------------- | ------------------------------------------------------- |
@@ -98,7 +98,9 @@ Type a keyword to search open tabs, bookmarks, and history, or use a default com
 | `= 12 * 8`    | Calculate an expression; select the result to copy it   |
 | `rmb 1234.56` | Convert an amount to uppercase RMB notation             |
 
-An empty input shows available commands. In settings, you can enable or disable commands, change their trigger keys, and choose whether they appear in global search.
+Type a trigger key followed by Space to select its function and remove the prefix, including `=`. Text entered in a selected mode is treated as search content. Click × on the mode badge, or press Backspace in an empty input, to return to all searches.
+
+An empty input shows available functions; you can also open the list with All functions. In settings, you can enable or disable commands, change their trigger keys, and choose whether they appear in global search.
 
 ### Popup Interface
 

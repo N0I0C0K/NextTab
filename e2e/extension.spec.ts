@@ -308,9 +308,11 @@ test('command palette resolves calculator and RMB commands', async ({ page, exte
   await openNewTab(page, extensionId)
 
   const commandInput = page.getByTestId('command-input')
-  await commandInput.fill('=1+2*3')
+  await commandInput.fill('= 1+2*3')
   await expect(page.getByText('1+2*3 = 7', { exact: true })).toBeVisible()
 
+  await commandInput.fill('')
+  await commandInput.press('Backspace')
   await commandInput.fill('rmb 123.45')
   await expect(page.getByText('壹佰贰拾叁元肆角伍分', { exact: true })).toBeVisible()
   expect(pageErrors).toEqual([])
@@ -325,7 +327,8 @@ test('command results return after copying a calculator result and editing the i
   const commandInput = page.getByTestId('command-input')
   await commandInput.fill('1+1')
   await expect(page.locator('[data-command-result-id="calc-result"]')).toContainText('1+1 = 2')
-  await commandInput.press('ArrowDown')
+  await commandInput.press('Home')
+  await expect(page.locator('[data-command-result-id="calc-result"]')).toHaveAttribute('aria-selected', 'true')
   await commandInput.press('Enter')
   await expect
     .poll(() => page.evaluate(() => JSON.parse(localStorage.getItem('calculator_history') ?? '[]')))
@@ -374,12 +377,15 @@ test('command palette resolves history, bookmarks, open tabs, and web search', a
   await expect(page.getByTestId('command-result').filter({ hasText: 'History Regression Page' })).toBeVisible()
   await commandInput.fill('h ')
   await expect(page.getByTestId('command-result').filter({ hasText: 'History Regression Page' })).toHaveCount(0)
-  await commandInput.fill('h History Regression')
+  await commandInput.fill('History Regression')
   await expect(page.getByTestId('command-result').filter({ hasText: 'History Regression Page' })).toBeVisible()
 
+  await commandInput.fill('')
+  await commandInput.press('Backspace')
   await commandInput.fill('b Bookmark Regression')
   await expect(page.getByTestId('command-result').filter({ hasText: 'Bookmark Regression Page' })).toBeVisible()
 
+  await page.getByTestId('command-clear-mode').click()
   await commandInput.fill('Open Tab Regression')
   await expect(page.locator(`[data-command-result-id="${openTabId}"]`)).toContainText('Open Tab Regression Page')
 
@@ -685,7 +691,8 @@ test('quick link rows stay aligned and reorder across responsive layouts', async
   }
 
   await page.setViewportSize({ width: 390, height: 1000 })
-  await cards.nth(11).scrollIntoViewIfNeeded()
+  // Keep the drag away from viewport edges so auto-scroll does not move the measured target.
+  await cards.nth(11).evaluate(element => element.scrollIntoView({ block: 'center' }))
   const source = await cards.nth(8).getByTestId('quick-link-drag-handle').boundingBox()
   const target = await cards.nth(11).boundingBox()
   expect(source).not.toBeNull()
@@ -707,7 +714,7 @@ test('quick link rows stay aligned and reorder across responsive layouts', async
   await page.reload()
   await expect(cards).toHaveCount(24)
   await page.setViewportSize({ width: 390, height: 700 })
-  await cards.nth(20).scrollIntoViewIfNeeded()
+  await cards.nth(20).evaluate(element => element.scrollIntoView({ block: 'center' }))
   const scrolledSource = await cards.nth(20).getByTestId('quick-link-drag-handle').boundingBox()
   const scrolledTarget = await cards.nth(17).boundingBox()
   expect(scrolledSource).not.toBeNull()
@@ -1013,7 +1020,7 @@ test('command plugins react to disabled, global, and custom trigger settings', a
       },
     })
   }, COMMAND_SETTINGS_KEY)
-  await commandInput.fill('=2+2')
+  await commandInput.fill('= 2+2')
   await expect(page.locator('[data-command-result-id="calc-result"]')).toHaveCount(0)
 
   await page.evaluate(async key => {

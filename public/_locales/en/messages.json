@@ -455,7 +455,7 @@
   },
   "commandPluginHistoryDescription": {
     "description": "History command plugin description",
-    "message": "Search browser history."
+    "message": "Search browser history"
   },
   "commandPluginTabs": {
     "description": "Tabs command plugin name",
@@ -463,7 +463,7 @@
   },
   "commandPluginTabsDescription": {
     "description": "Tabs command plugin description",
-    "message": "Search open tabs."
+    "message": "Search open tabs"
   },
   "commandPluginWebSearch": {
     "description": "Web Search command plugin name",
@@ -471,7 +471,7 @@
   },
   "commandPluginWebSearchDescription": {
     "description": "Web Search command plugin description",
-    "message": "Search the web using default search engine."
+    "message": "Search the web using default search engine"
   },
   "commandPluginWebSearchTitle": {
     "description": "Web Search result title template",
@@ -483,7 +483,7 @@
   },
   "commandPluginCalculatorDescription": {
     "description": "Calculator command plugin description",
-    "message": "Perform mathematical calculations."
+    "message": "Perform mathematical calculations"
   },
   "commandPluginNumberToRmb": {
     "description": "Number to RMB command plugin name",
@@ -491,7 +491,7 @@
   },
   "commandPluginNumberToRmbDescription": {
     "description": "Number to RMB command plugin description",
-    "message": "Convert numbers to Chinese uppercase currency."
+    "message": "Convert numbers to Chinese uppercase currency"
   },
   "numberToRmb": {
     "description": "Number to RMB plugin name",
@@ -551,7 +551,7 @@
   },
   "commandPluginBookmarksDescription": {
     "description": "Bookmarks command plugin description",
-    "message": "Search browser bookmarks."
+    "message": "Search browser bookmarks"
   },
   "localWallpaper": {
     "description": "Local wallpaper section title",
@@ -1146,5 +1146,53 @@
   },
   "returnDetailsActivityNote": {
     "message": "Reopening or returning to a tab is recorded independently, including brief views. Time away from the tab or an unfocused browser window is excluded. Only overlapping stays are combined; stays crossing midnight are split by day. Collection starts when this feature is enabled; browser history cannot reconstruct foreground time."
+  },
+  "commandQuickFunctions": {
+    "message": "Quick actions"
+  },
+  "commandAllFunctions": {
+    "message": "All functions"
+  },
+  "commandShortcutBookmarks": {
+    "message": "Bookmarks"
+  },
+  "commandShortcutTabs": {
+    "message": "Open tabs"
+  },
+  "commandShortcutRmb": {
+    "message": "Amount in words"
+  },
+  "commandBookmarksPlaceholder": {
+    "message": "Search bookmarks…"
+  },
+  "commandHistoryPlaceholder": {
+    "message": "Search browsing history…"
+  },
+  "commandTabsPlaceholder": {
+    "message": "Search open tabs…"
+  },
+  "commandWebPlaceholder": {
+    "message": "Enter a web search…"
+  },
+  "commandCalculatorPlaceholder": {
+    "message": "Enter a calculation, e.g. 128 × 0.85…"
+  },
+  "commandRmbPlaceholder": {
+    "message": "Enter an amount, e.g. 1234.56…"
+  },
+  "commandClearMode": {
+    "message": "Return to all searches"
+  },
+  "commandChooseFunction": {
+    "message": "Choose a function"
+  },
+  "commandKeyboardHint": {
+    "message": "↑ ↓ Select · Enter Confirm · Esc Close"
+  },
+  "commandTriggerRule": {
+    "message": "Trigger key, then Space"
+  },
+  "commandTriggerHint": {
+    "message": "Trigger key: $1"
   }
 }

@@ -455,7 +455,7 @@
   },
   "commandPluginHistoryDescription": {
     "description": "History command plugin description",
-    "message": "搜尋瀏覽器歷史記錄。"
+    "message": "搜尋瀏覽器歷史記錄"
   },
   "commandPluginTabs": {
     "description": "Tabs command plugin name",
@@ -463,7 +463,7 @@
   },
   "commandPluginTabsDescription": {
     "description": "Tabs command plugin description",
-    "message": "搜尋開啟的標籤頁。"
+    "message": "搜尋開啟的標籤頁"
   },
   "commandPluginWebSearch": {
     "description": "Web Search command plugin name",
@@ -471,7 +471,7 @@
   },
   "commandPluginWebSearchDescription": {
     "description": "Web Search command plugin description",
-    "message": "使用預設搜尋引擎搜尋網頁。"
+    "message": "使用預設搜尋引擎搜尋網頁"
   },
   "commandPluginWebSearchTitle": {
     "description": "Web Search result title template",
@@ -483,7 +483,7 @@
   },
   "commandPluginCalculatorDescription": {
     "description": "Calculator command plugin description",
-    "message": "執行數學計算。"
+    "message": "執行數學計算"
   },
   "commandPluginNumberToRmb": {
     "description": "Number to RMB command plugin name",
@@ -491,7 +491,7 @@
   },
   "commandPluginNumberToRmbDescription": {
     "description": "Number to RMB command plugin description",
-    "message": "將數字轉換為人民幣大寫格式。"
+    "message": "將數字轉換為人民幣大寫格式"
   },
   "numberToRmb": {
     "description": "Number to RMB plugin name",
@@ -551,7 +551,7 @@
   },
   "commandPluginBookmarksDescription": {
     "description": "Bookmarks command plugin description",
-    "message": "搜尋瀏覽器收藏夾。"
+    "message": "搜尋瀏覽器收藏夾"
   },
   "localWallpaper": {
     "description": "Local wallpaper section title",
@@ -1146,5 +1146,53 @@
   },
   "returnDetailsActivityNote": {
     "message": "重新進入或切回分頁都會獨立記錄，包含短暫停留；視窗失焦或切開期間不計時。僅重疊停留合併去重，跨午夜的停留分配到各天。記錄從啟用此功能後開始，瀏覽歷史無法還原前景停留。"
+  },
+  "commandQuickFunctions": {
+    "message": "快捷功能"
+  },
+  "commandAllFunctions": {
+    "message": "全部功能"
+  },
+  "commandShortcutBookmarks": {
+    "message": "書籤"
+  },
+  "commandShortcutTabs": {
+    "message": "已開分頁"
+  },
+  "commandShortcutRmb": {
+    "message": "金額大寫"
+  },
+  "commandBookmarksPlaceholder": {
+    "message": "在書籤中搜尋…"
+  },
+  "commandHistoryPlaceholder": {
+    "message": "在瀏覽記錄中搜尋…"
+  },
+  "commandTabsPlaceholder": {
+    "message": "搜尋已開啟的分頁…"
+  },
+  "commandWebPlaceholder": {
+    "message": "輸入要搜尋的內容…"
+  },
+  "commandCalculatorPlaceholder": {
+    "message": "輸入算式，如 128 × 0.85…"
+  },
+  "commandRmbPlaceholder": {
+    "message": "輸入金額，如 1234.56…"
+  },
+  "commandClearMode": {
+    "message": "返回全部搜尋"
+  },
+  "commandChooseFunction": {
+    "message": "選擇一個功能"
+  },
+  "commandKeyboardHint": {
+    "message": "↑ ↓ 選擇 · Enter 確認 · Esc 收起"
+  },
+  "commandTriggerRule": {
+    "message": "觸發鍵後按空格"
+  },
+  "commandTriggerHint": {
+    "message": "觸發鍵：$1"
   }
 }

@@ -455,7 +455,7 @@
   },
   "commandPluginHistoryDescription": {
     "description": "History command plugin description",
-    "message": "Browserverlauf durchsuchen."
+    "message": "Browserverlauf durchsuchen"
   },
   "commandPluginTabs": {
     "description": "Tabs command plugin name",
@@ -463,7 +463,7 @@
   },
   "commandPluginTabsDescription": {
     "description": "Tabs command plugin description",
-    "message": "Geöffnete Tabs durchsuchen."
+    "message": "Geöffnete Tabs durchsuchen"
   },
   "commandPluginWebSearch": {
     "description": "Web Search command plugin name",
@@ -471,7 +471,7 @@
   },
   "commandPluginWebSearchDescription": {
     "description": "Web Search command plugin description",
-    "message": "Das Web mit der Standard-Suchmaschine durchsuchen."
+    "message": "Das Web mit der Standard-Suchmaschine durchsuchen"
   },
   "commandPluginWebSearchTitle": {
     "description": "Web Search result title template",
@@ -483,7 +483,7 @@
   },
   "commandPluginCalculatorDescription": {
     "description": "Calculator command plugin description",
-    "message": "Mathematische Berechnungen durchführen."
+    "message": "Mathematische Berechnungen durchführen"
   },
   "commandPluginNumberToRmb": {
     "description": "Number to RMB command plugin name",
@@ -491,7 +491,7 @@
   },
   "commandPluginNumberToRmbDescription": {
     "description": "Number to RMB command plugin description",
-    "message": "Zahlen in chinesische Großbuchstaben-Währung umrechnen."
+    "message": "Zahlen in chinesische Großbuchstaben-Währung umrechnen"
   },
   "numberToRmb": {
     "description": "Number to RMB plugin name",
@@ -551,7 +551,7 @@
   },
   "commandPluginBookmarksDescription": {
     "description": "Bookmarks command plugin description",
-    "message": "Browser-Lesezeichen durchsuchen."
+    "message": "Browser-Lesezeichen durchsuchen"
   },
   "localWallpaper": {
     "description": "Local wallpaper section title",
@@ -1146,5 +1146,53 @@
   },
   "returnDetailsActivityNote": {
     "message": "Erneutes Öffnen und Zurückwechseln zu einem Tab werden unabhängig erfasst, auch bei kurzen Aufenthalten. Zeit außerhalb des Tabs oder bei unfokussiertem Browserfenster zählt nicht. Nur überlappende Aufenthalte werden zusammengefasst; Aufenthalte über Mitternacht werden auf die Tage verteilt. Die Erfassung beginnt bei Aktivierung dieser Funktion; der Browserverlauf kann die Vordergrunddauer nicht rekonstruieren."
+  },
+  "commandQuickFunctions": {
+    "message": "Schnellaktionen"
+  },
+  "commandAllFunctions": {
+    "message": "Alle Funktionen"
+  },
+  "commandShortcutBookmarks": {
+    "message": "Lesezeichen"
+  },
+  "commandShortcutTabs": {
+    "message": "Offene Tabs"
+  },
+  "commandShortcutRmb": {
+    "message": "Betrag in Worten"
+  },
+  "commandBookmarksPlaceholder": {
+    "message": "Lesezeichen durchsuchen…"
+  },
+  "commandHistoryPlaceholder": {
+    "message": "Browserverlauf durchsuchen…"
+  },
+  "commandTabsPlaceholder": {
+    "message": "Offene Tabs durchsuchen…"
+  },
+  "commandWebPlaceholder": {
+    "message": "Suchbegriff eingeben…"
+  },
+  "commandCalculatorPlaceholder": {
+    "message": "Berechnung eingeben, z. B. 128 × 0.85…"
+  },
+  "commandRmbPlaceholder": {
+    "message": "Betrag eingeben, z. B. 1234.56…"
+  },
+  "commandClearMode": {
+    "message": "Zurück zur gesamten Suche"
+  },
+  "commandChooseFunction": {
+    "message": "Funktion auswählen"
+  },
+  "commandKeyboardHint": {
+    "message": "↑ ↓ Auswählen · Enter Bestätigen · Esc Schließen"
+  },
+  "commandTriggerRule": {
+    "message": "Nach dem Kürzel Leertaste drücken"
+  },
+  "commandTriggerHint": {
+    "message": "Auslöser: $1"
   }
 }

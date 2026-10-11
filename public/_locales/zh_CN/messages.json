@@ -455,7 +455,7 @@
   },
   "commandPluginHistoryDescription": {
     "description": "History command plugin description",
-    "message": "搜索浏览器历史记录。"
+    "message": "搜索浏览器历史记录"
   },
   "commandPluginTabs": {
     "description": "Tabs command plugin name",
@@ -463,7 +463,7 @@
   },
   "commandPluginTabsDescription": {
     "description": "Tabs command plugin description",
-    "message": "搜索打开的标签页。"
+    "message": "搜索打开的标签页"
   },
   "commandPluginWebSearch": {
     "description": "Web Search command plugin name",
@@ -471,7 +471,7 @@
   },
   "commandPluginWebSearchDescription": {
     "description": "Web Search command plugin description",
-    "message": "使用默认搜索引擎搜索网页。"
+    "message": "使用默认搜索引擎搜索网页"
   },
   "commandPluginWebSearchTitle": {
     "description": "Web Search result title template",
@@ -483,7 +483,7 @@
   },
   "commandPluginCalculatorDescription": {
     "description": "Calculator command plugin description",
-    "message": "执行数学计算。"
+    "message": "执行数学计算"
   },
   "commandPluginNumberToRmb": {
     "description": "Number to RMB command plugin name",
@@ -491,7 +491,7 @@
   },
   "commandPluginNumberToRmbDescription": {
     "description": "Number to RMB command plugin description",
-    "message": "将数字转换为人民币大写格式。"
+    "message": "将数字转换为人民币大写格式"
   },
   "numberToRmb": {
     "description": "Number to RMB plugin name",
@@ -551,7 +551,7 @@
   },
   "commandPluginBookmarksDescription": {
     "description": "Bookmarks command plugin description",
-    "message": "搜索浏览器收藏夹。"
+    "message": "搜索浏览器收藏夹"
   },
   "localWallpaper": {
     "description": "Local wallpaper section title",
@@ -1146,5 +1146,53 @@
   },
   "returnDetailsActivityNote": {
     "message": "重新进入或切回标签都会独立记录，包含短暂停留；窗口失焦或切开期间不计时。仅重叠停留合并去重，跨午夜的停留分配到各天。记录从启用此功能后开始，浏览器历史无法还原前台停留。"
+  },
+  "commandQuickFunctions": {
+    "message": "快捷功能"
+  },
+  "commandAllFunctions": {
+    "message": "全部功能"
+  },
+  "commandShortcutBookmarks": {
+    "message": "书签"
+  },
+  "commandShortcutTabs": {
+    "message": "已开标签"
+  },
+  "commandShortcutRmb": {
+    "message": "金额大写"
+  },
+  "commandBookmarksPlaceholder": {
+    "message": "在书签中搜索…"
+  },
+  "commandHistoryPlaceholder": {
+    "message": "在历史记录中搜索…"
+  },
+  "commandTabsPlaceholder": {
+    "message": "搜索已打开的标签页…"
+  },
+  "commandWebPlaceholder": {
+    "message": "输入要搜索的内容…"
+  },
+  "commandCalculatorPlaceholder": {
+    "message": "输入算式，如 128 × 0.85…"
+  },
+  "commandRmbPlaceholder": {
+    "message": "输入金额，如 1234.56…"
+  },
+  "commandClearMode": {
+    "message": "返回全部搜索"
+  },
+  "commandChooseFunction": {
+    "message": "选择一个功能"
+  },
+  "commandKeyboardHint": {
+    "message": "↑ ↓ 选择 · Enter 确认 · Esc 收起"
+  },
+  "commandTriggerRule": {
+    "message": "触发键后按空格"
+  },
+  "commandTriggerHint": {
+    "message": "触发键：$1"
   }
 }
