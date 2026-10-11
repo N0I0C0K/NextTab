@@ -56,7 +56,10 @@
   z-index: 3;
 }
 .nt-command {
+  position: absolute;
+  inset: 0 0 auto;
   width: 100%;
+  height: auto;
   border: 1px solid hsl(var(--border));
   border-radius: 11px;
   background: hsl(var(--card));
@@ -84,18 +87,183 @@
   flex: 1;
   min-width: 0;
   font-size: 15px;
+  color: hsl(var(--foreground));
 }
-.nt-command [data-slot='command-list'] {
-  position: absolute;
-  top: calc(100% + 8px);
-  left: 0;
-  right: 0;
-  max-height: 360px;
+.nt-command [data-slot='command-input']::placeholder {
+  color: hsl(var(--muted-foreground));
+}
+.nt-command-module {
+  position: relative;
+  min-width: 0;
+  padding-top: 56px;
+}
+.nt-command-module[data-expanded='true'] > .nt-command-idle {
+  visibility: hidden;
+}
+.nt-command[data-expanded='true'] {
+  overflow: hidden;
+  box-shadow: 0 12px 36px #0002;
+}
+.dark .nt-command[data-expanded='true'] {
+  box-shadow: 0 12px 36px #0006;
+}
+.nt-command[data-expanded='true'] [data-slot='input-group'] {
+  border-radius: 12px 12px 0 0 !important;
+}
+.nt-command-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+  border-top: 1px solid hsl(var(--border));
+}
+.nt-command .nt-command-panel [data-slot='command-list'] {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: none;
+  padding: 8px;
+}
+.nt-command-mode {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 5px;
+  margin: 0 8px;
+  padding: 5px 8px;
+  border: 0;
+  border-radius: 6px;
+  background: hsl(var(--muted));
+  color: hsl(var(--foreground));
+  font-size: 12px;
+  white-space: nowrap;
+}
+.nt-command-mode svg {
+  width: 13px;
+  height: 13px;
+  color: hsl(var(--muted-foreground));
+}
+.nt-command-shortcuts {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 12px;
+}
+.nt-command-chip,
+.nt-command-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 9px;
   border: 1px solid hsl(var(--border));
-  border-radius: 11px;
-  background: hsl(var(--popover));
-  box-shadow: 0 18px 40px #0002;
-  padding: 6px;
+  border-radius: 7px;
+  background: hsl(var(--card));
+  color: hsl(var(--foreground));
+  font-size: 13px;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+.nt-command-chip svg,
+.nt-command-all svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  color: hsl(var(--muted-foreground));
+}
+.nt-command-all {
+  border-color: transparent;
+  background: transparent;
+  color: hsl(var(--muted-foreground));
+}
+.nt-command-chip:hover,
+.nt-command-all:hover,
+.nt-command-chip[aria-pressed='true'] {
+  background: hsl(var(--muted));
+  color: hsl(var(--foreground));
+}
+.nt-command-chip:focus-visible,
+.nt-command-all:focus-visible,
+.nt-command-mode:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+}
+.nt-command:has([data-slot='command-input']:focus-visible) {
+  border-color: hsl(var(--ring) / 0.35);
+}
+.nt-command-footer {
+  flex-shrink: 0;
+  border-top: 1px solid hsl(var(--border));
+  padding: 9px 12px 8px;
+}
+.nt-command-footer .nt-command-shortcuts {
+  margin-top: 0;
+  gap: 5px;
+}
+.nt-command-footer .nt-command-chip {
+  border-color: transparent;
+  background: transparent;
+  padding: 5px 7px;
+}
+.nt-command-footer .nt-command-chip:hover,
+.nt-command-footer .nt-command-chip[aria-pressed='true'] {
+  background: hsl(var(--muted));
+}
+.nt-command-keyboard-hint {
+  display: block;
+  margin-top: 7px;
+  font-size: 11px;
+  color: hsl(var(--muted-foreground));
+}
+.nt-command-result {
+  width: 100%;
+  min-width: 0;
+  gap: 12px;
+  padding: 10px;
+  border-radius: 8px;
+}
+.nt-command-result > svg:last-child {
+  display: none;
+}
+.nt-command-result-copy {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  gap: 3px;
+}
+.nt-command-trigger {
+  flex-shrink: 0;
+  padding: 2px 5px;
+  border: 1px solid hsl(var(--border));
+  border-radius: 4px;
+  color: hsl(var(--muted-foreground));
+  font-size: 11px;
+}
+@media (max-width: 650px) {
+  .nt-command-chip,
+  .nt-command-all {
+    gap: 5px;
+    padding-inline: 7px;
+    font-size: 12px;
+  }
+  .nt-command-shortcuts {
+    gap: 5px;
+  }
+  .nt-command-result {
+    gap: 9px;
+    padding: 9px 7px;
+  }
+  .nt-command-mode {
+    margin-inline: 6px;
+    padding-inline: 6px;
+  }
+}
+@media (pointer: coarse) {
+  .nt-command-chip,
+  .nt-command-all,
+  .nt-command-mode {
+    min-height: 44px;
+  }
 }
 .nt-links-section {
   margin-top: 27px;
@@ -272,7 +440,7 @@
   }
 }
 @media (max-width: 360px) {
-  .nt-command kbd {
+  .nt-command [data-slot='command-input-wrapper'] kbd {
     display: none;
   }
 }

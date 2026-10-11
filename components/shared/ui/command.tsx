@@ -48,11 +48,13 @@ function CommandDialog({
   )
 }
 
-function CommandInput({
-  className,
-  keyBindings,
-  ...props
-}: React.ComponentProps<typeof CommandPrimitive.Input> & { keyBindings?: string }) {
+const CommandInput = React.forwardRef<
+  React.ElementRef<typeof CommandPrimitive.Input>,
+  React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input> & {
+    keyBindings?: string
+    startAdornment?: React.ReactNode
+  }
+>(({ className, keyBindings, startAdornment, ...props }, ref) => {
   return (
     <div data-slot="command-input-wrapper" className="p-1 pb-0">
       <InputGroup
@@ -60,7 +62,9 @@ function CommandInput({
         <InputGroupAddon>
           <SearchIcon className="size-4 shrink-0 opacity-50" />
         </InputGroupAddon>
+        {startAdornment}
         <CommandPrimitive.Input
+          ref={ref}
           data-slot="command-input"
           className={cn('w-full text-sm outline-hidden disabled:cursor-not-allowed disabled:opacity-50', className)}
           {...props}
@@ -74,7 +78,8 @@ function CommandInput({
       </InputGroup>
     </div>
   )
-}
+})
+CommandInput.displayName = 'CommandInput'
 
 function CommandList({ className, ...props }: React.ComponentProps<typeof CommandPrimitive.List>) {
   return (

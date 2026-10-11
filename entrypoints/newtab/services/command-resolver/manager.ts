@@ -12,7 +12,7 @@ import {
 import { WarpDefaultObject } from '@/utils'
 import { commandSettingsStorage, defaultCommandSettings } from '@/utils/storage'
 import type { CommandSettingsData } from '@/utils/storage'
-import { stripTriggerKeyForPlugin } from './utils'
+import { matchesTriggerKey, stripTriggerKeyForPlugin } from './utils'
 import { filter } from 'lodash'
 
 export type IDisposable = {
@@ -94,8 +94,12 @@ class CommandResolverService {
     })
   }
 
-  choosePlugins(rawQuery: string): { plugins: ICommandResolverWithSettings[]; hit: boolean } {
+  choosePlugins(rawQuery: string, resolverName?: string): { plugins: ICommandResolverWithSettings[]; hit: boolean } {
     const availablePlugins = this.resolvers.filter(it => it.getSettings().active)
+
+    if (resolverName && resolverName !== 'all') {
+      return { plugins: availablePlugins.filter(it => it.properties.name === resolverName), hit: true }
+    }
 
     // When query is empty, show plugin list
     if (rawQuery.length === 0) {
@@ -106,8 +110,9 @@ class CommandResolverService {
 
     // Try to match plugins with activeKey
     const matchedPlugins = availablePlugins.filter(it => {
+      if (resolverName === 'all') return false
       const settings = it.getSettings()
-      return settings.activeKey && rawQuery.startsWith(settings.activeKey)
+      return matchesTriggerKey(rawQuery, settings.activeKey)
     })
 
     if (matchedPlugins.length > 0) {
@@ -130,7 +135,7 @@ class CommandResolverService {
   resolve(params: CommandQueryParams, onGroupResolve: (group: ICommandResultGroup) => void) {
     const _tick = ++this._queryTimes
     // Choose plugins based on raw query
-    const { plugins, hit } = this.choosePlugins(params.rawQuery)
+    const { plugins, hit } = this.choosePlugins(params.rawQuery, params.resolverName)
 
     const warpOnGroupResolve = (group: ICommandResultGroup) => {
       if (_tick !== this._queryTimes) {
@@ -156,7 +161,9 @@ class CommandResolverService {
           const settings = it.getSettings()
 
           // Strip trigger key for this specific plugin
-          const strippedQuery = stripTriggerKeyForPlugin(params.rawQuery, settings.activeKey)
+          const strippedQuery = params.resolverName
+            ? params.query
+            : stripTriggerKeyForPlugin(params.rawQuery, settings.activeKey)
 
           // Create params with plugin-specific stripped query
           const pluginParams: CommandQueryParams & { resolverService: CommandResolverService } = {
