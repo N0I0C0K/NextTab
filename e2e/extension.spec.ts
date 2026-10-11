@@ -691,7 +691,8 @@ test('quick link rows stay aligned and reorder across responsive layouts', async
   }
 
   await page.setViewportSize({ width: 390, height: 1000 })
-  await cards.nth(11).scrollIntoViewIfNeeded()
+  // Keep the drag away from viewport edges so auto-scroll does not move the measured target.
+  await cards.nth(11).evaluate(element => element.scrollIntoView({ block: 'center' }))
   const source = await cards.nth(8).getByTestId('quick-link-drag-handle').boundingBox()
   const target = await cards.nth(11).boundingBox()
   expect(source).not.toBeNull()
@@ -713,7 +714,7 @@ test('quick link rows stay aligned and reorder across responsive layouts', async
   await page.reload()
   await expect(cards).toHaveCount(24)
   await page.setViewportSize({ width: 390, height: 700 })
-  await cards.nth(20).scrollIntoViewIfNeeded()
+  await cards.nth(20).evaluate(element => element.scrollIntoView({ block: 'center' }))
   const scrolledSource = await cards.nth(20).getByTestId('quick-link-drag-handle').boundingBox()
   const scrolledTarget = await cards.nth(17).boundingBox()
   expect(scrolledSource).not.toBeNull()
