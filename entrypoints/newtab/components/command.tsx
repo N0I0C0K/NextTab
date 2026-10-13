@@ -8,6 +8,7 @@ import type { CommandQueryParams, ICommandResultGroup } from '@/entrypoints/newt
 import { useEffect, useId, useLayoutEffect, useRef, useState, forwardRef, useImperativeHandle, type FC } from 'react'
 import { ChevronDown, Layers, X } from 'lucide-react'
 import { t, type MessageKey } from '@/utils/i18n'
+import { isMacOS } from '@/utils/platform'
 
 const shortcutOrder = ['bookmarks', 'history', 'tabs', 'calculator']
 const shortLabels: Record<string, MessageKey> = {
@@ -58,10 +59,8 @@ export const CommandModule = forwardRef<
   const inputDelay = useDebounce(inputVal, 200)
   const setting = useStorage(settingStorage)
   const pluginSettings = useStorage(commandSettingsStorage)
-  const [isWindows] = useState(() => {
-    return navigator.userAgent.toLowerCase().includes('windows')
-  })
-  const keyBindings = isWindows ? 'Alt+K' : '⌘+K'
+  const [isMac] = useState(isMacOS)
+  const keyBindings = isMac ? '⌘+K' : 'Alt+K'
 
   const plugins = commandResolverService.registeredResolvers.filter(plugin => {
     return (pluginSettings[plugin.properties.name] ?? plugin.getSettings()).active
@@ -125,8 +124,8 @@ export const CommandModule = forwardRef<
   useEffect(() => {
     const listener = (ev: KeyboardEvent) => {
       if (
-        (isWindows && ev.altKey && (ev.key === 'k' || ev.key === 'K')) ||
-        (!isWindows && ev.metaKey && (ev.key === 'k' || ev.key === 'K'))
+        (!isMac && ev.altKey && (ev.key === 'k' || ev.key === 'K')) ||
+        (isMac && ev.metaKey && (ev.key === 'k' || ev.key === 'K'))
       ) {
         ev.preventDefault()
         setOpen(true)
@@ -142,7 +141,7 @@ export const CommandModule = forwardRef<
     return () => {
       window.removeEventListener('keydown', listener)
     }
-  }, [isWindows])
+  }, [isMac])
 
   useImperativeHandle(ref, () => ({
     focus: () => {

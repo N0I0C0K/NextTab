@@ -131,13 +131,14 @@ Background script manages MQTT connection for cross-device notifications:
 ### Adding UI Components
 
 Follow `packages/ui/README.md` for shadcn/ui components:
+
 - Run `pnpm dlx shadcn@latest add {component} -c ./packages/ui`
 - Export from `packages/ui/lib/components/ui/index.ts`
 - Use `withUI()` in consuming page's `tailwind.config.ts`
 
 ## Version Management
 
-Use `pnpm update-version <version>` to update all `package.json` files atomically (see `UPDATE-PACKAGE-VERSIONS.md`).
+Use `pnpm update-version <version>` to update the root `package.json`. WXT derives both browser manifest versions and ZIP filenames from it. Update `CHANGELOG.md` and the source version in both READMEs for a release; see `DEVELOPMENT.md`.
 
 ## Testing
 

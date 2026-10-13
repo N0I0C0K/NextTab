@@ -1,5 +1,6 @@
 <div align="center">
 
+<img src="public/icon-128.png" width="64" height="64" alt="NextTab icon" />
 <h1>NextTab</h1>
 <p>An efficiency-focused browser start page, clean and modern</p>
 
@@ -10,6 +11,8 @@
 [![GitHub Release](https://img.shields.io/github/v/release/N0I0C0K/NextTab?style=flat-square)](https://github.com/N0I0C0K/NextTab/releases)
 
 English | [简体中文](README.md)
+
+Current source version: **1.5.0** · [Changelog](CHANGELOG.md) (the store listing may have a different published version)
 
 </div>
 
@@ -46,7 +49,7 @@ NextTab is a new tab page extension focused on boosting browser efficiency with 
 - 📱 **Responsive Design** - Adapts to various screen sizes for a consistent experience
 - 🔒 **Privacy Focused** - Core features run locally. Page usage records and recommendation preferences stay in your browser, with no user data collection
 - 💾 **Data Backups** - Export and import quick links and settings for backups or migration
-- 🌐 **Cross-Device Sync** - Sync data across multiple devices via MQTT protocol (optional & WIP)
+- 🌐 **Cross-Device Reminders** - Send and receive drink-water reminders via MQTT (optional), with data disclosure and authorization before connecting
 
 ## 📸 Feature Showcase
 
@@ -162,10 +165,12 @@ For more details, please refer to [DEVELOPMENT.en.md](DEVELOPMENT.en.md).
 ## Browser Support
 
 - ✅ Chrome/Edge (Recommended)
-- ✅ Firefox
+- ✅ Desktop Firefox 140+ (first submission awaiting review; not publicly listed yet)
 - ⚠️ Other Chromium-based browsers (Untested)
 
 ## License
+
+See the [Privacy notice](PRIVACY.md) for local data and optional network features.
 
 This project is licensed under the [MIT License](LICENSE).
 

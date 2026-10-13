@@ -1,9 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
-import { hasPermission, requestPermission } from '../utils/permissions'
-
-const hasRelevantOriginChange = (permissions: chrome.permissions.Permissions, origins: readonly string[]) => {
-  return permissions.origins?.some(origin => origins.includes(origin)) ?? false
-}
+import { hasPermission, isRelevantPermissionChange, requestPermission } from '../utils/permissions'
 
 type PermissionChangeListener = (permissions: chrome.permissions.Permissions) => void
 
@@ -52,7 +48,7 @@ export const usePermission = (origins: string[]): PermissionState => {
     }
 
     const handlePermissionChange = (permissions: chrome.permissions.Permissions) => {
-      if (!hasRelevantOriginChange(permissions, normalizedOrigins)) {
+      if (!isRelevantPermissionChange(permissions, normalizedOrigins)) {
         return
       }
 

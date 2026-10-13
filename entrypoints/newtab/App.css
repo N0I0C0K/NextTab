@@ -22,11 +22,13 @@
   letter-spacing: 0.035em;
 }
 .nt-brand-mark {
-  width: 20px;
-  height: 20px;
-  border: 5px solid currentColor;
-  border-radius: 7px;
-  transform: rotate(-12deg);
+  width: 24px;
+  height: 24px;
+  /* The source has 2px of padding; keep the existing 20px layout footprint. */
+  margin: -2px;
+  flex-shrink: 0;
+  background: currentColor;
+  mask: url('/icon.svg') center / contain no-repeat;
 }
 .nt-main {
   width: min(100%, 784px);

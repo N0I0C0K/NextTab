@@ -1,12 +1,14 @@
 import { useStorage } from '@/utils'
 import { getDisplayQuickUrls, quickUrlItemsStorage, settingStorage } from '@/utils/storage'
 import { t } from '@/utils/i18n'
+import { isMacOS } from '@/utils/platform'
 import { PopupQuickUrlItem } from './PopupQuickUrlItem'
 
 export const PopupQuickUrlGrid = () => {
   const quickUrls = useStorage(quickUrlItemsStorage)
   const settings = useStorage(settingStorage)
   const displayQuickUrls = getDisplayQuickUrls(quickUrls, settings.quickUrlSortMode ?? 'manual')
+  const modifierKey = isMacOS() ? '⌘' : t('keyboardControlKey')
 
   if (quickUrls.length === 0) {
     return (
@@ -24,7 +26,9 @@ export const PopupQuickUrlGrid = () => {
         ))}
       </div>
       <div className="px-4 pb-4 pt-2">
-        <p className="text-xs text-muted-foreground text-center leading-relaxed">{t('popupKeyboardHint')}</p>
+        <p className="text-xs text-muted-foreground text-center leading-relaxed" data-testid="popup-keyboard-hint">
+          {t('popupKeyboardHint', modifierKey)}
+        </p>
       </div>
     </div>
   )
