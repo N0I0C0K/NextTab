@@ -107,7 +107,14 @@
   },
   "popupKeyboardHint": {
     "description": "Popup keyboard shortcuts hint",
-    "message": "Ctrl/⌘ + Click to open in new tab | Shift + Ctrl/⌘ + Click to open next to current tab"
+    "message": "$modifier$ + Click to open in new tab | Shift + $modifier$ + Click to open next to current tab",
+    "placeholders": {
+      "modifier": { "content": "$1" }
+    }
+  },
+  "keyboardControlKey": {
+    "description": "Localized label for the Control key",
+    "message": "Ctrl"
   },
   "addCurrentPage": {
     "description": "Add current page to quick links",
@@ -880,7 +887,7 @@
   },
   "mqttPermissionDescription": {
     "description": "Description for MQTT broker permission",
-    "message": "Authorization required to connect to MQTT server"
+    "message": "Optional: connecting shares your display name, channel key and message metadata with the MQTT broker and devices in the same channel."
   },
   "returnPagesHeading": {
     "message": "Return to a page"

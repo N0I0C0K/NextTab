@@ -1,6 +1,7 @@
 import { useState, type FC } from 'react'
 import { Button, Stack, Text } from '@/components/shared'
 import { t } from '@/utils/i18n'
+import { isMacOS } from '@/utils/platform'
 import { Check } from 'lucide-react'
 import { StepHeader, StepContainer } from '../components'
 
@@ -9,8 +10,8 @@ interface CompleteStepProps {
 }
 
 export const CompleteStep: FC<CompleteStepProps> = ({ onComplete }) => {
-  const [isWindows] = useState(() => navigator.userAgent.toLowerCase().includes('windows'))
-  const keyBindings = isWindows ? 'Alt+K' : '⌘+K'
+  const [isMac] = useState(isMacOS)
+  const keyBindings = isMac ? '⌘+K' : 'Alt+K'
 
   return (
     <StepContainer>

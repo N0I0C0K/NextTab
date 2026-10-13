@@ -1,12 +1,17 @@
 import { defineConfig } from 'wxt'
 import { readFile } from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
+import { FIREFOX_MQTT_DATA_PERMISSIONS } from './utils/permissions'
 
 const localesDirectory = resolve(import.meta.dirname, 'public/_locales').replaceAll('\\', '/')
 const localeModulePrefix = '\0nexttab-locale:'
 
 export default defineConfig({
   modules: ['@wxt-dev/module-react'],
+  zip: {
+    // WXT source ZIPs do not use .gitignore; keep local traces and credentials out.
+    excludeSources: ['artifacts/**', 'test-results/**', 'playwright-report/**', 'coverage/**', '.env', '.env.*'],
+  },
   // Keep Chrome's locale files as the single source while avoiding /public module requests in dev.
   vite: () => ({
     plugins: [
@@ -49,9 +54,31 @@ export default defineConfig({
       'alarms',
       'topSites',
     ],
+    ...(browser === 'firefox'
+      ? {
+          browser_specific_settings: {
+            gecko: {
+              id: 'nexttab@n0i0c0k.github.io',
+              strict_min_version: '140.0',
+              data_collection_permissions: {
+                required: ['none'],
+                optional: FIREFOX_MQTT_DATA_PERMISSIONS,
+              },
+            },
+            gecko_android: {
+              strict_min_version: '142.0',
+            },
+          },
+        }
+      : {}),
     optional_host_permissions: ['https://api.github.com/*', 'wss://broker.emqx.io:8084/*'],
     action: {
-      default_icon: 'icon-34.png',
+      default_icon: {
+        16: 'icon-16.png',
+        24: 'icon-24.png',
+        32: 'icon-32.png',
+        48: 'icon-48.png',
+      },
     },
     commands: {
       _execute_action: {
@@ -59,6 +86,9 @@ export default defineConfig({
       },
     },
     icons: {
+      16: 'icon-16.png',
+      32: 'icon-32.png',
+      48: 'icon-48.png',
       128: 'icon-128.png',
     },
   }),
