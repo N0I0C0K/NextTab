@@ -53,10 +53,12 @@ English summary: A clean new tab for searching tabs, bookmarks and history, retu
 
 The source ZIP includes the pnpm lockfile and build instructions. No remote code is loaded and the default MV3 content security policy is used without `unsafe-eval`.
 
-The current `web-ext lint` warnings come from bundled dependencies:
+For 1.5.1, `web-ext lint` reports 0 errors, 0 notices and 9 warnings. Eight warnings come from bundled dependencies:
 
 - `innerHTML`: React DOM's renderer and Base UI's DOM mirroring. Application code does not use `dangerouslySetInnerHTML` for page titles, URLs or MQTT messages.
 - `Function`: expr-eval's unused `toJSFunction` method, lodash's global-object fallback, and MQTT dependency polyfills for generator runtime/function binding. The calculator uses `Parser.evaluate` to interpret expressions. Modern browser globals and native function binding bypass the fallback branches.
 - `eval`: an intrinsic reference in an MQTT dependency; it is not an evaluation of downloaded code.
+
+The remaining warning checks `gecko.data_collection_permissions` against Android 140 (inherited from the desktop minimum). Data consent is supported on desktop Firefox 140; this release intentionally omits `gecko_android` because Android does not support the new-tab override. The warning does not represent an Android support claim, and Android compatibility should not be added to suppress it.
 
 These are static warnings, not an AMO approval. Reviewers can inspect the corresponding locked dependencies in the source build. The package does not enable dynamic evaluation to bypass extension CSP.
