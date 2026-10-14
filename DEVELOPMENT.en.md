@@ -29,7 +29,7 @@ pnpm zip
 pnpm zip:firefox
 pnpm check           # Types, lint, unit tests, and both browser builds
 pnpm icons:generate  # Generate icons and wordmarks from the SVG source
-pnpm update-version 1.5.0 # Update both manifests and ZIP filenames through package.json
+pnpm update-version 1.5.1 # Update both manifests and ZIP filenames through package.json
 ```
 
 Install the Playwright browser before the first E2E run:

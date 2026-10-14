@@ -1,6 +1,6 @@
 # NextTab 隐私说明 / Privacy notice
 
-适用版本：1.5.0 · 更新日期：2026-10-11
+适用版本：1.5.0、1.5.1 · 更新日期：2026-10-14
 
 ## 简体中文
 
@@ -20,7 +20,7 @@ Firefox 中，MQTT 的身份／认证信息和技术／交互数据需要另行�
 
 ## English
 
-Version 1.5.0 · Updated 2026-10-11
+Versions 1.5.0 and 1.5.1 · Updated 2026-10-14
 
 NextTab uses history, tabs, bookmarks, foreground events, preferences, quick links, and settings locally for search and recommendations. Foreground logs retain ten days, up to 2 MiB. These browsing records are not uploaded. The extension contains no analytics or advertising trackers.
 

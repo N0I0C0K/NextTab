@@ -30,7 +30,7 @@ pnpm zip
 pnpm zip:firefox
 pnpm check           # 类型、lint、单测及双浏览器构建
 pnpm icons:generate  # 从 SVG 源文件生成图标和字标
-pnpm update-version 1.5.0 # 更新版本，自动用于双浏览器 manifest 和 ZIP 文件名
+pnpm update-version 1.5.1 # 更新版本，自动用于双浏览器 manifest 和 ZIP 文件名
 ```
 
 首次运行 E2E 前需要安装浏览器：

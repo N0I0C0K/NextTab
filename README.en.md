@@ -12,7 +12,7 @@
 
 English | [简体中文](README.md)
 
-Current source version: **1.5.0** · [Changelog](CHANGELOG.md) (the store listing may have a different published version)
+Current source version: **1.5.1** · [Changelog](CHANGELOG.md) (the store listing may have a different published version)
 
 </div>
 

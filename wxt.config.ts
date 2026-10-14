@@ -65,9 +65,6 @@ export default defineConfig({
                 optional: FIREFOX_MQTT_DATA_PERMISSIONS,
               },
             },
-            gecko_android: {
-              strict_min_version: '142.0',
-            },
           },
         }
       : {}),

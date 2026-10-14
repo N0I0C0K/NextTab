@@ -10,7 +10,8 @@ function createClient() {
   const client = Object.assign(new EventEmitter(), {
     connected: false,
     reconnect: vi.fn(),
-    subscribeAsync: vi.fn(async () => []),
+    subscribeAsync: vi.fn(async (topics: string[]) => topics.map(topic => ({ topic }))),
+    unsubscribeAsync: vi.fn(async () => undefined),
     endAsync: vi.fn(async () => {
       client.connected = false
       client.emit('end')
@@ -56,6 +57,34 @@ describe('MQTT connection cancellation', () => {
     await reconnecting
     expect(provider.client).toBe(next)
     expect(first.reconnect).not.toHaveBeenCalled()
+    await provider.disconnect()
+  })
+
+  it('keeps the old channel out of a new broker connection and preserves reminder topics', async () => {
+    const first = createClient()
+    const provider = new MqttProvider({ brokerUrl: 'wss://broker-a.example/mqtt' })
+    const reminder = provider.getOrCreateTopicEvent('drink-water')
+    const receive = vi.fn()
+    reminder.subscribe(receive)
+    await provider.changeSecretPrefix('old-channel')
+    const connecting = provider.connect()
+    first.connected = true
+    first.emit('connect')
+    await connecting
+    await vi.waitFor(() => expect(first.subscribeAsync).toHaveBeenCalledWith(['old-channel/drink-water']))
+    await provider.disconnect()
+
+    await provider.changeSecretPrefix('new-channel')
+    const next = createClient()
+    const reconnecting = provider.connect({ brokerUrl: 'wss://broker-b.example/mqtt' })
+    next.connected = true
+    next.emit('connect')
+    await reconnecting
+    await vi.waitFor(() => expect(next.subscribeAsync).toHaveBeenCalledWith(['new-channel/drink-water']))
+    expect(mqtt.connect).toHaveBeenLastCalledWith('wss://broker-b.example/mqtt')
+    expect(next.unsubscribeAsync).not.toHaveBeenCalled()
+    next.emit('message', 'new-channel/drink-water', Buffer.from(JSON.stringify({ id: 'sample-reminder' })))
+    expect(receive).toHaveBeenCalledExactlyOnceWith({ id: 'sample-reminder' })
     await provider.disconnect()
   })
 })
