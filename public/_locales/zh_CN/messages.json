@@ -96,7 +96,14 @@
   },
   "popupKeyboardHint": {
     "description": "Popup keyboard shortcuts hint",
-    "message": "Ctrl/⌘+点击：新标签页打开 | Shift + Ctrl/⌘ + 点击：在当前 Tab 旁边打开"
+    "message": "$modifier$ + 点击：新标签页打开 | Shift + $modifier$ + 点击：在当前 Tab 旁边打开",
+    "placeholders": {
+      "modifier": { "content": "$1" }
+    }
+  },
+  "keyboardControlKey": {
+    "description": "Localized label for the Control key",
+    "message": "Ctrl"
   },
   "addCurrentPage": {
     "description": "Add current page to quick links",
@@ -865,7 +872,7 @@
   },
   "mqttPermissionDescription": {
     "description": "Description for MQTT broker permission",
-    "message": "需要授权才能连接 MQTT 服务器"
+    "message": "可选：连接后会向 MQTT 服务及同频道设备发送显示名称、频道密钥和消息元数据。"
   },
   "returnPagesHeading": {
     "message": "回到页面"

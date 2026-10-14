@@ -123,15 +123,37 @@ export class MqttProvider extends EventEmitter<MqttProviderEventMap> {
       throw new Error('MQTT broker URL is not set')
     }
 
+    const client = mqtt.connect(this.brokerUrl)
+    this._clientInner = client
     try {
-      this._clientInner = await mqtt.connectAsync(this.brokerUrl)
+      // Retain the client during the handshake so revocation can cancel retries.
+      await new Promise<void>((resolve, reject) => {
+        const cleanup = () => {
+          client.off('connect', finish)
+          client.off('end', finish)
+          client.off('error', fail)
+        }
+        const finish = () => {
+          cleanup()
+          resolve()
+        }
+        const fail = (error: Error) => {
+          cleanup()
+          reject(error)
+        }
+        client.once('connect', finish)
+        client.once('end', finish)
+        client.once('error', fail)
+      })
     } catch (error) {
-      this._clientInner = null
+      if (this._clientInner === client) this._clientInner = null
+      await client.endAsync(true)
       console.error('Failed to connect to MQTT broker:', error)
       throw error
     }
-    this.emit('client-loaded', this._clientInner)
-    this._clientInner.on('message', (topic: string, message: Buffer) => {
+    if (this._clientInner !== client || !client.connected) return
+    this.emit('client-loaded', client)
+    client.on('message', (topic: string, message: Buffer) => {
       const rawTopic = this.topicRegisterService.removeSecretPrefix(topic)
       const topicEvent = this.registeredTopics.get(rawTopic)
       if (!topicEvent) return
@@ -145,8 +167,9 @@ export class MqttProvider extends EventEmitter<MqttProviderEventMap> {
   }
 
   async disconnect() {
-    if (!this._clientInner || !this._clientInner.connected) return
-    await this._clientInner.endAsync()
+    const client = this._clientInner
+    this._clientInner = null
+    await client?.endAsync(true)
   }
 
   deleteTopicEvent<T>(event: TopicEventHandler<T>) {

@@ -1,5 +1,6 @@
 <div align="center">
 
+<img src="public/icon-128.png" width="64" height="64" alt="NextTab 图标" />
 <h1>NextTab</h1>
 <p>一个聚焦效率的浏览器起始界面，简洁且现代</p>
 
@@ -10,6 +11,8 @@
 [![GitHub Release](https://img.shields.io/github/v/release/N0I0C0K/NextTab?style=flat-square)](https://github.com/N0I0C0K/NextTab/releases)
 
 [English](README.en.md) | 简体中文
+
+当前源码版本：**1.5.1** · [更新日志](CHANGELOG.md)（商店版本以商店页面为准）
 
 </div>
 
@@ -46,7 +49,7 @@ NextTab 是一个专注于提升浏览器效率的新标签页扩展，采用简
 - 📱 **响应式设计** - 适配各种屏幕尺寸，提供一致体验
 - 🔒 **隐私至上** - 核心功能在本地运行，页面使用记录和推荐偏好保存在当前浏览器中，不收集用户数据
 - 💾 **数据备份** - 导出和导入快捷链接、设置，方便备份或迁移
-- 🌐 **跨设备同步** - 通过 MQTT 协议在多设备间同步数据（可选 & WIP）
+- 🌐 **跨设备提醒** - 通过 MQTT 收发喝水提醒（可选）；连接前会说明发送的数据并请求授权
 
 ## 📸 功能展示
 
@@ -162,10 +165,12 @@ pnpm dev
 ## 浏览器支持
 
 - ✅ Chrome/Edge (推荐)
-- ✅ Firefox
+- ✅ 桌面 Firefox 140+（首次提交等待审核，尚未公开上架）
 - ⚠️ 其他基于 Chromium 的浏览器（未测试）
 
 ## 开源协议
+
+本地数据与可选联网功能的说明见 [隐私说明](PRIVACY.md)。
 
 本项目采用 [MIT License](LICENSE) 开源协议。
 
