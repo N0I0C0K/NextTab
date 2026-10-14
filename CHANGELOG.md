@@ -1,5 +1,17 @@
 # 更新日志 / Changelog
 
+## 1.5.1
+
+### 简体中文
+
+- 移除 Android 兼容声明；Firefox Android 不支持当前首页使用的新标签页覆盖接口，此轮仅发布桌面 Firefox 140+。
+- 修复 MQTT 更换服务与频道后向新服务发送旧频道主题的问题；新客户端保留提醒主题定义，但不继承旧会话的订阅状态，旧订阅确认晚到也不会污染新会话。
+
+### English
+
+- Removed the Android compatibility declaration because Firefox for Android does not support the new-tab override used by NextTab. This release targets desktop Firefox 140+.
+- Prevented old MQTT channel topics from being sent to a replacement broker. New clients retain reminder topic definitions without inheriting prior subscription state, including late acknowledgements from an old client.
+
 ## 1.5.0
 
 ### 简体中文
