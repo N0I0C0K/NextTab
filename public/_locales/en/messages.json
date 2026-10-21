@@ -28,6 +28,11 @@
   "addSite": {
     "message": "Add site"
   },
+  "addToQuickLinks": { "message": "Add to favorite sites" },
+  "quickLinkSaved": { "message": "Already in favorite sites" },
+  "quickLinkAdded": { "message": "Added to favorite sites" },
+  "quickLinkAddFailed": { "message": "Could not add site. Please try again." },
+  "quickLinkSuggestionHint": { "message": "Select to edit" },
   "addQuickLinkTitle": {
     "message": "Add a quick link"
   },

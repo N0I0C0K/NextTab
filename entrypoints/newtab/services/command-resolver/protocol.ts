@@ -14,6 +14,7 @@ export interface ICommandResult {
   id: string
   title: string
   description?: string
+  url?: string
   iconUrl?: string
   IconType?: React.ElementType
   onSelect?: () => void

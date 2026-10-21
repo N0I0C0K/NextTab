@@ -20,6 +20,7 @@ export const tabSearchResolver: ICommandResolver = {
     return result.map(it => {
       return {
         id: it.id!.toString(),
+        url: it.url ?? it.pendingUrl,
         title: it.title!,
         description: it.url!,
         iconUrl: it.favIconUrl!,
