@@ -6,8 +6,47 @@ import { t } from '@/utils/i18n'
 import { Button } from '@/components/shared/ui/button'
 import { XIcon } from 'lucide-react'
 
-function Dialog({ ...props }: DialogPrimitive.Root.Props) {
-  return <DialogPrimitive.Root data-slot="dialog" {...props} />
+const CloseGuardContext = React.createContext<{
+  register: (guard: () => boolean) => () => void
+  canClose: () => boolean
+} | null>(null)
+
+/** An inline editor can veto closing its containing dialog without opening another modal. */
+function useDialogCloseGuard(guard: () => boolean) {
+  const register = React.useContext(CloseGuardContext)?.register
+  React.useEffect(() => register?.(guard), [register, guard])
+}
+
+/** Reuse the editor's leave check when settings navigation would unmount it. */
+function useDialogCloseCheck() {
+  return React.useContext(CloseGuardContext)?.canClose
+}
+
+function Dialog({ onOpenChange, ...props }: DialogPrimitive.Root.Props) {
+  const guard = React.useRef<(() => boolean) | null>(null)
+  const register = React.useCallback((next: () => boolean) => {
+    guard.current = next
+    return () => {
+      if (guard.current === next) guard.current = null
+    }
+  }, [])
+  const canClose = React.useCallback(() => guard.current?.() ?? true, [])
+  const context = React.useMemo(() => ({ register, canClose }), [register, canClose])
+  return (
+    <CloseGuardContext.Provider value={context}>
+      <DialogPrimitive.Root
+        data-slot="dialog"
+        {...props}
+        onOpenChange={(open, details) => {
+          if (!open && !canClose()) {
+            details.cancel()
+            return
+          }
+          onOpenChange?.(open, details)
+        }}
+      />
+    </CloseGuardContext.Provider>
+  )
 }
 
 function DialogTrigger({ ...props }: DialogPrimitive.Trigger.Props) {
@@ -132,4 +171,6 @@ export {
   DialogPortal,
   DialogTitle,
   DialogTrigger,
+  useDialogCloseGuard,
+  useDialogCloseCheck,
 }

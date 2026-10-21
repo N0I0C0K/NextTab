@@ -39,67 +39,32 @@ export async function getBookmarkFolders(): Promise<chrome.bookmarks.BookmarkTre
   }
 }
 
-/**
- * Get all bookmark IDs within a folder (including nested children)
- * More efficient than checking each bookmark individually
- * Returns null if the folder doesn't exist (deleted/invalid)
- */
-async function getBookmarkIdsInFolder(folderId: string): Promise<Set<string> | null> {
-  try {
-    const [subtree] = await chrome.bookmarks.getSubTree(folderId)
-    const ids = new Set<string>()
+export type SiteBookmark = chrome.bookmarks.BookmarkTreeNode & { folderPath: string }
 
-    const collectIds = (node: chrome.bookmarks.BookmarkTreeNode) => {
-      ids.add(node.id)
-      if (node.children) {
-        node.children.forEach(collectIds)
-      }
+/** Traverse the complete selected subtree in bookmark order, preserving individual records. */
+export function collectSiteBookmarks(
+  tree: chrome.bookmarks.BookmarkTreeNode[],
+  domain: string,
+  folderId?: string | null,
+): SiteBookmark[] {
+  const result: SiteBookmark[] = []
+  const walk = (nodes: chrome.bookmarks.BookmarkTreeNode[], path: string[], inside: boolean) => {
+    for (const node of nodes) {
+      const included = inside || !folderId || node.id === folderId
+      if (node.url && included && getDomainFromUrl(node.url) === domain)
+        result.push({ ...node, folderPath: path.join(' / ') })
+      if (node.children) walk(node.children, node.title ? [...path, node.title] : path, included)
     }
-
-    collectIds(subtree)
-    return ids
-  } catch (error) {
-    console.error('Failed to get folder subtree:', error)
-    // Return null to indicate the folder is invalid/deleted
-    return null
   }
+  walk(tree, [], false)
+  return result
 }
 
 /**
- * Find bookmarks matching a domain using chrome.bookmarks.search API
- * This is more efficient than fetching the entire tree and filtering
+ * Find exact-host bookmarks in the complete tree; a missing folder produces no matches.
  * @param domain The domain to search for
  * @param folderId Optional folder ID to filter bookmarks by
  */
-export async function findBookmarksByDomain(
-  domain: string,
-  folderId?: string | null,
-): Promise<chrome.bookmarks.BookmarkTreeNode[]> {
-  try {
-    // Use chrome.bookmarks.search() to find bookmarks containing the domain
-    // This is more efficient than getTree() for large bookmark collections
-    const results = await chrome.bookmarks.search({ query: domain })
-
-    // Filter to exact domain matches
-    let filteredResults = results.filter(bookmark => {
-      if (!bookmark.url) return false
-      const bookmarkDomain = getDomainFromUrl(bookmark.url)
-      return bookmarkDomain === domain
-    })
-
-    // If a folder ID is specified, further filter to only bookmarks in that folder
-    if (folderId) {
-      // Get all bookmark IDs within the folder once (more efficient than per-bookmark checks)
-      const folderBookmarkIds = await getBookmarkIdsInFolder(folderId)
-      // If folder is invalid/deleted, skip filtering and return all results
-      if (folderBookmarkIds !== null) {
-        filteredResults = filteredResults.filter(bookmark => folderBookmarkIds.has(bookmark.id))
-      }
-    }
-
-    return filteredResults
-  } catch (error) {
-    console.error('Failed to search bookmarks:', error)
-    return []
-  }
+export async function findBookmarksByDomain(domain: string, folderId?: string | null): Promise<SiteBookmark[]> {
+  return collectSiteBookmarks(await chrome.bookmarks.getTree(), domain, folderId)
 }

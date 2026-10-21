@@ -27,6 +27,7 @@ import {
   DialogHeader,
   DialogDescription,
   ScrollArea,
+  useDialogCloseCheck,
 } from '@/components/shared'
 import type { LucideProps } from 'lucide-react'
 import {
@@ -187,6 +188,7 @@ const MqttSettings: FC = () => {
 }
 
 const SettingTabs: FC = () => {
+  const canLeaveEditor = useDialogCloseCheck()
   const renderTabContent = (value: string, content: ReactNode) => (
     <TabsContent value={value} className="mt-0 min-w-0 flex-1 p-6">
       <Suspense
@@ -201,7 +203,12 @@ const SettingTabs: FC = () => {
   )
 
   return (
-    <Tabs defaultValue="homepage-settings" className="nt-settings-tabs">
+    <Tabs
+      defaultValue="homepage-settings"
+      className="nt-settings-tabs"
+      onValueChange={(_, details) => {
+        if (canLeaveEditor && !canLeaveEditor()) details.cancel()
+      }}>
       <TabsList className="nt-settings-tab-list">
         <TabsTrigger className="justify-start" value="homepage-settings" data-testid="settings-tab-homepage">
           <House aria-hidden="true" />

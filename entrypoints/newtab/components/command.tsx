@@ -1,21 +1,34 @@
 import { cn } from '@/entrypoints/newtab/lib/utils'
 import { useDebounce, useStorage } from '@/utils'
-import { commandSettingsStorage, settingStorage } from '@/utils/storage'
-import { command, Text } from '@/components/shared'
+import {
+  addQuickUrl,
+  commandSettingsStorage,
+  quickUrlItemsStorage,
+  searchEnginesStorage,
+  settingStorage,
+} from '@/utils/storage'
+import { command, Text, Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/shared'
 import { commandResolverService } from '@/entrypoints/newtab/services/command-resolver'
 import { matchesTriggerKey, stripTriggerKeyForPlugin } from '@/entrypoints/newtab/services/command-resolver/utils'
 import type { CommandQueryParams, ICommandResultGroup } from '@/entrypoints/newtab/services/command-resolver'
 import { useEffect, useId, useLayoutEffect, useRef, useState, forwardRef, useImperativeHandle, type FC } from 'react'
 import { ChevronDown, Layers, X } from 'lucide-react'
 import { t, type MessageKey } from '@/utils/i18n'
+import { toast } from 'sonner'
+import { nanoid } from 'nanoid'
+import { QuickLinksDialog } from './navigation/quick-links-dialog'
+import { SearchEngineSettings } from './settings/SearchEngineSettings'
+import { QuickItemEditForm } from './quick-item-edit-form'
+import { useGlobalDialog } from '../providers'
 
-const shortcutOrder = ['bookmarks', 'history', 'tabs', 'calculator']
+const shortcutOrder = ['quickLinks', 'bookmarks', 'history', 'tabs', 'calculator']
 const shortLabels: Record<string, MessageKey> = {
   bookmarks: 'commandShortcutBookmarks',
   tabs: 'commandShortcutTabs',
   numberToRmb: 'commandShortcutRmb',
 }
 const placeholders: Record<string, MessageKey> = {
+  quickLinks: 'quickLinksSearchPlaceholder',
   bookmarks: 'commandBookmarksPlaceholder',
   history: 'commandHistoryPlaceholder',
   tabs: 'commandTabsPlaceholder',
@@ -55,6 +68,13 @@ export const CommandModule = forwardRef<
   const [functionPickerOpen, setFunctionPickerOpen] = useState(false)
   const [panelHeight, setPanelHeight] = useState(360)
   const [result, setResult] = useState<ICommandResultGroup[]>([])
+  const [quickListQuery, setQuickListQuery] = useState<string | null>(null)
+  const [enginesOpen, setEnginesOpen] = useState(false)
+  const [retry, setRetry] = useState(0)
+  const quickLinks = useStorage(quickUrlItemsStorage)
+  const [searchEngineRevision, setSearchEngineRevision] = useState(0)
+  useEffect(() => searchEnginesStorage.watch(() => setSearchEngineRevision(value => value + 1)), [])
+  const { show: showDialog, close: closeDialog } = useGlobalDialog()
   const inputDelay = useDebounce(inputVal, 200)
   const setting = useStorage(settingStorage)
   const pluginSettings = useStorage(commandSettingsStorage)
@@ -85,6 +105,22 @@ export const CommandModule = forwardRef<
     const query: CommandQueryParams = {
       query: inputDelay,
       rawQuery: inputDelay,
+      openQuickLinks: setQuickListQuery,
+      openSearchEngines: () => setEnginesOpen(true),
+      addQuickLink: () =>
+        showDialog(
+          <QuickItemEditForm
+            submitButtonTitle={t('addSite')}
+            onSubmit={item => {
+              void addQuickUrl({ ...item, id: nanoid() }).then(
+                () => closeDialog(),
+                () => toast.error(t('engineSaveFailed')),
+              )
+            }}
+          />,
+          t('addQuickLinkTitle'),
+        ),
+      retry: () => setRetry(value => value + 1),
       resolverName: selectedResolver?.properties.name ?? (sharedTrigger ? undefined : 'all'),
       changeQuery: (newQuery: string) => {
         setInputVal(newQuery)
@@ -96,13 +132,27 @@ export const CommandModule = forwardRef<
         }, 200)
       },
     }
-    commandResolverService.resolve(query, group => {
+    void commandResolverService.resolve(query, group => {
       if (current) setResult(prev => [...prev, group])
     })
     return () => {
       current = false
     }
-  }, [inputDelay, inputVal, selectedPlugin, selectedResolver, sharedTrigger, functionPickerOpen, pluginSettings])
+  }, [
+    inputDelay,
+    inputVal,
+    selectedPlugin,
+    selectedResolver,
+    sharedTrigger,
+    functionPickerOpen,
+    pluginSettings,
+    retry,
+    quickLinks,
+    searchEngineRevision,
+    setting.quickUrlSortMode,
+    showDialog,
+    closeDialog,
+  ])
 
   useLayoutEffect(() => {
     if (!open) return
@@ -132,7 +182,7 @@ export const CommandModule = forwardRef<
         setOpen(true)
         inputRef.current?.focus()
       }
-      if (ev.key === 'Escape' && containerRef.current?.contains(document.activeElement)) {
+      if (ev.key === 'Escape' && !ev.isComposing && containerRef.current?.contains(document.activeElement)) {
         setOpen(false)
         setFunctionPickerOpen(false)
         ;(document.activeElement as HTMLElement).blur()
@@ -237,165 +287,216 @@ export const CommandModule = forwardRef<
   )
 
   return (
-    <div
-      className="nt-command-module"
-      ref={containerRef}
-      data-expanded={open}
-      onBlur={event => {
-        if (!event.currentTarget.contains(event.relatedTarget)) setOpen(false)
-      }}>
-      <command.Command className={cn('rounded-xl', className)} data-expanded={open} shouldFilter={false}>
-        <command.CommandInput
-          data-testid="command-input"
-          onFocus={() => setOpen(true)}
-          value={inputVal}
-          ref={inputRef}
-          onValueChange={changeInput}
-          onCompositionStart={() => {
-            composingRef.current = true
-          }}
-          onCompositionEnd={event => {
-            composingRef.current = false
-            changeInput(event.currentTarget.value)
-          }}
-          onKeyDown={event => {
-            if (
-              event.key === 'Backspace' &&
-              selectedResolver &&
-              inputVal.length === 0 &&
-              !composingRef.current &&
-              !event.nativeEvent.isComposing &&
-              event.nativeEvent.keyCode !== 229 &&
-              !event.altKey &&
-              !event.ctrlKey &&
-              !event.metaKey
-            ) {
-              event.preventDefault()
-              event.stopPropagation()
-              clearPlugin()
-            }
-          }}
-          // eslint-disable-next-line jsx-a11y/no-autofocus
-          autoFocus={setting.autoFocusCommandInput}
-          placeholder={
-            selectedResolver ? t(placeholders[selectedResolver.properties.name]) : t('searchCommandPlaceholder')
-          }
-          className="text-base"
-          keyBindings={keyBindings}
-          startAdornment={
-            selectedResolver && (
-              <button
-                type="button"
-                className="nt-command-mode"
-                data-testid="command-clear-mode"
-                aria-label={t('commandClearMode')}
-                onKeyDown={event => {
-                  if (event.key === 'Enter' || event.key === ' ') event.stopPropagation()
-                }}
-                onClick={clearPlugin}>
-                <span>{label(selectedResolver)}</span>
-                <X aria-hidden="true" />
-              </button>
-            )
-          }
-        />
-        {open && (
-          <div className="nt-command-panel" id={panelId} data-testid="command-panel" style={{ maxHeight: panelHeight }}>
-            <command.CommandList
-              className="nt-command-results"
-              data-testid="command-results"
-              onMouseDown={e => {
-                // Prevent the input from losing focus when clicking on items
-                e.preventDefault()
-              }}>
-              <command.CommandEmpty>
-                {selectedResolver && inputVal.length === 0
-                  ? selectedResolver.properties.description
-                  : t('noResultsFound')}
-              </command.CommandEmpty>
-              {showFunctions ? (
-                <command.CommandGroup heading={t('commandChooseFunction')}>
-                  {plugins.map(plugin => (
-                    <command.CommandItem
-                      key={plugin.properties.name}
-                      value={`plugin-list-${plugin.properties.name}`}
-                      data-command-result-id={`plugin-list-${plugin.properties.name}`}
-                      title={triggerLabel(plugin) ? t('commandTriggerHint', triggerLabel(plugin)) : undefined}
-                      onSelect={() => selectPlugin(plugin.properties.name)}
-                      className="nt-command-result">
-                      <CommandItemIcon IconType={plugin.properties.icon ?? Layers} />
-                      <div className="nt-command-result-copy">
-                        <Text level="s" className="truncate" title={label(plugin)}>
-                          {label(plugin)}
-                        </Text>
-                        <Text level="xs" className="truncate" gray title={plugin.properties.description}>
-                          {plugin.properties.description}
-                        </Text>
-                      </div>
-                      {triggerLabel(plugin) && <kbd className="nt-command-trigger">{triggerLabel(plugin)}</kbd>}
-                    </command.CommandItem>
-                  ))}
-                </command.CommandGroup>
-              ) : (
-                result.map(val => {
-                  // groupName is already displayName (translated)
-                  return (
-                    <command.CommandGroup
-                      heading={selectedResolver ? label(selectedResolver) : val.groupName}
-                      key={val.groupName}>
-                      {val.result.length === 0 ? (
-                        <command.CommandItem disabled className="py-1.5 w-full opacity-60">
-                          <Text level="xs" gray>
-                            {t('noResultsForPlugin')}
-                          </Text>
-                        </command.CommandItem>
-                      ) : (
-                        val.result.map(res => {
-                          return (
-                            <command.CommandItem
-                              key={res.id}
-                              value={`${val.groupName}:${res.id}`}
-                              data-testid="command-result"
-                              data-command-result-id={res.id}
-                              onSelect={() => {
-                                res.onSelect?.()
-                                // Hide the panel after selection
-                                inputRef.current?.focus()
-                                setOpen(false)
-                              }}
-                              className="nt-command-result">
-                              <CommandItemIcon iconUrl={res.iconUrl} IconType={res.IconType} />
-                              <div className="nt-command-result-copy">
-                                <Text level="s" className="truncate" title={res.title}>
-                                  {res.title}
-                                </Text>
-                                <Text level="xs" className="truncate" gray title={res.description}>
-                                  {res.description}
-                                </Text>
-                              </div>
-                            </command.CommandItem>
-                          )
-                        })
-                      )}
-                    </command.CommandGroup>
+    <>
+      <div
+        className="nt-command-module"
+        ref={containerRef}
+        data-expanded={open}
+        onBlur={event => {
+          if (!event.currentTarget.contains(event.relatedTarget)) setOpen(false)
+        }}>
+        <command.Command className={cn('rounded-xl', className)} data-expanded={open} shouldFilter={false}>
+          <command.CommandInput
+            data-testid="command-input"
+            onFocus={() => setOpen(true)}
+            onClick={() => setOpen(true)}
+            value={inputVal}
+            ref={inputRef}
+            onValueChange={changeInput}
+            onCompositionStart={() => {
+              composingRef.current = true
+            }}
+            onCompositionEnd={event => {
+              composingRef.current = false
+              changeInput(event.currentTarget.value)
+            }}
+            onKeyDown={event => {
+              if (
+                event.key === 'Enter' &&
+                (event.ctrlKey || event.metaKey) &&
+                !composingRef.current &&
+                !event.nativeEvent.isComposing &&
+                event.nativeEvent.keyCode !== 229
+              ) {
+                const selected = containerRef.current?.querySelector<HTMLElement>(
+                  '[data-command-result-id][aria-selected="true"]',
+                )
+                const item = result
+                  .flatMap(group => group.result)
+                  .find(item => item.id === selected?.dataset.commandResultId)
+                if (item) {
+                  event.preventDefault()
+                  event.stopPropagation()
+                  void Promise.resolve(item.onSelect?.({ newTab: true })).catch(() =>
+                    toast.error(t('returnOpenFailed')),
                   )
-                })
-              )}
-            </command.CommandList>
-            <div className="nt-command-footer">
-              {shortcuts}
-              <span className="nt-command-keyboard-hint">
-                {showFunctions && <>{t('commandTriggerRule')} · </>}
-                {t('commandKeyboardHint')}
-              </span>
+                  if (!item.keepOpen) setOpen(false)
+                  return
+                }
+              }
+              if (
+                event.key === 'Backspace' &&
+                selectedResolver &&
+                inputVal.length === 0 &&
+                !composingRef.current &&
+                !event.nativeEvent.isComposing &&
+                event.nativeEvent.keyCode !== 229 &&
+                !event.altKey &&
+                !event.ctrlKey &&
+                !event.metaKey
+              ) {
+                event.preventDefault()
+                event.stopPropagation()
+                clearPlugin()
+              }
+            }}
+            // eslint-disable-next-line jsx-a11y/no-autofocus
+            autoFocus={setting.autoFocusCommandInput}
+            placeholder={
+              selectedResolver ? t(placeholders[selectedResolver.properties.name]) : t('searchCommandPlaceholder')
+            }
+            className="text-base"
+            keyBindings={keyBindings}
+            startAdornment={
+              selectedResolver && (
+                <button
+                  type="button"
+                  className="nt-command-mode"
+                  data-testid="command-clear-mode"
+                  aria-label={t('commandClearMode')}
+                  onKeyDown={event => {
+                    if (event.key === 'Enter' || event.key === ' ') event.stopPropagation()
+                  }}
+                  onClick={clearPlugin}>
+                  <span>{label(selectedResolver)}</span>
+                  <X aria-hidden="true" />
+                </button>
+              )
+            }
+          />
+          {open && (
+            <div
+              className="nt-command-panel"
+              id={panelId}
+              data-testid="command-panel"
+              style={{ maxHeight: panelHeight }}>
+              <command.CommandList
+                className="nt-command-results"
+                data-testid="command-results"
+                onMouseDown={e => {
+                  // Prevent the input from losing focus when clicking on items
+                  e.preventDefault()
+                }}>
+                <command.CommandEmpty>
+                  {selectedResolver && inputVal.length === 0
+                    ? selectedResolver.properties.description
+                    : t('noResultsFound')}
+                </command.CommandEmpty>
+                {showFunctions ? (
+                  <command.CommandGroup heading={t('commandChooseFunction')}>
+                    {plugins.map(plugin => (
+                      <command.CommandItem
+                        key={plugin.properties.name}
+                        value={`plugin-list-${plugin.properties.name}`}
+                        data-command-result-id={`plugin-list-${plugin.properties.name}`}
+                        title={triggerLabel(plugin) ? t('commandTriggerHint', triggerLabel(plugin)) : undefined}
+                        onSelect={() => selectPlugin(plugin.properties.name)}
+                        className="nt-command-result">
+                        <CommandItemIcon IconType={plugin.properties.icon ?? Layers} />
+                        <div className="nt-command-result-copy">
+                          <Text level="s" className="truncate" title={label(plugin)}>
+                            {label(plugin)}
+                          </Text>
+                          <Text level="xs" className="truncate" gray title={plugin.properties.description}>
+                            {plugin.properties.description}
+                          </Text>
+                        </div>
+                        {triggerLabel(plugin) && <kbd className="nt-command-trigger">{triggerLabel(plugin)}</kbd>}
+                      </command.CommandItem>
+                    ))}
+                  </command.CommandGroup>
+                ) : (
+                  result.map(val => {
+                    // groupName is already displayName (translated)
+                    return (
+                      <command.CommandGroup
+                        heading={selectedResolver ? label(selectedResolver) : val.groupName}
+                        key={val.groupName}>
+                        {val.result.length === 0 ? (
+                          <command.CommandItem disabled className="py-1.5 w-full opacity-60">
+                            <Text level="xs" gray>
+                              {t('noResultsForPlugin')}
+                            </Text>
+                          </command.CommandItem>
+                        ) : (
+                          val.result.map(res => {
+                            return (
+                              <command.CommandItem
+                                key={res.id}
+                                value={`${val.groupName}:${res.id}`}
+                                data-testid="command-result"
+                                data-command-result-id={res.id}
+                                onClickCapture={event => {
+                                  if (event.ctrlKey || event.metaKey) {
+                                    event.preventDefault()
+                                    event.stopPropagation()
+                                    void Promise.resolve(res.onSelect?.({ newTab: true })).catch(() =>
+                                      toast.error(t('returnOpenFailed')),
+                                    )
+                                    if (!res.keepOpen) setOpen(false)
+                                  }
+                                }}
+                                onSelect={() => {
+                                  if (composingRef.current) return
+                                  void Promise.resolve(res.onSelect?.()).catch(() => toast.error(t('returnOpenFailed')))
+                                  // Hide the panel after selection
+                                  inputRef.current?.focus()
+                                  if (!res.keepOpen) setOpen(false)
+                                }}
+                                className="nt-command-result">
+                                <CommandItemIcon iconUrl={res.iconUrl} IconType={res.IconType} />
+                                <div className="nt-command-result-copy">
+                                  <Text level="s" className="truncate" title={res.title}>
+                                    {res.title}
+                                  </Text>
+                                  <Text level="xs" className="truncate" gray title={res.description}>
+                                    {res.description}
+                                  </Text>
+                                </div>
+                              </command.CommandItem>
+                            )
+                          })
+                        )}
+                      </command.CommandGroup>
+                    )
+                  })
+                )}
+              </command.CommandList>
+              <div className="nt-command-footer">
+                {shortcuts}
+                <span className="nt-command-keyboard-hint">
+                  {showFunctions && <>{t('commandTriggerRule')} · </>}
+                  {t('commandKeyboardHint')}
+                </span>
+              </div>
             </div>
-          </div>
-        )}
-      </command.Command>
-      <div className="nt-command-idle" aria-hidden={open}>
-        {shortcuts}
+          )}
+        </command.Command>
+        <div className="nt-command-idle" aria-hidden={open}>
+          {shortcuts}
+        </div>
       </div>
-    </div>
+      <QuickLinksDialog query={quickListQuery} onClose={() => setQuickListQuery(null)} finalFocus={inputRef} />
+      <Dialog open={enginesOpen} onOpenChange={setEnginesOpen}>
+        <DialogContent className="nt-engine-dialog" finalFocus={inputRef}>
+          <DialogHeader>
+            <DialogTitle>{t('engineManage')}</DialogTitle>
+            <DialogDescription>{t('engineBrowserDescription')}</DialogDescription>
+          </DialogHeader>
+          <SearchEngineSettings />
+        </DialogContent>
+      </Dialog>
+    </>
   )
 })
 

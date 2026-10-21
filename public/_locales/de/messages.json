@@ -1194,5 +1194,140 @@
   },
   "commandTriggerHint": {
     "message": "Auslöser: $1"
+  },
+  "commandPluginQuickLinks": {
+    "message": "Schnelllinks"
+  },
+  "commandPluginQuickLinksDescription": {
+    "message": "Gespeicherte Schnelllinks nach Name oder URL durchsuchen."
+  },
+  "quickLinksEmpty": {
+    "message": "Noch keine Schnelllinks"
+  },
+  "quickLinksSearchPlaceholder": {
+    "message": "Schnelllinks nach Name oder URL suchen"
+  },
+  "quickLinksViewAll": {
+    "message": "Alle Schnelllinks anzeigen ($1)"
+  },
+  "navigationReadFailed": {
+    "message": "Diese Quelle konnte nicht geladen werden. Erneut versuchen."
+  },
+  "retryAction": {
+    "message": "Erneut versuchen"
+  },
+  "navigationAllBookmarks": {
+    "message": "Alle Lesezeichen anzeigen ($1)"
+  },
+  "navigationAllTabs": {
+    "message": "Alle Tabs anzeigen ($1)"
+  },
+  "navigationCloseNamedTab": {
+    "message": "Tab schließen: $1"
+  },
+  "navigationSearch": {
+    "message": "Titel, URL oder Lesezeichenordner suchen"
+  },
+  "navigationSleeping": {
+    "message": "Im Ruhezustand"
+  },
+  "engineManage": {
+    "message": "Suchmaschinen"
+  },
+  "engineBrowserDefault": {
+    "message": "Standardsuche des Browsers"
+  },
+  "engineBrowserDescription": {
+    "message": "Verwendet die im Browser eingestellte Suchmaschine."
+  },
+  "engineDefault": {
+    "message": "Standard"
+  },
+  "engineEnterQuery": {
+    "message": "Suchbegriffe eingeben"
+  },
+  "engineSearchWith": {
+    "message": "Mit $1 suchen"
+  },
+  "engineName": {
+    "message": "Name"
+  },
+  "engineUrl": {
+    "message": "Such-URL"
+  },
+  "engineNameRequired": {
+    "message": "Einen Namen mit 1–40 Zeichen eingeben."
+  },
+  "engineNameDuplicate": {
+    "message": "Dieser Name wird bereits verwendet."
+  },
+  "engineUrlInvalid": {
+    "message": "Eine gültige HTTP- oder HTTPS-URL eingeben."
+  },
+  "enginePlaceholderMissing": {
+    "message": "%s als Platzhalter für Suchbegriffe verwenden."
+  },
+  "enginePlaceholderHost": {
+    "message": "%s darf nicht in Protokoll, Host oder Port stehen."
+  },
+  "engineCredentials": {
+    "message": "Die URL darf keine Zugangsdaten enthalten."
+  },
+  "engineTemplateHelp": {
+    "message": "%s steht für Suchbegriffe, z. B. https://github.com/search?q=%s"
+  },
+  "enginePreviewQuery": {
+    "message": "Suchbegriffe für die Vorschau"
+  },
+  "enginePreviewPlaceholder": {
+    "message": "Eine gültige Vorlage und Suchbegriffe für die Vorschau eingeben."
+  },
+  "engineAdd": {
+    "message": "Suchmaschine hinzufügen"
+  },
+  "engineEdit": {
+    "message": "Bearbeiten"
+  },
+  "engineSave": {
+    "message": "Suchmaschine speichern"
+  },
+  "engineSaved": {
+    "message": "Suchmaschine gespeichert"
+  },
+  "engineSaveFailed": {
+    "message": "Speichern fehlgeschlagen. Änderungen bleiben erhalten."
+  },
+  "engineDelete": {
+    "message": "Löschen"
+  },
+  "engineDeleted": {
+    "message": "$1 gelöscht"
+  },
+  "engineToggle": {
+    "message": "$1 aktivieren"
+  },
+  "engineActions": {
+    "message": "Aktionen für $1"
+  },
+  "engineMoveUp": {
+    "message": "Nach oben"
+  },
+  "engineMoveDown": {
+    "message": "Nach unten"
+  },
+  "engineLimit": {
+    "message": "Bis zu $1 eigene Suchmaschinen können eingerichtet werden."
+  },
+  "engineDiscardQuestion": {
+    "message": "Ungespeicherte Änderungen verwerfen?"
+  },
+  "engineDiscard": {
+    "message": "Änderungen verwerfen"
+  },
+  "engineContinueEditing": {
+    "message": "Weiter bearbeiten"
+  },
+  "engineInvalidConfig": {
+    "message": "Ungültige Suchmaschinen wurden übersprungen."
   }
 }

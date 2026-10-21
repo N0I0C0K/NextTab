@@ -18,6 +18,7 @@ import {
   AccordionItem,
   AccordionTrigger,
   AccordionContent,
+  useDialogCloseCheck,
 } from '@/components/shared'
 import { Layers, Pointer, MousePointerClick } from 'lucide-react'
 import { useState, type FC } from 'react'
@@ -26,6 +27,7 @@ import type { ICommandResolver } from '@/entrypoints/newtab/services/command-res
 import { commandResolverService } from '@/entrypoints/newtab/services/command-resolver'
 import { cn } from '@/entrypoints/newtab/lib/utils'
 import { SettingItem } from './SettingItem'
+import { SearchEngineSettings } from './SearchEngineSettings'
 
 const CommandPluginSettingItem: FC<{
   plugin: ICommandResolver
@@ -97,12 +99,14 @@ const CommandPluginSettingItem: FC<{
             />
           </Stack>
         </Stack>
+        {plugin.properties.name === 'webSearch' && <SearchEngineSettings />}
       </AccordionContent>
     </AccordionItem>
   )
 }
 
 export const CommandSettings: FC = () => {
+  const canLeaveEditor = useDialogCloseCheck()
   const commandSettings = useStorage(commandSettingsStorage)
   const settings = useStorage(settingStorage)
 
@@ -142,7 +146,12 @@ export const CommandSettings: FC = () => {
       <Text gray level="s">
         {t('commandPluginSettings')}
       </Text>
-      <Accordion multiple className="flex flex-col gap-2">
+      <Accordion
+        multiple
+        className="flex flex-col gap-2"
+        onValueChange={(value, details) => {
+          if (!value.includes('webSearch') && canLeaveEditor && !canLeaveEditor()) details.cancel()
+        }}>
         {plugins.map(plugin => {
           const pluginSettings =
             commandSettings[plugin.properties.name] || defaultCommandSettings[plugin.properties.name]

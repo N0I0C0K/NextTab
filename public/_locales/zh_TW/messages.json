@@ -1194,5 +1194,140 @@
   },
   "commandTriggerHint": {
     "message": "觸發鍵：$1"
+  },
+  "commandPluginQuickLinks": {
+    "message": "快捷連結"
+  },
+  "commandPluginQuickLinksDescription": {
+    "message": "透過名稱或 URL 搜尋已儲存的快捷連結。"
+  },
+  "quickLinksEmpty": {
+    "message": "還沒有快捷連結"
+  },
+  "quickLinksSearchPlaceholder": {
+    "message": "搜尋快捷連結名稱或 URL"
+  },
+  "quickLinksViewAll": {
+    "message": "查看全部快捷連結（$1）"
+  },
+  "navigationReadFailed": {
+    "message": "暫時無法讀取此來源，請重試。"
+  },
+  "retryAction": {
+    "message": "重試"
+  },
+  "navigationAllBookmarks": {
+    "message": "查看全部書籤（$1）"
+  },
+  "navigationAllTabs": {
+    "message": "查看全部分頁（$1）"
+  },
+  "navigationCloseNamedTab": {
+    "message": "關閉分頁：$1"
+  },
+  "navigationSearch": {
+    "message": "搜尋標題、URL 或書籤資料夾"
+  },
+  "navigationSleeping": {
+    "message": "已休眠"
+  },
+  "engineManage": {
+    "message": "搜尋引擎"
+  },
+  "engineBrowserDefault": {
+    "message": "瀏覽器預設搜尋"
+  },
+  "engineBrowserDescription": {
+    "message": "使用瀏覽器設定的搜尋引擎。"
+  },
+  "engineDefault": {
+    "message": "預設"
+  },
+  "engineEnterQuery": {
+    "message": "輸入關鍵字開始搜尋"
+  },
+  "engineSearchWith": {
+    "message": "在 $1 搜尋"
+  },
+  "engineName": {
+    "message": "名稱"
+  },
+  "engineUrl": {
+    "message": "搜尋 URL"
+  },
+  "engineNameRequired": {
+    "message": "請輸入 1–40 個字元的名稱。"
+  },
+  "engineNameDuplicate": {
+    "message": "這個名稱已被使用。"
+  },
+  "engineUrlInvalid": {
+    "message": "請輸入有效的 HTTP 或 HTTPS 網址。"
+  },
+  "enginePlaceholderMissing": {
+    "message": "請用 %s 標記關鍵字的位置。"
+  },
+  "enginePlaceholderHost": {
+    "message": "%s 不能放在通訊協定、主機或連接埠中。"
+  },
+  "engineCredentials": {
+    "message": "URL 不能包含使用者名稱或密碼。"
+  },
+  "engineTemplateHelp": {
+    "message": "用 %s 代表關鍵字，例如 https://github.com/search?q=%s"
+  },
+  "enginePreviewQuery": {
+    "message": "預覽關鍵字"
+  },
+  "enginePreviewPlaceholder": {
+    "message": "填寫有效範本和關鍵字後顯示預覽。"
+  },
+  "engineAdd": {
+    "message": "新增搜尋引擎"
+  },
+  "engineEdit": {
+    "message": "編輯"
+  },
+  "engineSave": {
+    "message": "儲存引擎"
+  },
+  "engineSaved": {
+    "message": "搜尋引擎已儲存"
+  },
+  "engineSaveFailed": {
+    "message": "儲存失敗，已保留目前編輯內容。"
+  },
+  "engineDelete": {
+    "message": "刪除"
+  },
+  "engineDeleted": {
+    "message": "已刪除 $1"
+  },
+  "engineToggle": {
+    "message": "啟用 $1"
+  },
+  "engineActions": {
+    "message": "$1 的操作"
+  },
+  "engineMoveUp": {
+    "message": "上移"
+  },
+  "engineMoveDown": {
+    "message": "下移"
+  },
+  "engineLimit": {
+    "message": "最多可設定 $1 個自訂引擎。"
+  },
+  "engineDiscardQuestion": {
+    "message": "放棄尚未儲存的修改？"
+  },
+  "engineDiscard": {
+    "message": "放棄修改"
+  },
+  "engineContinueEditing": {
+    "message": "繼續編輯"
+  },
+  "engineInvalidConfig": {
+    "message": "已略過無效的引擎設定。"
   }
 }

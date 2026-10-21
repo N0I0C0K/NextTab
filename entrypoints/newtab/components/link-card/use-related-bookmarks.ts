@@ -9,31 +9,45 @@ import { settingStorage } from '@/utils/storage'
  */
 export const useRelatedBookmarks = (url: string, contextMenuOpen: boolean) => {
   const [relatedBookmarks, setRelatedBookmarks] = useState<chrome.bookmarks.BookmarkTreeNode[]>([])
+  const [error, setError] = useState(false)
+  const [loadedScope, setLoadedScope] = useState('')
   const settings = useStorage(settingStorage)
+  const scope = getDomainFromUrl(url) + ':' + (settings.bookmarkFolderId ?? '')
 
   useEffect(() => {
+    let cancelled = false
     if (!settings.showBookmarksInQuickUrlMenu) {
       setRelatedBookmarks([])
       return
     }
     if (contextMenuOpen) {
+      setError(false)
       const domain = getDomainFromUrl(url)
       if (domain) {
         findBookmarksByDomain(domain, settings.bookmarkFolderId)
           .then(bookmarks => {
-            // Filter out the current URL itself
-            setRelatedBookmarks(bookmarks.filter(b => b.url !== url))
+            if (!cancelled) {
+              setRelatedBookmarks(bookmarks)
+              setLoadedScope(scope)
+            }
           })
           .catch(error => {
             console.error('Failed to fetch bookmarks:', error)
-            setRelatedBookmarks([])
+            if (!cancelled) setError(true)
           })
       } else {
         // Clear bookmarks if domain extraction fails
         setRelatedBookmarks([])
       }
     }
-  }, [contextMenuOpen, url, settings.showBookmarksInQuickUrlMenu, settings.bookmarkFolderId])
+    return () => {
+      cancelled = true
+    }
+  }, [contextMenuOpen, url, settings.showBookmarksInQuickUrlMenu, settings.bookmarkFolderId, scope])
 
-  return { relatedBookmarks, showBookmarks: settings.showBookmarksInQuickUrlMenu }
+  return {
+    relatedBookmarks: loadedScope === scope ? relatedBookmarks : [],
+    bookmarkError: error,
+    showBookmarks: settings.showBookmarksInQuickUrlMenu,
+  }
 }

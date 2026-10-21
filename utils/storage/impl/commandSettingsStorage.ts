@@ -19,6 +19,7 @@ export const defaultCommandSettings: CommandSettingsData = {
   calculator: { priority: -10, active: true, activeKey: '=', includeInGlobal: true },
   numberToRmb: { priority: 50, active: true, activeKey: 'rmb', includeInGlobal: true },
   bookmarks: { priority: 5, active: true, activeKey: 'b', includeInGlobal: true },
+  quickLinks: { priority: 3, active: true, activeKey: 'q', includeInGlobal: true },
 }
 
 export const commandSettingsStorage = storage.defineItem<CommandSettingsData>('local:command-settings-storage', {

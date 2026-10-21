@@ -4,6 +4,281 @@
   background: #f8f9fb;
   color: hsl(var(--foreground));
 }
+
+/* Search and source lists keep their search and pagination outside the scroll area. */
+.nt-navigation-dialog,
+.nt-site-pages-dialog[data-navigation-view='true'] {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: calc(100% - 32px);
+  max-width: 56rem;
+  height: min(680px, calc(100dvh - 32px));
+  max-height: calc(100dvh - 32px);
+  overflow: hidden;
+  padding: 22px;
+}
+.nt-navigation-dialog > [data-slot='dialog-header'],
+.nt-navigation-dialog > input,
+.nt-site-pages-dialog[data-navigation-view='true'] > [data-slot='dialog-header'],
+.nt-site-pages-dialog[data-navigation-view='true'] > input {
+  flex-shrink: 0;
+}
+.nt-navigation-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+.nt-navigation-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+.nt-navigation-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  border-bottom: 1px solid hsl(var(--border));
+}
+.nt-navigation-open {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 4px;
+  text-align: left;
+  border-radius: 6px;
+}
+.nt-navigation-open:hover,
+.nt-navigation-open:focus-visible {
+  background: hsl(var(--accent));
+}
+.nt-navigation-copy {
+  flex: 1;
+  min-width: 0;
+}
+.nt-navigation-title,
+.nt-navigation-url {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.nt-navigation-title {
+  font-size: 13px;
+}
+.nt-navigation-url,
+.nt-navigation-detail,
+.nt-navigation-action {
+  color: hsl(var(--muted-foreground));
+  font-size: 12px;
+}
+.nt-navigation-url,
+.nt-navigation-detail {
+  margin-top: 3px;
+}
+.nt-navigation-detail {
+  display: block;
+  overflow-wrap: anywhere;
+}
+.nt-navigation-action {
+  flex-shrink: 0;
+}
+.nt-navigation-close,
+.nt-engine-more {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  border: 1px solid hsl(var(--border));
+}
+.nt-navigation-pagination {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 12px;
+  border-top: 1px solid hsl(var(--border));
+  color: hsl(var(--muted-foreground));
+  font-size: 12px;
+}
+.nt-navigation-pagination > div {
+  display: flex;
+  gap: 8px;
+}
+.nt-navigation-pagination button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid hsl(var(--border));
+  border-radius: 6px;
+}
+.nt-navigation-pagination button:disabled {
+  opacity: 0.35;
+}
+.nt-navigation-sources {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+}
+.nt-navigation-sources > button {
+  border-radius: 6px;
+  padding: 6px 9px;
+  color: hsl(var(--muted-foreground));
+  font-size: 12px;
+}
+.nt-navigation-sources > button[aria-pressed='true'] {
+  background: hsl(var(--muted));
+  color: hsl(var(--foreground));
+}
+.nt-navigation-error {
+  font-size: 12px;
+}
+.nt-navigation-error button {
+  margin-left: 10px;
+  text-decoration: underline;
+}
+.nt-engine-dialog {
+  width: calc(100% - 32px);
+  max-width: 42rem;
+  padding: 24px;
+}
+.nt-engine-settings {
+  min-width: 0;
+  padding-top: 12px;
+}
+.nt-engine-settings h3,
+.nt-engine-editor h3 {
+  margin: 0 0 12px;
+  font-size: 14px;
+  font-weight: 500;
+}
+.nt-engine-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+  padding: 12px;
+  border: 1px solid hsl(var(--border));
+  border-radius: 8px;
+}
+.nt-engine-row > svg {
+  flex-shrink: 0;
+  color: hsl(var(--muted-foreground));
+}
+.nt-engine-copy {
+  flex: 1;
+  min-width: 0;
+}
+.nt-engine-copy strong {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+.nt-engine-copy span {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-top: 3px;
+  color: hsl(var(--muted-foreground));
+  font-size: 12px;
+}
+.nt-engine-badge {
+  background: hsl(var(--muted));
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+  white-space: nowrap;
+}
+.nt-engine-actions {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  width: 100%;
+  border-top: 1px solid hsl(var(--border));
+  padding-top: 10px;
+}
+.nt-engine-editor {
+  min-width: 0;
+  padding-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.nt-engine-editor label {
+  font-size: 12px;
+  margin-top: 5px;
+}
+.nt-engine-error {
+  color: hsl(var(--destructive));
+  font-size: 12px;
+  min-height: 0;
+}
+.nt-engine-preview {
+  display: block;
+  padding: 12px;
+  border-radius: 7px;
+  background: hsl(var(--muted));
+  color: hsl(var(--muted-foreground));
+  overflow-wrap: anywhere;
+  font-size: 12px;
+}
+.nt-engine-form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 12px;
+}
+.nt-engine-discard {
+  padding: 12px;
+  border: 1px solid hsl(var(--border));
+  border-radius: 7px;
+}
+.nt-engine-discard button {
+  margin: 8px 8px 0 0;
+}
+@media (max-width: 640px) {
+  .nt-navigation-dialog,
+  .nt-site-pages-dialog[data-navigation-view='true'] {
+    padding: 16px;
+    gap: 10px;
+  }
+  .nt-navigation-open {
+    gap: 8px;
+  }
+  .nt-navigation-action {
+    display: none;
+  }
+  .nt-engine-row {
+    padding: 10px;
+    gap: 8px;
+  }
+  .nt-engine-row > svg {
+    display: none;
+  }
+}
+@media (pointer: coarse) {
+  .nt-navigation-close,
+  .nt-engine-more,
+  .nt-navigation-pagination button,
+  .nt-navigation-sources > button {
+    min-width: 44px;
+    min-height: 44px;
+  }
+}
 .dark .nt-page {
   background: #101114;
 }

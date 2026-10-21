@@ -96,7 +96,8 @@ test('quick link menu recommends two frequent recent pages from its domain', asy
       'title',
       /long project page title.*code\.example\.com/s,
     )
-    await expect(page.getByTestId('related-bookmark')).toHaveCount(8)
+    await expect(page.getByTestId('related-bookmark')).toHaveCount(5)
+    await expect(page.getByTestId('all-site-bookmarks')).toBeVisible()
     await expect(page.getByTestId('related-tab')).toHaveCount(1)
     const bounds = await menu.boundingBox()
     expect(bounds).not.toBeNull()

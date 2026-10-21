@@ -7,6 +7,8 @@ import { settingStorage, updateSettings } from './settingsStorage'
 import { quickUrlItemsStorage } from './quickUrlStorage'
 import { exampleThemeStorage } from './exampleThemeStorage'
 import { commandSettingsStorage } from './commandSettingsStorage'
+import { searchEnginesStorage } from './searchEnginesStorage'
+import { searchEnginesSchema } from '@/utils/search-engines'
 
 // ---- Zod schemas --------------------------------------------------------
 
@@ -60,6 +62,7 @@ const exportedDataSchema = z.object({
   settings: settingsSchema.optional(),
   quickUrls: z.array(quickUrlItemSchema).optional(),
   commandSettings: commandSettingsSchema.optional(),
+  searchEngines: searchEnginesSchema.optional(),
 })
 
 // ---- Public types -------------------------------------------------------
@@ -90,6 +93,7 @@ export async function exportAllData(): Promise<void> {
   const quickUrls = await quickUrlItemsStorage.getValue()
   const theme = await exampleThemeStorage.getValue()
   const commandSettings = await commandSettingsStorage.getValue()
+  const searchEngines = searchEnginesSchema.parse(await searchEnginesStorage.getValue())
   const version = chrome.runtime.getManifest().version
 
   const exportData: ExportedData = {
@@ -99,6 +103,7 @@ export async function exportAllData(): Promise<void> {
     settings,
     quickUrls,
     commandSettings,
+    searchEngines,
   }
 
   const jsonString = JSON.stringify(exportData, null, 2)
@@ -180,6 +185,11 @@ export async function importAllDataFromText(content: string): Promise<ImportResu
     }
   }
 
+  if ('searchEngines' in raw) {
+    const result = searchEnginesSchema.safeParse(raw.searchEngines)
+    if (result.success) await searchEnginesStorage.setValue(result.data)
+    else warnings.push(`searchEngines: ${formatZodError(result.error)}`)
+  }
   return { warnings }
 }
 
@@ -203,7 +213,13 @@ function parseImportFile(content: string): Record<string, unknown> {
 
     const raw = result.data
     // Use key-existence checks so present-but-null/invalid fields are not treated as missing.
-    if (!('settings' in raw) && !('quickUrls' in raw) && !('theme' in raw) && !('commandSettings' in raw)) {
+    if (
+      !('settings' in raw) &&
+      !('quickUrls' in raw) &&
+      !('theme' in raw) &&
+      !('commandSettings' in raw) &&
+      !('searchEngines' in raw)
+    ) {
       throw new Error('no recognisable fields found')
     }
 
