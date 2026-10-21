@@ -17,6 +17,41 @@ async function prepare(page: Page, extensionId: string) {
   await expect(page.getByTestId('command-input')).toBeVisible()
 }
 
+test('history, bookmarks and tabs show defaults on entry and after clearing the query', async ({
+  page,
+  context,
+  extensionId,
+}) => {
+  await context.route('https://command-default.example/**', route =>
+    route.fulfill({ status: 200, contentType: 'text/html', body: '<title>Recent Command Page</title>' }),
+  )
+  await prepare(page, extensionId)
+  const target = await context.newPage()
+  await target.goto('https://command-default.example/recent')
+  await expect(target).toHaveTitle('Recent Command Page')
+  await page.bringToFront()
+  const input = page.getByTestId('command-input')
+  for (const [mode, title] of [
+    ['history', 'Recent Command Page'],
+    ['bookmarks', 'beta Command Bookmark'],
+    ['tabs', 'Recent Command Page'],
+  ]) {
+    await page.getByRole('button', { name: '全部功能', exact: true }).click()
+    await page.locator(`[data-command-result-id="plugin-list-${mode}"]`).click()
+    await expect(input).toHaveValue('')
+    await expect(page.getByTestId('command-result').filter({ hasText: title })).toHaveCount(1)
+    await input.fill('no-match-for-command-defaults')
+    await expect(page.getByTestId('command-result')).toHaveCount(0)
+    await input.fill('')
+    await expect(page.getByTestId('command-result').filter({ hasText: title })).toHaveCount(1)
+    await input.fill('   ')
+    await expect(page.getByTestId('command-result').filter({ hasText: title })).toHaveCount(1)
+    await input.fill('')
+    await input.press('ArrowDown')
+    await expect(input).toBeFocused()
+  }
+})
+
 test('shortcuts select explicit modes, preserve keywords, and include modes without trigger keys', async ({
   page,
   context,

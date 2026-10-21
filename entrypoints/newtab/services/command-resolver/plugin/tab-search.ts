@@ -14,10 +14,8 @@ export const tabSearchResolver: ICommandResolver = {
     icon: Columns,
   },
   resolve: async params => {
-    if (params.query.length === 0) return null
-    const result = await chrome.tabs.query({
-      title: `*${params.query}*`,
-    })
+    const query = params.query.trim()
+    const result = await chrome.tabs.query(query ? { title: `*${query}*` } : {})
     if (result.length === 0) return null
     return result.map(it => {
       return {

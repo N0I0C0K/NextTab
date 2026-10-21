@@ -993,6 +993,68 @@ test('multiple matching tabs prompt for a target instead of opening or closing t
   await expect(visibleRows(page).first().locator('.nt-return-open')).toBeFocused()
 })
 
+test('page rows use hidden action space for long titles and reveal controls on hover or keyboard focus', async ({
+  page,
+  context,
+  extensionId,
+}, testInfo) => {
+  await prepare(page, context, extensionId)
+  const title = 'NextTab 项目资料与页面布局说明 · 长标题应该使用隐藏操作区域的空间 '.repeat(4)
+  const url = `https://github.return.test/docs/${'long-localized-path/'.repeat(8)}`
+  await page.evaluate(({ title, url }) => chrome.bookmarks.create({ title, url }), { title, url })
+  await page.getByRole('button', { name: 'Show pages from GitHub', exact: true }).click()
+  const dialog = page.getByTestId('site-pages-dialog')
+  const row = dialog.locator(`[data-page-url="${url}"]`)
+  const primary = row.locator('.nt-return-open')
+  const hint = row.locator('.nt-return-hint')
+  const more = row.locator('.nt-return-more')
+  for (const viewport of [
+    { width: 1440, height: 1000 },
+    { width: 390, height: 700 },
+    { width: 900, height: 360 },
+  ]) {
+    await page.setViewportSize(viewport)
+    await page.mouse.move(0, 0)
+    await dialog.getByRole('heading', { name: 'GitHub', exact: true }).focus()
+    await expect(more).toHaveCSS('width', '0px')
+    const idle = await row.evaluate(element => ({
+      titleWidth: element.querySelector('.nt-return-title')!.getBoundingClientRect().width,
+      copyRight: element.querySelector('.nt-return-copy')!.getBoundingClientRect().right,
+      right: element.getBoundingClientRect().right,
+      hintWidth: element.querySelector('.nt-return-hint')!.getBoundingClientRect().width,
+    }))
+    expect(idle.hintWidth).toBe(0)
+    expect(idle.right - idle.copyRight).toBeLessThanOrEqual(10)
+    await expect(primary).toHaveAccessibleName(`${title} — Open page`)
+    await primary.scrollIntoViewIfNeeded()
+    await page.screenshot({ path: testInfo.outputPath(`row-idle-${viewport.width}.png`) })
+    await primary.hover()
+    await expect(more).toHaveCSS('width', '40px')
+    const activeTitle = (await row.locator('.nt-return-title').boundingBox())!
+    expect(activeTitle.width).toBeLessThan(idle.titleWidth)
+    expect(await hint.evaluate(element => element.getBoundingClientRect().width > 0)).toBe(viewport.width > 650)
+    await page.mouse.move(0, 0)
+    await primary.focus()
+    await primary.press('Tab')
+    await expect(more).toBeFocused()
+    await expect(more).toBeInViewport()
+    await more.press('Enter')
+    await expect(page.getByRole('menuitem', { name: 'Copy link', exact: true })).toBeVisible()
+    await page.keyboard.press('Escape')
+    await expect(more).toBeFocused()
+    await more.press('Shift+Tab')
+    await expect(primary).toBeFocused()
+    expect(await hint.evaluate(element => element.getBoundingClientRect().width > 0)).toBe(viewport.width > 650)
+    await expect(dialog.locator('[data-slot="dialog-close"]')).toBeInViewport()
+    await expect(dialog.getByRole('button', { name: 'Open website', exact: true })).toBeInViewport()
+    expect(await dialog.evaluate(element => element.scrollWidth <= element.clientWidth)).toBe(true)
+    await page.screenshot({ path: testInfo.outputPath(`row-focused-${viewport.width}.png`) })
+  }
+  await page.evaluate(() => chrome.storage.local.set({ 'theme-storage-key': 'dark' }))
+  await expect(page.locator('html')).toHaveClass(/dark/)
+  await page.screenshot({ path: testInfo.outputPath('row-focused-dark.png'), animations: 'disabled' })
+})
+
 test('website body and expand button show separate hover actions', async ({ page, context, extensionId }) => {
   await prepare(page, context, extensionId)
   const card = page.getByTestId('quick-link-card').first()
@@ -1036,12 +1098,12 @@ test('page row secondary actions fill their height in the homepage and every pag
     )
     const primary = row.locator('.nt-return-open')
     const more = row.locator('.nt-return-more')
+    await row.hover()
     const primaryBounds = await primary.boundingBox()
     const moreBounds = await more.boundingBox()
     expect(moreBounds!.height).toBeCloseTo(primaryBounds!.height)
     expect(moreBounds!.y).toBeCloseTo(primaryBounds!.y)
     expect(moreBounds!.x).toBeCloseTo(primaryBounds!.x + primaryBounds!.width)
-    await row.hover()
     await more.hover({ position: { x: moreBounds!.width / 2, y: 2 } })
     expect(await more.evaluate(element => getComputedStyle(element).backgroundColor)).not.toBe('rgba(0, 0, 0, 0)')
     await expect(primary).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)')
