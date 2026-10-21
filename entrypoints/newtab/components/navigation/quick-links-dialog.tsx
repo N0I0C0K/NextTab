@@ -47,11 +47,7 @@ export function QuickLinksDialog({
           onChange={event => setQuery(event.target.value)}
           onKeyDown={focusNavigationFromSearch}
         />
-        <NavigationList
-          items={matches}
-          resetKey={query}
-          onOpen={(item, newTab) => openSavedUrl(item.url, newTab)}
-        />
+        <NavigationList items={matches} resetKey={query} onOpen={(item, newTab) => openSavedUrl(item.url, newTab)} />
       </DialogContent>
     </Dialog>
   )
