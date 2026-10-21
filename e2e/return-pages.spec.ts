@@ -529,10 +529,10 @@ test('return source selection survives reloads and new tabs, and visits follow t
   for (const event of snapshot.events) {
     if (event.type === 'enter') latestEnters.set(event.pageId, Math.max(event.at, latestEnters.get(event.pageId) ?? 0))
   }
-  const expectedTitles = snapshot.pages
+  const expectedPages = snapshot.pages
     .filter(item => latestEnters.has(item.id))
     .sort((a, b) => latestEnters.get(b.id)! - latestEnters.get(a.id)!)
-    .map(item => item.title.trim() || item.url)
+  const expectedTitles = expectedPages.map(item => item.title.trim() || item.url)
   expect(expectedTitles).toHaveLength(6)
   await expect(visibleRows(page).first()).toContainText(expectedTitles[0])
   await page.getByTestId('return-view-all').click()
@@ -542,9 +542,12 @@ test('return source selection survives reloads and new tabs, and visits follow t
   await expect(dialog.locator('.nt-return-title')).toHaveText(expectedTitles.filter(title => title.includes('NextTab')))
   await page.keyboard.press('Escape')
   await expect(page.getByTestId('return-view-all')).toBeFocused()
-  await page.evaluate(url => chrome.history.deleteUrl({ url }), fixturePages[5].url)
-  await expect(page.locator(`.nt-return-pages [data-page-url="${fixturePages[5].url}"]`)).toHaveCount(0)
-  await expect(page.locator(`.nt-return-pages [data-page-url="${fixturePages[4].url}"]`)).toBeVisible()
+  // Tied enter timestamps need not follow fixture navigation order. Remove the actual first row.
+  await page.evaluate(url => chrome.history.deleteUrl({ url }), expectedPages[0].url)
+  await expect(page.locator(`.nt-return-pages [data-page-url="${expectedPages[0].url}"]`)).toHaveCount(0)
+  await expect(visibleRows(page).first()).toContainText(expectedTitles[1])
+  await page.getByTestId('return-view-all').click()
+  await expect(dialog.locator('.nt-return-title')).toHaveText(expectedTitles.slice(1))
 })
 
 test('recent visits use background event logs, refresh on reentry and ignore recommendation filters', async ({
