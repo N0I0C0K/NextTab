@@ -1007,6 +1007,7 @@ test('page rows use hidden action space for long titles and reveal controls on h
   const row = dialog.locator(`[data-page-url="${url}"]`)
   const primary = row.locator('.nt-return-open')
   const hint = row.locator('.nt-return-hint')
+  const save = row.getByTestId('save-quick-link')
   const more = row.locator('.nt-return-more')
   for (const viewport of [
     { width: 1440, height: 1000 },
@@ -1017,6 +1018,7 @@ test('page rows use hidden action space for long titles and reveal controls on h
     await page.mouse.move(0, 0)
     await dialog.getByRole('heading', { name: 'GitHub', exact: true }).focus()
     await expect(more).toHaveCSS('width', '0px')
+    await expect(save).toHaveCSS('width', '0px')
     const idle = await row.evaluate(element => ({
       titleWidth: element.querySelector('.nt-return-title')!.getBoundingClientRect().width,
       copyRight: element.querySelector('.nt-return-copy')!.getBoundingClientRect().right,
@@ -1029,6 +1031,7 @@ test('page rows use hidden action space for long titles and reveal controls on h
     await primary.scrollIntoViewIfNeeded()
     await page.screenshot({ path: testInfo.outputPath(`row-idle-${viewport.width}.png`) })
     await primary.hover()
+    await expect(save).toHaveCSS('width', '32px')
     await expect(more).toHaveCSS('width', '40px')
     const activeTitle = (await row.locator('.nt-return-title').boundingBox())!
     expect(activeTitle.width).toBeLessThan(idle.titleWidth)
@@ -1036,6 +1039,9 @@ test('page rows use hidden action space for long titles and reveal controls on h
     await page.mouse.move(0, 0)
     await primary.focus()
     await primary.press('Tab')
+    await expect(save).toBeFocused()
+    await expect(save).toBeInViewport()
+    await save.press('Tab')
     await expect(more).toBeFocused()
     await expect(more).toBeInViewport()
     await more.press('Enter')
@@ -1043,6 +1049,8 @@ test('page rows use hidden action space for long titles and reveal controls on h
     await page.keyboard.press('Escape')
     await expect(more).toBeFocused()
     await more.press('Shift+Tab')
+    await expect(save).toBeFocused()
+    await save.press('Shift+Tab')
     await expect(primary).toBeFocused()
     expect(await hint.evaluate(element => element.getBoundingClientRect().width > 0)).toBe(viewport.width > 650)
     await expect(dialog.locator('[data-slot="dialog-close"]')).toBeInViewport()

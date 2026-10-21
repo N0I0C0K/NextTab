@@ -60,8 +60,8 @@ test('page lists and link search results save exact URLs without navigating, inc
     { width: 900, height: 360 },
   ]) {
     await page.setViewportSize(viewport)
-    await save.scrollIntoViewIfNeeded()
     await save.focus()
+    await save.scrollIntoViewIfNeeded()
     await expect(save).toBeInViewport({ ratio: 1 })
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
     await page.screenshot({ path: testInfo.outputPath(`save-links-${viewport.width}.png`) })

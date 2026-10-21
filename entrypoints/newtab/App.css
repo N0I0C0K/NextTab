@@ -522,12 +522,28 @@
 }
 .nt-return-row > .nt-save-quick-link {
   align-self: stretch;
+  width: 0;
   height: auto;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+.nt-return-row:hover > .nt-save-quick-link,
+.nt-return-row:focus-within > .nt-save-quick-link,
+.nt-return-row[data-interacting='true'] > .nt-save-quick-link {
+  width: 32px;
+  opacity: 1;
+  pointer-events: auto;
 }
 @media (pointer: coarse) {
   .nt-save-quick-link {
     min-width: 36px;
     min-height: 44px;
+  }
+  .nt-return-row > .nt-save-quick-link {
+    width: 36px;
+    opacity: 1;
+    pointer-events: auto;
   }
 }
 .nt-return-row {
