@@ -25,6 +25,7 @@ export function SitePagesDialog({
 }) {
   const settings = useStorage(settingStorage)
   const quickUrls = useStorage(quickUrlItemsStorage)
+  const [savedAtOpen, setSavedAtOpen] = useState(quickUrls)
   const [history, setHistory] = useState<ReturnPage[]>([])
   const [bookmarks, setBookmarks] = useState<chrome.bookmarks.BookmarkTreeNode[]>([])
   const [loading, setLoading] = useState(true)
@@ -39,6 +40,10 @@ export function SitePagesDialog({
       return ''
     }
   }, [url])
+  useEffect(() => {
+    // Saving a recent page must not move its focused row to another group mid-interaction.
+    if (!open) setSavedAtOpen(quickUrls)
+  }, [open, quickUrls])
   const matches = (value: string) => {
     try {
       return new URL(value).hostname === host
@@ -111,7 +116,7 @@ export function SitePagesDialog({
       })
     : []
   const saved = unique([
-    ...quickUrls
+    ...savedAtOpen
       .filter(item => normalizePageUrl(item.url) !== normalizePageUrl(url))
       .map(item => ({ ...item, lastVisitTime: 0, activeDays: 0 })),
     ...bookmarks.flatMap(item =>

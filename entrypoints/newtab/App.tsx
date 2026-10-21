@@ -13,9 +13,25 @@ function TimeDisplay() {
   const [time, setTime] = useState(() => new Date())
 
   useEffect(() => {
-    const update = () => setTime(new Date())
-    const interval = window.setInterval(update, 30_000)
-    return () => window.clearInterval(interval)
+    let timer: number
+    const update = () => {
+      window.clearTimeout(timer)
+      const now = new Date()
+      setTime(now)
+      // Recalculate each time, so throttling never shifts the minute boundary.
+      timer = window.setTimeout(update, 60_000 - (now.getTime() % 60_000))
+    }
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') update()
+    }
+    update()
+    document.addEventListener('visibilitychange', onVisible)
+    window.addEventListener('focus', update)
+    return () => {
+      window.clearTimeout(timer)
+      document.removeEventListener('visibilitychange', onVisible)
+      window.removeEventListener('focus', update)
+    }
   }, [])
 
   return (

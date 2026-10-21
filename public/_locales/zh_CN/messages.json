@@ -28,6 +28,11 @@
   "addSite": {
     "message": "添加网站"
   },
+  "addToQuickLinks": { "message": "添加到常用网站" },
+  "quickLinkSaved": { "message": "已在常用网站中" },
+  "quickLinkAdded": { "message": "已添加到常用网站" },
+  "quickLinkAddFailed": { "message": "添加失败，请重试。" },
+  "quickLinkSuggestionHint": { "message": "点选后可编辑" },
   "addQuickLinkTitle": {
     "message": "添加常用网站"
   },

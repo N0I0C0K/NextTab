@@ -7,6 +7,7 @@ import { useDebounce } from '@/utils'
 import moment from 'moment'
 import { X } from 'lucide-react'
 import { Command } from 'cmdk'
+import { SaveQuickLinkButton } from '../save-quick-link-button'
 
 interface DomainHistoryItem {
   id: string
@@ -162,6 +163,7 @@ const DomainHistoryItem: FC<DomainHistoryItem> = ({ id, title, url, lastVisitTim
   }, [lastVisitTime])
 
   const handleClickCapture = (ev: React.MouseEvent<HTMLDivElement>) => {
+    if ((ev.target as HTMLElement).closest('button')) return
     if (ev.ctrlKey || ev.metaKey) {
       ev.preventDefault()
       ev.stopPropagation()
@@ -174,8 +176,8 @@ const DomainHistoryItem: FC<DomainHistoryItem> = ({ id, title, url, lastVisitTim
       value={id}
       data-testid="domain-history-item"
       className={cn(
-        `grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-3 gap-y-1 py-3 px-3 cursor-pointer group
-        sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:py-3.5`,
+        `grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1 py-3 px-3 cursor-pointer group
+        sm:grid-cols-[auto_minmax(0,1fr)_auto_auto] sm:py-3.5`,
         'hover:bg-muted data-[selected=true]:bg-muted rounded-md outline-none transition-colors duration-200',
       )}
       onClickCapture={handleClickCapture}
@@ -188,7 +190,7 @@ const DomainHistoryItem: FC<DomainHistoryItem> = ({ id, title, url, lastVisitTim
           e.currentTarget.style.display = 'none'
         }}
       />
-      <div className="flex flex-col min-w-0 gap-1">
+      <div className="col-span-2 flex flex-col min-w-0 gap-1 sm:col-span-1">
         <Text level="s" className="font-medium truncate" title={title}>
           {title}
         </Text>
@@ -207,6 +209,9 @@ const DomainHistoryItem: FC<DomainHistoryItem> = ({ id, title, url, lastVisitTim
             {visitCount} {t('visits')}
           </Text>
         )}
+      </div>
+      <div className="col-start-3 row-start-2 sm:col-start-4 sm:row-start-1">
+        <SaveQuickLinkButton title={title} url={url} />
       </div>
     </Command.Item>
   )

@@ -42,6 +42,25 @@ export const moveUrlItemById = <T extends QuickUrlItem>(item: StorageItem<T[]>, 
   })
 
 export const addQuickUrl = (item: QuickUrlItem) => addUrlItem(quickUrlItemsStorage, item)
+
+export function quickUrlKey(url: string): string {
+  try {
+    return new URL(url).href
+  } catch {
+    return url
+  }
+}
+
+/** Keep one exact page, including its query and fragment, across concurrent additions. */
+export async function addQuickUrlIfMissing(item: QuickUrlItem): Promise<boolean> {
+  let added = false
+  await updateStorageItem(quickUrlItemsStorage, items => {
+    if (items.some(current => quickUrlKey(current.url) === quickUrlKey(item.url))) return items
+    added = true
+    return [...items, item]
+  })
+  return added
+}
 export const removeQuickUrlAt = (index: number) => removeUrlItemAt(quickUrlItemsStorage, index)
 export const removeQuickUrlById = (id: string) => removeUrlItemById(quickUrlItemsStorage, id)
 export const putQuickUrlById = (id: string, value: QuickUrlItem) => putUrlItemById(quickUrlItemsStorage, id, value)

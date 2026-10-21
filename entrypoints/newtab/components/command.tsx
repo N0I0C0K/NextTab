@@ -8,6 +8,7 @@ import type { CommandQueryParams, ICommandResultGroup } from '@/entrypoints/newt
 import { useEffect, useId, useLayoutEffect, useRef, useState, forwardRef, useImperativeHandle, type FC } from 'react'
 import { ChevronDown, Layers, X } from 'lucide-react'
 import { t, type MessageKey } from '@/utils/i18n'
+import { SaveQuickLinkButton } from './save-quick-link-button'
 
 const shortcutOrder = ['bookmarks', 'history', 'tabs', 'calculator']
 const shortLabels: Record<string, MessageKey> = {
@@ -373,6 +374,7 @@ export const CommandModule = forwardRef<
                                   {res.description}
                                 </Text>
                               </div>
+                              {res.url && <SaveQuickLinkButton title={res.title} url={res.url} />}
                             </command.CommandItem>
                           )
                         })
