@@ -34,11 +34,12 @@ export const bookmarksResolver: ICommandResolver = {
     icon: Star,
   },
   resolve: async params => {
-    if (params.query.length === 0) {
+    const query = params.query.trim()
+    if (query.length === 0) {
       return (await chrome.bookmarks.getRecent(10)).map(convertBookmarkToCommandResult)
     }
 
-    const result = await chrome.bookmarks.search({ query: params.query })
+    const result = await chrome.bookmarks.search({ query })
     if (result.length === 0) return null
     return result.slice(0, 10).map(convertBookmarkToCommandResult)
   },
