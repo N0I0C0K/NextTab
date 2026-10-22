@@ -38,6 +38,23 @@ for (const source of [
   'entrypoints/newtab/components/return-pages/index.tsx',
   'entrypoints/newtab/components/return-pages/page-list.tsx',
   'entrypoints/newtab/components/return-pages/page-row.tsx',
+  'entrypoints/newtab/components/command.tsx',
+  'entrypoints/newtab/components/navigation/navigation-list.tsx',
+  'entrypoints/newtab/components/navigation/quick-links-dialog.tsx',
+  'entrypoints/newtab/components/link-card/site-pages-dialog.tsx',
+  'entrypoints/newtab/lib/bookmarks.ts',
+  'entrypoints/newtab/services/command-resolver/plugin/quick-links.ts',
+  'entrypoints/newtab/services/command-resolver/plugin/web-search.ts',
+  'utils/quick-link-search.ts',
+  'utils/search-engines.ts',
+  'entrypoints/newtab/services/command-resolver/manager.ts',
+  'entrypoints/newtab/hooks/useOpenTabs.ts',
+  'entrypoints/newtab/components/link-card/link-card-item.tsx',
+  'entrypoints/newtab/components/link-card/link-card-context-menu.tsx',
+  'entrypoints/newtab/App.css',
+  'components/shared/ui/dialog.tsx',
+  'entrypoints/newtab/components/setting-pannel.tsx',
+  'entrypoints/newtab/components/settings/SearchEngineSettings.tsx',
 ]) {
   sourceHashes[source] = createHash('sha256')
     .update(await readFile(path.join(root, source)))
@@ -321,6 +338,7 @@ try {
     args: [`--disable-extensions-except=${extensionPath}`, `--load-extension=${extensionPath}`],
   })
   const ui = []
+  const navigationUi = []
   try {
     let [worker] = context.serviceWorkers()
     worker ??= await context.waitForEvent('serviceworker')
@@ -431,6 +449,164 @@ try {
       })
       console.log(`Completed production UI at ${rate}x CPU slowdown with ${tabs} tab results`)
     }
+    // Measure event-to-next-animation-frame time in the same production renderer.
+    await view.evaluate(async () => {
+      await chrome.storage.local.set({
+        'quick-url-item-storage-key': Array.from({ length: 100 }, (_, index) => ({
+          id: String(index),
+          title: `Saved ${index}`,
+          url: `https://perf.example/page/${index}`,
+        })),
+      })
+    })
+    await view.addInitScript(() => {
+      Object.defineProperty(chrome.bookmarks, 'getTree', {
+        value: async () => [
+          {
+            id: 'root',
+            title: '',
+            children: [
+              {
+                id: 'folder',
+                title: 'Performance bookmarks',
+                children: Array.from({ length: 2000 }, (_, index) => ({
+                  id: String(index),
+                  title: `Bookmark ${index}`,
+                  url: `https://perf.example/saved/${index}`,
+                })),
+              },
+            ],
+          },
+        ],
+      })
+    })
+    const measureNavigation = async (name, action, selector, total, rows, eventType = 'click') => {
+      await view.evaluate(
+        ({ selector, total, rows, eventType }) => {
+          window.navigationMeasurement = null
+          let start = 0
+          const observer = new MutationObserver(() => {
+            const list = document.querySelector(selector)
+            if (
+              !start ||
+              !list ||
+              Number(list.dataset.total) !== total ||
+              list.querySelectorAll('[data-testid="navigation-row"]').length !== rows
+            )
+              return
+            observer.disconnect()
+            requestAnimationFrame(() => {
+              window.navigationMeasurement = { readyMs: performance.now() - start }
+            })
+          })
+          observer.observe(document, {
+            childList: true,
+            subtree: true,
+            attributes: true,
+            attributeFilter: ['data-total'],
+          })
+          document.addEventListener(
+            eventType,
+            () => {
+              start = performance.now()
+            },
+            { capture: true, once: true },
+          )
+        },
+        { selector, total, rows, eventType },
+      )
+      await action()
+      await view.waitForFunction(() => window.navigationMeasurement, undefined, { timeout: 60000 })
+      return {
+        name,
+        ...(await view.evaluate(() => window.navigationMeasurement)),
+        candidates: total,
+        mountedRows: rows,
+      }
+    }
+    for (const rate of [1, 6]) {
+      await session.send('Emulation.setCPUThrottlingRate', { rate })
+      await view.reload()
+      await view.getByTestId('command-input').waitFor()
+      const measurements = []
+      await view.getByTestId('command-shortcut-quickLinks').click()
+      await view.locator('[data-command-result-id="quick-links-all"]').waitFor()
+      measurements.push(
+        await measureNavigation(
+          'quick-links-open',
+          () => view.locator('[data-command-result-id="quick-links-all"]').click(),
+          '[data-testid="quick-links-dialog"] [data-testid="navigation-list"]',
+          100,
+          20,
+        ),
+      )
+      measurements.push(
+        await measureNavigation(
+          'quick-links-search',
+          () => view.locator('[data-testid="quick-links-dialog"] input').fill('Saved 99'),
+          '[data-testid="quick-links-dialog"] [data-testid="navigation-list"]',
+          1,
+          1,
+          'input',
+        ),
+      )
+      await view.locator('[data-testid="quick-links-dialog"] input').press('Escape')
+      await view.getByTestId('command-input').press('Escape')
+      await view.getByTestId('quick-link-card').first().click({ button: 'right' })
+      await view.getByTestId('all-site-tabs').waitFor()
+      measurements.push(
+        await measureNavigation(
+          'site-tabs-open',
+          () => view.getByTestId('all-site-tabs').click(),
+          '[data-testid="site-pages-dialog"] [data-testid="navigation-list"]',
+          800,
+          20,
+        ),
+      )
+      measurements.push(
+        await measureNavigation(
+          'site-tabs-search',
+          () => view.locator('[data-testid="site-pages-dialog"] input').fill('ref=tab-999'),
+          '[data-testid="site-pages-dialog"] [data-testid="navigation-list"]',
+          1,
+          1,
+          'input',
+        ),
+      )
+      await view.locator('[data-testid="site-pages-dialog"] input').press('Escape')
+      await view.getByTestId('quick-link-card').first().click({ button: 'right' })
+      await view.getByTestId('all-site-bookmarks').waitFor()
+      measurements.push(
+        await measureNavigation(
+          'site-bookmarks-open',
+          () => view.getByTestId('all-site-bookmarks').click(),
+          '[data-testid="site-pages-dialog"] [data-testid="navigation-list"]',
+          2000,
+          20,
+        ),
+      )
+      measurements.push(
+        await measureNavigation(
+          'site-bookmarks-search',
+          () => view.locator('[data-testid="site-pages-dialog"] input').fill('saved/1999'),
+          '[data-testid="site-pages-dialog"] [data-testid="navigation-list"]',
+          1,
+          1,
+          'input',
+        ),
+      )
+      await session.send('HeapProfiler.collectGarbage')
+      navigationUi.push({
+        cpuSlowdown: rate,
+        savedLinks: 100,
+        openTabs: 1000,
+        bookmarks: 2000,
+        measurements,
+        heapMiB: (await session.send('Runtime.getHeapUsage')).usedSize / 1024 ** 2,
+      })
+      await view.locator('[data-testid="site-pages-dialog"] input').press('Escape')
+      console.log(`Completed search/navigation UI at ${rate}x CPU slowdown`)
+    }
   } finally {
     await context.close()
   }
@@ -445,6 +621,7 @@ try {
     note: 'Real Chromium renderer/IndexedDB, 1x and 6x CPU slowdown. History and tab APIs use doubles, not real disk/IPC timings or 1000 live page renderers. No device-level memory or disk slowdown. firstRunMs measures the first scoring call for each fixture in an already-loaded renderer, not an extension/browser cold start.',
     runs,
     ui,
+    navigationUi,
   }
   const output = path.join(root, 'artifacts/performance-return-pages')
   await mkdir(output, { recursive: true })

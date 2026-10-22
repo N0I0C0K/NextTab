@@ -88,6 +88,16 @@ test('page lists and link search results save exact URLs without navigating, inc
   await expect(resultSave).toHaveAttribute('aria-disabled', 'true')
   await expect(page.getByTestId('command-panel')).toBeVisible()
   expect(page.url()).toContain('/newtab.html')
+  for (const modifier of ['Control', 'Meta'] as const) {
+    await page.evaluate(() => chrome.storage.local.set({ 'quick-url-item-storage-key': [] }))
+    await expect(resultSave).toHaveAttribute('aria-disabled', 'false')
+    const pageCount = context.pages().length
+    await resultSave.click({ modifiers: [modifier] })
+    await expect(resultSave).toHaveAttribute('aria-disabled', 'true')
+    await expect(page.getByTestId('command-panel')).toBeVisible()
+    expect(context.pages()).toHaveLength(pageCount)
+    expect(page.url()).toContain('/newtab.html')
+  }
   await page.evaluate(() => chrome.storage.local.set({ 'quick-url-item-storage-key': [] }))
   await page.evaluate(() => {
     const set = chrome.storage.local.set.bind(chrome.storage.local)

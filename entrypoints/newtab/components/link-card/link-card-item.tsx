@@ -37,6 +37,7 @@ export const SortableLinkCardItem: FC<LinkCardProps> = ({
   const { ref, handleRef } = useSortable({ id, index, disabled: !canReorder })
   const [contextMenuOpen, setContextMenuOpen] = useState(false)
   const [siteOpen, setSiteOpen] = useState(false)
+  const [siteSource, setSiteSource] = useState<'tabs' | 'bookmarks'>()
   const expandRef = useRef<HTMLButtonElement>(null)
   const canExpand = normalizePageUrl(url) !== null
   const settings = useStorage(settingStorage)
@@ -58,7 +59,7 @@ export const SortableLinkCardItem: FC<LinkCardProps> = ({
   const openCount = relatedTabs.length
   const globalDialog = useGlobalDialog()
 
-  const { relatedBookmarks, showBookmarks } = useRelatedBookmarks(url, contextMenuOpen)
+  const { relatedBookmarks, showBookmarks, bookmarkError } = useRelatedBookmarks(url, contextMenuOpen)
   const recommendedPages = useDomainRecommendations(url, contextMenuOpen, relatedBookmarks, relatedTabs)
   const handleOpen = useCallback(
     (ev: MouseEvent<HTMLButtonElement>) => {
@@ -135,7 +136,10 @@ export const SortableLinkCardItem: FC<LinkCardProps> = ({
                     aria-label={t('expandSitePages', title)}
                     aria-expanded={siteOpen}
                     aria-haspopup="dialog"
-                    onClick={() => setSiteOpen(true)}
+                    onClick={() => {
+                      setSiteSource(undefined)
+                      setSiteOpen(true)
+                    }}
                   />
                 }>
                 <ChevronDown size={15} aria-hidden="true" />
@@ -155,17 +159,22 @@ export const SortableLinkCardItem: FC<LinkCardProps> = ({
             </button>
           )}
         </ContextMenuTrigger>
-        <ContextMenuContent className="w-72 max-w-[calc(100vw-24px)]">
+        <ContextMenuContent className="w-72 max-w-[calc(100vw-24px)]" finalFocus={siteOpen ? false : undefined}>
           <LinkCardContextMenuContent
             id={id}
             title={title}
             url={url}
             relatedBookmarks={relatedBookmarks}
+            bookmarkError={bookmarkError}
             showBookmarks={showBookmarks}
             relatedTabs={relatedTabs}
             showOpenTabs={settings.showOpenTabsInQuickUrlMenu}
             recommendedPages={recommendedPages}
             globalDialog={globalDialog}
+            onShowAll={source => {
+              setSiteSource(source)
+              setSiteOpen(true)
+            }}
           />
         </ContextMenuContent>
       </ContextMenu>
@@ -174,6 +183,7 @@ export const SortableLinkCardItem: FC<LinkCardProps> = ({
         title={title}
         tabs={tabs}
         open={siteOpen}
+        initialSource={siteSource}
         onOpenChange={setSiteOpen}
         finalFocus={expandRef}
       />

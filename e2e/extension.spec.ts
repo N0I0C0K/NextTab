@@ -393,7 +393,8 @@ test('command palette resolves history, bookmarks, open tabs, and web search', a
 
   await commandInput.fill('g ocean regression')
   const webSearchResult = page.locator('[data-command-result-id="search-unique-key"]')
-  await expect(webSearchResult).toContainText('Search for "ocean regression"')
+  await expect(webSearchResult).toContainText('Browser default')
+  await expect(webSearchResult).toContainText('ocean regression')
 
   const searchPagePromise = context.waitForEvent('page')
   await webSearchResult.click()
@@ -767,8 +768,9 @@ test('quick link context menu shows related bookmarks and open tabs', async ({ p
   await card.filter({ hasText: 'Related' }).click({ button: 'right' })
 
   await expect(page.getByTestId('quick-link-edit')).toBeVisible()
-  await expect(page.getByTestId('related-bookmark')).toHaveCount(1)
-  await expect(page.getByTestId('related-bookmark')).toContainText('Related Bookmark')
+  await expect(page.getByTestId('related-bookmark')).toHaveCount(2)
+  await expect(page.getByTestId('related-bookmark').filter({ hasText: 'Related Bookmark' })).toBeVisible()
+  await expect(page.getByTestId('related-bookmark').filter({ hasText: 'Current Bookmark' })).toBeVisible()
   await expect(page.getByTestId('related-tab')).toHaveCount(1)
   await expect(page.getByTestId('related-tab')).toContainText('related.example.com')
 

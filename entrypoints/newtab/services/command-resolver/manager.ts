@@ -7,6 +7,7 @@ import {
   calculatorResolver,
   numberToRmbResolver,
   bookmarksResolver,
+  quickLinksResolver,
   pluginListResolver,
 } from './plugin'
 import { WarpDefaultObject } from '@/utils'
@@ -14,6 +15,7 @@ import { commandSettingsStorage, defaultCommandSettings } from '@/utils/storage'
 import type { CommandSettingsData } from '@/utils/storage'
 import { matchesTriggerKey, stripTriggerKeyForPlugin } from './utils'
 import { filter } from 'lodash'
+import { t } from '@/utils/i18n'
 
 export type IDisposable = {
   dispose: () => void
@@ -60,9 +62,13 @@ class CommandResolverService {
   private _queryTimes = 0
   private _storageSettings: CommandSettingsData | null = null
   private pluginListResolverInstance: ICommandResolverWithSettings
+  private ready: Promise<void>
+  private watching = false
+  private storageRevision = 0
+  private readingSettings?: Promise<void>
 
   constructor() {
-    void this.initStorage()
+    this.ready = this.initStorage().catch(() => undefined)
 
     this.pluginListResolverInstance = createResolverWithSettings(pluginListResolver, this.getStorageSettings)
   }
@@ -72,11 +78,27 @@ class CommandResolverService {
   }
 
   private async initStorage() {
-    this._storageSettings = await commandSettingsStorage.getValue()
-    commandSettingsStorage.watch(value => {
+    if (this.readingSettings) return this.readingSettings
+    if (!this.watching) {
+      commandSettingsStorage.watch(value => {
+        this.storageRevision++
+        this._storageSettings = value
+        this.sortResolvers()
+      })
+      this.watching = true
+    }
+    const revision = this.storageRevision
+    const request = commandSettingsStorage.getValue().then(value => {
+      if (revision !== this.storageRevision) return
       this._storageSettings = value
       this.sortResolvers()
     })
+    this.readingSettings = request
+    try {
+      await request
+    } finally {
+      if (this.readingSettings === request) this.readingSettings = undefined
+    }
   }
 
   private getStorageSettings = (): CommandSettingsData | null => {
@@ -132,8 +154,30 @@ class CommandResolverService {
     }
   }
 
-  resolve(params: CommandQueryParams, onGroupResolve: (group: ICommandResultGroup) => void) {
+  async resolve(params: CommandQueryParams, onGroupResolve: (group: ICommandResultGroup) => void) {
     const _tick = ++this._queryTimes
+    await this.ready
+    if (!this._storageSettings) {
+      try {
+        await this.initStorage()
+      } catch {
+        if (_tick === this._queryTimes)
+          onGroupResolve({
+            groupName: t('commandPluginSettings'),
+            result: [
+              {
+                id: 'retry-command-settings',
+                title: t('navigationReadFailed'),
+                description: t('retryAction'),
+                keepOpen: true,
+                onSelect: () => params.retry?.(),
+              },
+            ],
+          })
+        return
+      }
+    }
+    if (_tick !== this._queryTimes) return
     // Choose plugins based on raw query
     const { plugins, hit } = this.choosePlugins(params.rawQuery, params.resolverName)
 
@@ -151,12 +195,17 @@ class CommandResolverService {
     const baseParams = {
       rawQuery: params.rawQuery,
       changeQuery: params.changeQuery,
+      openQuickLinks: params.openQuickLinks,
+      addQuickLink: params.addQuickLink,
+      openSearchEngines: params.openSearchEngines,
+      retry: params.retry,
+      resolverName: params.resolverName,
       resolverService: this,
     }
 
-    Promise.all(
+    await Promise.all(
       plugins.map(it => {
-        return new Promise((resolve, reject) => {
+        return new Promise(resolve => {
           // Get settings once for this plugin
           const settings = it.getSettings()
 
@@ -191,7 +240,21 @@ class CommandResolverService {
               })
               resolve(null)
             })
-            .catch(err => reject(err))
+            .catch(() => {
+              warpOnGroupResolve({
+                groupName: it.properties.displayName,
+                result: [
+                  {
+                    id: `retry-${it.properties.name}`,
+                    title: t('navigationReadFailed'),
+                    description: t('retryAction'),
+                    keepOpen: true,
+                    onSelect: () => params.retry?.(),
+                  },
+                ],
+              })
+              resolve(null)
+            })
         })
       }),
     )
@@ -206,3 +269,4 @@ commandResolverService.register(webSearchResolver)
 commandResolverService.register(calculatorResolver)
 commandResolverService.register(numberToRmbResolver)
 commandResolverService.register(bookmarksResolver)
+commandResolverService.register(quickLinksResolver)

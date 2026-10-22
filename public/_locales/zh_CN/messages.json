@@ -1199,5 +1199,140 @@
   },
   "commandTriggerHint": {
     "message": "触发键：$1"
+  },
+  "commandPluginQuickLinks": {
+    "message": "快捷链接"
+  },
+  "commandPluginQuickLinksDescription": {
+    "message": "通过名称或 URL 搜索已保存的快捷链接。"
+  },
+  "quickLinksEmpty": {
+    "message": "还没有快捷链接"
+  },
+  "quickLinksSearchPlaceholder": {
+    "message": "搜索快捷链接名称或 URL"
+  },
+  "quickLinksViewAll": {
+    "message": "查看全部快捷链接（$1）"
+  },
+  "navigationReadFailed": {
+    "message": "暂时无法读取此来源，请重试。"
+  },
+  "retryAction": {
+    "message": "重试"
+  },
+  "navigationAllBookmarks": {
+    "message": "查看全部书签（$1）"
+  },
+  "navigationAllTabs": {
+    "message": "查看全部标签页（$1）"
+  },
+  "navigationCloseNamedTab": {
+    "message": "关闭标签页：$1"
+  },
+  "navigationSearch": {
+    "message": "搜索标题、URL 或书签文件夹"
+  },
+  "navigationSleeping": {
+    "message": "已休眠"
+  },
+  "engineManage": {
+    "message": "搜索引擎"
+  },
+  "engineBrowserDefault": {
+    "message": "浏览器默认搜索"
+  },
+  "engineBrowserDescription": {
+    "message": "使用浏览器设置的搜索引擎。"
+  },
+  "engineDefault": {
+    "message": "默认"
+  },
+  "engineEnterQuery": {
+    "message": "输入关键词开始搜索"
+  },
+  "engineSearchWith": {
+    "message": "在 $1 搜索"
+  },
+  "engineName": {
+    "message": "名称"
+  },
+  "engineUrl": {
+    "message": "搜索 URL"
+  },
+  "engineNameRequired": {
+    "message": "请输入 1–40 个字符的名称。"
+  },
+  "engineNameDuplicate": {
+    "message": "这个名称已被使用。"
+  },
+  "engineUrlInvalid": {
+    "message": "请输入有效的 HTTP 或 HTTPS 地址。"
+  },
+  "enginePlaceholderMissing": {
+    "message": "请用 %s 标记关键词的位置。"
+  },
+  "enginePlaceholderHost": {
+    "message": "%s 不能放在协议、主机或端口中。"
+  },
+  "engineCredentials": {
+    "message": "URL 不能包含用户名或密码。"
+  },
+  "engineTemplateHelp": {
+    "message": "用 %s 代表关键词，例如 https://github.com/search?q=%s"
+  },
+  "enginePreviewQuery": {
+    "message": "预览关键词"
+  },
+  "enginePreviewPlaceholder": {
+    "message": "填写有效模板和关键词后显示预览。"
+  },
+  "engineAdd": {
+    "message": "添加搜索引擎"
+  },
+  "engineEdit": {
+    "message": "编辑"
+  },
+  "engineSave": {
+    "message": "保存引擎"
+  },
+  "engineSaved": {
+    "message": "搜索引擎已保存"
+  },
+  "engineSaveFailed": {
+    "message": "保存失败，已保留当前编辑内容。"
+  },
+  "engineDelete": {
+    "message": "删除"
+  },
+  "engineDeleted": {
+    "message": "已删除 $1"
+  },
+  "engineToggle": {
+    "message": "启用 $1"
+  },
+  "engineActions": {
+    "message": "$1 的操作"
+  },
+  "engineMoveUp": {
+    "message": "上移"
+  },
+  "engineMoveDown": {
+    "message": "下移"
+  },
+  "engineLimit": {
+    "message": "最多可配置 $1 个自定义引擎。"
+  },
+  "engineDiscardQuestion": {
+    "message": "放弃尚未保存的修改？"
+  },
+  "engineDiscard": {
+    "message": "放弃修改"
+  },
+  "engineContinueEditing": {
+    "message": "继续编辑"
+  },
+  "engineInvalidConfig": {
+    "message": "已跳过无效的引擎配置。"
   }
 }

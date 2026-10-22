@@ -1199,5 +1199,140 @@
   },
   "commandTriggerHint": {
     "message": "Trigger key: $1"
+  },
+  "commandPluginQuickLinks": {
+    "message": "Quick links"
+  },
+  "commandPluginQuickLinksDescription": {
+    "message": "Search saved quick links by name or URL."
+  },
+  "quickLinksEmpty": {
+    "message": "No quick links yet"
+  },
+  "quickLinksSearchPlaceholder": {
+    "message": "Search quick links by name or URL"
+  },
+  "quickLinksViewAll": {
+    "message": "View all quick links ($1)"
+  },
+  "navigationReadFailed": {
+    "message": "Unable to load this source. Try again."
+  },
+  "retryAction": {
+    "message": "Retry"
+  },
+  "navigationAllBookmarks": {
+    "message": "View all bookmarks ($1)"
+  },
+  "navigationAllTabs": {
+    "message": "View all tabs ($1)"
+  },
+  "navigationCloseNamedTab": {
+    "message": "Close tab: $1"
+  },
+  "navigationSearch": {
+    "message": "Search title, URL or bookmark folder"
+  },
+  "navigationSleeping": {
+    "message": "Sleeping"
+  },
+  "engineManage": {
+    "message": "Search engines"
+  },
+  "engineBrowserDefault": {
+    "message": "Browser default search"
+  },
+  "engineBrowserDescription": {
+    "message": "Uses the search engine configured in your browser."
+  },
+  "engineDefault": {
+    "message": "Default"
+  },
+  "engineEnterQuery": {
+    "message": "Enter keywords to start searching"
+  },
+  "engineSearchWith": {
+    "message": "Search with $1"
+  },
+  "engineName": {
+    "message": "Name"
+  },
+  "engineUrl": {
+    "message": "Search URL"
+  },
+  "engineNameRequired": {
+    "message": "Enter a name with 1–40 characters."
+  },
+  "engineNameDuplicate": {
+    "message": "This name is already in use."
+  },
+  "engineUrlInvalid": {
+    "message": "Enter a valid HTTP or HTTPS URL."
+  },
+  "enginePlaceholderMissing": {
+    "message": "Use %s for the search keywords."
+  },
+  "enginePlaceholderHost": {
+    "message": "%s cannot appear in the protocol, host or port."
+  },
+  "engineCredentials": {
+    "message": "The URL must not include a username or password."
+  },
+  "engineTemplateHelp": {
+    "message": "Use %s for keywords, for example https://github.com/search?q=%s"
+  },
+  "enginePreviewQuery": {
+    "message": "Preview keywords"
+  },
+  "enginePreviewPlaceholder": {
+    "message": "Enter a valid template and keywords to see the URL."
+  },
+  "engineAdd": {
+    "message": "Add search engine"
+  },
+  "engineEdit": {
+    "message": "Edit"
+  },
+  "engineSave": {
+    "message": "Save engine"
+  },
+  "engineSaved": {
+    "message": "Search engine saved"
+  },
+  "engineSaveFailed": {
+    "message": "Unable to save. Your changes have been kept."
+  },
+  "engineDelete": {
+    "message": "Delete"
+  },
+  "engineDeleted": {
+    "message": "Deleted $1"
+  },
+  "engineToggle": {
+    "message": "Enable $1"
+  },
+  "engineActions": {
+    "message": "Actions for $1"
+  },
+  "engineMoveUp": {
+    "message": "Move up"
+  },
+  "engineMoveDown": {
+    "message": "Move down"
+  },
+  "engineLimit": {
+    "message": "You can configure up to $1 custom engines."
+  },
+  "engineDiscardQuestion": {
+    "message": "Discard unsaved changes?"
+  },
+  "engineDiscard": {
+    "message": "Discard changes"
+  },
+  "engineContinueEditing": {
+    "message": "Keep editing"
+  },
+  "engineInvalidConfig": {
+    "message": "Some invalid engines were skipped."
   }
 }

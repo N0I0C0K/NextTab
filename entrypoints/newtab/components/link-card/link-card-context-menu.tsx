@@ -14,6 +14,8 @@ import { t } from '@/utils/i18n'
 import type { ReactNode } from 'react'
 import type { RecentPage } from '../../recent-page-recommendations'
 import { DomainHistoryDialog } from './domain-history-dialog'
+import { queryProfileTabs, switchToPageTab } from '../../services/return-pages'
+import { toast } from 'sonner'
 import { SaveQuickLinkButton } from '../save-quick-link-button'
 
 interface LinkCardContextMenuContentProps {
@@ -21,11 +23,13 @@ interface LinkCardContextMenuContentProps {
   title: string
   url: string
   relatedBookmarks: chrome.bookmarks.BookmarkTreeNode[]
+  bookmarkError: boolean
   showBookmarks: boolean
   relatedTabs: chrome.tabs.Tab[]
   showOpenTabs: boolean
   recommendedPages: RecentPage[]
   globalDialog: GlobalDialogProps
+  onShowAll: (source: 'tabs' | 'bookmarks') => void
 }
 
 /**
@@ -48,11 +52,13 @@ export const LinkCardContextMenuContent = ({
   title,
   url,
   relatedBookmarks,
+  bookmarkError,
   showBookmarks,
   relatedTabs,
   showOpenTabs,
   recommendedPages,
   globalDialog,
+  onShowAll,
 }: LinkCardContextMenuContentProps): ReactNode => {
   return (
     <>
@@ -141,19 +147,22 @@ export const LinkCardContextMenuContent = ({
       )}
 
       {/* Related Bookmarks Section */}
-      {showBookmarks && relatedBookmarks.length > 0 && (
+      {showBookmarks && (relatedBookmarks.length > 0 || bookmarkError) && (
         <>
           <ContextMenuSeparator />
           <ContextMenuGroup>
-            <ContextMenuLabel>{t('relatedBookmarks')}</ContextMenuLabel>
-            {relatedBookmarks.slice(0, 10).map(bookmark => (
+            <ContextMenuLabel>
+              {t('relatedBookmarks')} · {bookmarkError ? '—' : relatedBookmarks.length}
+            </ContextMenuLabel>
+            {relatedBookmarks.slice(0, 5).map(bookmark => (
               <ContextMenuItem
                 key={bookmark.id}
                 data-testid="related-bookmark"
                 data-bookmark-id={bookmark.id}
-                onClick={() => {
+                onClick={event => {
                   if (bookmark.url) {
-                    chrome.tabs.update({ url: bookmark.url })
+                    if (event.ctrlKey || event.metaKey) void chrome.tabs.create({ url: bookmark.url, active: true })
+                    else void chrome.tabs.update({ url: bookmark.url })
                   }
                 }}
                 className="flex items-center gap-2">
@@ -172,6 +181,13 @@ export const LinkCardContextMenuContent = ({
                 {bookmark.url && <SaveQuickLinkButton title={bookmark.title} url={bookmark.url} />}
               </ContextMenuItem>
             ))}
+            {(relatedBookmarks.length > 5 || bookmarkError) && (
+              <ContextMenuItem data-testid="all-site-bookmarks" onClick={() => onShowAll('bookmarks')}>
+                {bookmarkError
+                  ? t('navigationReadFailed') + ' · ' + t('retryAction')
+                  : t('navigationAllBookmarks', String(relatedBookmarks.length))}
+              </ContextMenuItem>
+            )}
           </ContextMenuGroup>
         </>
       )}
@@ -181,19 +197,25 @@ export const LinkCardContextMenuContent = ({
         <>
           <ContextMenuSeparator />
           <ContextMenuGroup>
-            <ContextMenuLabel>{t('relatedOpenTabs')}</ContextMenuLabel>
-            {relatedTabs.slice(0, 10).map(tab => (
+            <ContextMenuLabel>
+              {t('relatedOpenTabs')} · {relatedTabs.length}
+            </ContextMenuLabel>
+            {relatedTabs.slice(0, 5).map(tab => (
               <ContextMenuItem
                 key={tab.id}
                 data-testid="related-tab"
                 data-tab-id={tab.id}
                 onClick={() => {
-                  if (tab.id !== undefined) {
-                    chrome.tabs.update(tab.id, { active: true })
-                    if (tab.windowId !== undefined) {
-                      chrome.windows.update(tab.windowId, { focused: true })
-                    }
-                  }
+                  void queryProfileTabs()
+                    .then(async tabs => {
+                      const current = tabs.find(
+                        item =>
+                          item.id === tab.id &&
+                          getDomainFromUrl(item.url ?? item.pendingUrl ?? '') === getDomainFromUrl(url),
+                      )
+                      if (current) await switchToPageTab(current)
+                    })
+                    .catch(() => toast.error(t('returnOpenFailed')))
                 }}
                 className="flex items-center gap-2">
                 <img
@@ -211,6 +233,11 @@ export const LinkCardContextMenuContent = ({
                 {tab.url && <SaveQuickLinkButton title={tab.title || tab.url} url={tab.url} />}
               </ContextMenuItem>
             ))}
+            {relatedTabs.length > 5 && (
+              <ContextMenuItem data-testid="all-site-tabs" onClick={() => onShowAll('tabs')}>
+                {t('navigationAllTabs', String(relatedTabs.length))}
+              </ContextMenuItem>
+            )}
           </ContextMenuGroup>
         </>
       )}
