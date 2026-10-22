@@ -529,10 +529,10 @@ test('return source selection survives reloads and new tabs, and visits follow t
   for (const event of snapshot.events) {
     if (event.type === 'enter') latestEnters.set(event.pageId, Math.max(event.at, latestEnters.get(event.pageId) ?? 0))
   }
-  const expectedTitles = snapshot.pages
+  const expectedPages = snapshot.pages
     .filter(item => latestEnters.has(item.id))
     .sort((a, b) => latestEnters.get(b.id)! - latestEnters.get(a.id)!)
-    .map(item => item.title.trim() || item.url)
+  const expectedTitles = expectedPages.map(item => item.title.trim() || item.url)
   expect(expectedTitles).toHaveLength(6)
   await expect(visibleRows(page).first()).toContainText(expectedTitles[0])
   await page.getByTestId('return-view-all').click()
@@ -542,9 +542,12 @@ test('return source selection survives reloads and new tabs, and visits follow t
   await expect(dialog.locator('.nt-return-title')).toHaveText(expectedTitles.filter(title => title.includes('NextTab')))
   await page.keyboard.press('Escape')
   await expect(page.getByTestId('return-view-all')).toBeFocused()
-  await page.evaluate(url => chrome.history.deleteUrl({ url }), fixturePages[5].url)
-  await expect(page.locator(`.nt-return-pages [data-page-url="${fixturePages[5].url}"]`)).toHaveCount(0)
-  await expect(page.locator(`.nt-return-pages [data-page-url="${fixturePages[4].url}"]`)).toBeVisible()
+  // Tied enter timestamps need not follow fixture navigation order. Remove the actual first row.
+  await page.evaluate(url => chrome.history.deleteUrl({ url }), expectedPages[0].url)
+  await expect(page.locator(`.nt-return-pages [data-page-url="${expectedPages[0].url}"]`)).toHaveCount(0)
+  await expect(visibleRows(page).first()).toContainText(expectedTitles[1])
+  await page.getByTestId('return-view-all').click()
+  await expect(dialog.locator('.nt-return-title')).toHaveText(expectedTitles.slice(1))
 })
 
 test('recent visits use background event logs, refresh on reentry and ignore recommendation filters', async ({
@@ -1007,6 +1010,7 @@ test('page rows use hidden action space for long titles and reveal controls on h
   const row = dialog.locator(`[data-page-url="${url}"]`)
   const primary = row.locator('.nt-return-open')
   const hint = row.locator('.nt-return-hint')
+  const save = row.getByTestId('save-quick-link')
   const more = row.locator('.nt-return-more')
   for (const viewport of [
     { width: 1440, height: 1000 },
@@ -1017,6 +1021,7 @@ test('page rows use hidden action space for long titles and reveal controls on h
     await page.mouse.move(0, 0)
     await dialog.getByRole('heading', { name: 'GitHub', exact: true }).focus()
     await expect(more).toHaveCSS('width', '0px')
+    await expect(save).toHaveCSS('width', '0px')
     const idle = await row.evaluate(element => ({
       titleWidth: element.querySelector('.nt-return-title')!.getBoundingClientRect().width,
       copyRight: element.querySelector('.nt-return-copy')!.getBoundingClientRect().right,
@@ -1029,6 +1034,7 @@ test('page rows use hidden action space for long titles and reveal controls on h
     await primary.scrollIntoViewIfNeeded()
     await page.screenshot({ path: testInfo.outputPath(`row-idle-${viewport.width}.png`) })
     await primary.hover()
+    await expect(save).toHaveCSS('width', '32px')
     await expect(more).toHaveCSS('width', '40px')
     const activeTitle = (await row.locator('.nt-return-title').boundingBox())!
     expect(activeTitle.width).toBeLessThan(idle.titleWidth)
@@ -1036,6 +1042,9 @@ test('page rows use hidden action space for long titles and reveal controls on h
     await page.mouse.move(0, 0)
     await primary.focus()
     await primary.press('Tab')
+    await expect(save).toBeFocused()
+    await expect(save).toBeInViewport()
+    await save.press('Tab')
     await expect(more).toBeFocused()
     await expect(more).toBeInViewport()
     await more.press('Enter')
@@ -1043,6 +1052,8 @@ test('page rows use hidden action space for long titles and reveal controls on h
     await page.keyboard.press('Escape')
     await expect(more).toBeFocused()
     await more.press('Shift+Tab')
+    await expect(save).toBeFocused()
+    await save.press('Shift+Tab')
     await expect(primary).toBeFocused()
     expect(await hint.evaluate(element => element.getBoundingClientRect().width > 0)).toBe(viewport.width > 650)
     await expect(dialog.locator('[data-slot="dialog-close"]')).toBeInViewport()
@@ -1097,13 +1108,18 @@ test('page row secondary actions fill their height in the homepage and every pag
       ),
     )
     const primary = row.locator('.nt-return-open')
+    const save = row.getByTestId('save-quick-link')
     const more = row.locator('.nt-return-more')
     await row.hover()
     const primaryBounds = await primary.boundingBox()
+    const saveBounds = await save.boundingBox()
     const moreBounds = await more.boundingBox()
     expect(moreBounds!.height).toBeCloseTo(primaryBounds!.height)
     expect(moreBounds!.y).toBeCloseTo(primaryBounds!.y)
-    expect(moreBounds!.x).toBeCloseTo(primaryBounds!.x + primaryBounds!.width)
+    expect(saveBounds!.height).toBeCloseTo(primaryBounds!.height)
+    expect(saveBounds!.y).toBeCloseTo(primaryBounds!.y)
+    expect(saveBounds!.x).toBeCloseTo(primaryBounds!.x + primaryBounds!.width)
+    expect(moreBounds!.x).toBeCloseTo(saveBounds!.x + saveBounds!.width)
     await more.hover({ position: { x: moreBounds!.width / 2, y: 2 } })
     expect(await more.evaluate(element => getComputedStyle(element).backgroundColor)).not.toBe('rgba(0, 0, 0, 0)')
     await expect(primary).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)')

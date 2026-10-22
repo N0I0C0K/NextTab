@@ -22,6 +22,7 @@ import { t } from '@/utils/i18n'
 import { matchingPageTabs, normalizePageUrl, switchToPageTab, type ReturnPage } from '../../services/return-pages'
 import { formatPageTime } from './page-format'
 import { PageDetailsDialog } from './page-details-dialog'
+import { SaveQuickLinkButton } from '../save-quick-link-button'
 
 export function PageRow({
   page,
@@ -140,6 +141,7 @@ export function PageRow({
           <span>{action}</span>
         </TooltipContent>
       </Tooltip>
+      <SaveQuickLinkButton title={page.title} url={page.url} />
       <DropdownMenu onOpenChange={setMenuOpen}>
         <DropdownMenuTrigger
           render={

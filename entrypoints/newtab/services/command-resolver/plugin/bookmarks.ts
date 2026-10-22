@@ -6,6 +6,7 @@ import { t } from '@/utils/i18n'
 function convertBookmarkToCommandResult(item: chrome.bookmarks.BookmarkTreeNode): ICommandResult {
   return {
     id: item.id,
+    url: item.url,
     title: item.title,
     description: item.url,
     iconUrl: item.url ? getDefaultIconUrl(item.url) : undefined,

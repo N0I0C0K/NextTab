@@ -16,6 +16,7 @@ import type { RecentPage } from '../../recent-page-recommendations'
 import { DomainHistoryDialog } from './domain-history-dialog'
 import { queryProfileTabs, switchToPageTab } from '../../services/return-pages'
 import { toast } from 'sonner'
+import { SaveQuickLinkButton } from '../save-quick-link-button'
 
 interface LinkCardContextMenuContentProps {
   id: string
@@ -138,6 +139,7 @@ export const LinkCardContextMenuContent = ({
                 <span className="min-w-0 flex-1 truncate" title={`${page.title}\n${page.url}`}>
                   {page.title}
                 </span>
+                <SaveQuickLinkButton title={page.title} url={page.url} />
               </ContextMenuItem>
             ))}
           </ContextMenuGroup>
@@ -176,6 +178,7 @@ export const LinkCardContextMenuContent = ({
                 <span className="min-w-0 flex-1 truncate" title={bookmark.title || bookmark.url}>
                   {bookmark.title || bookmark.url}
                 </span>
+                {bookmark.url && <SaveQuickLinkButton title={bookmark.title} url={bookmark.url} />}
               </ContextMenuItem>
             ))}
             {(relatedBookmarks.length > 5 || bookmarkError) && (
@@ -227,6 +230,7 @@ export const LinkCardContextMenuContent = ({
                 <span className="min-w-0 flex-1 truncate" title={tab.title || tab.url}>
                   {tab.title || tab.url}
                 </span>
+                {tab.url && <SaveQuickLinkButton title={tab.title || tab.url} url={tab.url} />}
               </ContextMenuItem>
             ))}
             {relatedTabs.length > 5 && (

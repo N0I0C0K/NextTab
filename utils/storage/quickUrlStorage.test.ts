@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it } from 'vitest'
 import { fakeBrowser } from 'wxt/testing/fake-browser'
 import {
   addQuickUrl,
+  addQuickUrlIfMissing,
   getDisplayQuickUrls,
   moveQuickUrlById,
   putQuickUrlById,
@@ -19,6 +20,19 @@ describe('quick link storage', () => {
     await Promise.all([addQuickUrl(link('a')), addQuickUrl(link('b')), addQuickUrl(link('c'))])
 
     expect((await quickUrlItemsStorage.getValue()).map(item => item.id)).toEqual(['a', 'b', 'c'])
+  })
+
+  it('deduplicates concurrent page additions while keeping distinct queries and fragments', async () => {
+    const page = { ...link('a'), url: 'https://a.example.com' }
+    expect(
+      await Promise.all([
+        addQuickUrlIfMissing(page),
+        addQuickUrlIfMissing({ ...page, id: 'duplicate', url: `${page.url}/` }),
+        addQuickUrlIfMissing({ ...page, id: 'query', url: `${page.url}/?view=all` }),
+        addQuickUrlIfMissing({ ...page, id: 'fragment', url: `${page.url}/#intro` }),
+      ]),
+    ).toEqual([true, false, true, true])
+    expect((await quickUrlItemsStorage.getValue()).map(item => item.id)).toEqual(['a', 'query', 'fragment'])
   })
 
   it('reorders links by id and ignores missing ids', async () => {

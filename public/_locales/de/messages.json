@@ -28,6 +28,11 @@
   "addSite": {
     "message": "Website hinzufügen"
   },
+  "addToQuickLinks": { "message": "Zu Schnellzugriffen hinzufügen" },
+  "quickLinkSaved": { "message": "Bereits in Schnellzugriffen" },
+  "quickLinkAdded": { "message": "Zu Schnellzugriffen hinzugefügt" },
+  "quickLinkAddFailed": { "message": "Hinzufügen fehlgeschlagen. Bitte erneut versuchen." },
+  "quickLinkSuggestionHint": { "message": "Zum Bearbeiten auswählen" },
   "addQuickLinkTitle": {
     "message": "Schnellzugriff hinzufügen"
   },

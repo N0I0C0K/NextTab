@@ -20,6 +20,7 @@ import { QuickLinksDialog } from './navigation/quick-links-dialog'
 import { SearchEngineSettings } from './settings/SearchEngineSettings'
 import { QuickItemEditForm } from './quick-item-edit-form'
 import { useGlobalDialog } from '../providers'
+import { SaveQuickLinkButton } from './save-quick-link-button'
 
 const shortcutOrder = ['quickLinks', 'bookmarks', 'history', 'tabs', 'calculator']
 const shortLabels: Record<string, MessageKey> = {
@@ -437,7 +438,10 @@ export const CommandModule = forwardRef<
                                 data-testid="command-result"
                                 data-command-result-id={res.id}
                                 onClickCapture={event => {
-                                  if (event.ctrlKey || event.metaKey) {
+                                  if (
+                                    (event.ctrlKey || event.metaKey) &&
+                                    !(event.target as Element).closest('.nt-save-quick-link')
+                                  ) {
                                     event.preventDefault()
                                     event.stopPropagation()
                                     void Promise.resolve(res.onSelect?.({ newTab: true })).catch(() =>
@@ -463,6 +467,7 @@ export const CommandModule = forwardRef<
                                     {res.description}
                                   </Text>
                                 </div>
+                                {res.url && <SaveQuickLinkButton title={res.title} url={res.url} />}
                               </command.CommandItem>
                             )
                           })

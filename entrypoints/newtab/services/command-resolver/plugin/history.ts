@@ -8,6 +8,7 @@ function convertHistoryItemToCommandResult(item: chrome.history.HistoryItem): IC
   const formatLastDate = moment(item.lastVisitTime).format('MM/DD HH:mm')
   return {
     id: item.id,
+    url: item.url,
     title: item.title || item.url || '',
     description: `${formatLastDate} ${item.url!}`,
     iconUrl: getDefaultIconUrl(item.url!),

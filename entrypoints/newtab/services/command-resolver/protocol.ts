@@ -18,6 +18,7 @@ export interface ICommandResult {
   id: string
   title: string
   description?: string
+  url?: string
   iconUrl?: string
   IconType?: React.ElementType
   onSelect?: (options?: { newTab?: boolean }) => void | Promise<void>

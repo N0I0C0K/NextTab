@@ -771,6 +771,56 @@
   border-radius: 10px;
   background: hsl(var(--card));
 }
+.nt-save-quick-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  align-self: center;
+  width: 32px;
+  height: 36px;
+  border-radius: 6px;
+  color: hsl(var(--muted-foreground));
+  cursor: pointer;
+}
+.nt-save-quick-link:hover,
+.nt-save-quick-link:focus-visible {
+  color: hsl(var(--foreground));
+  background: hsl(var(--accent));
+}
+.nt-save-quick-link:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: -2px;
+}
+.nt-save-quick-link[aria-disabled='true'] {
+  cursor: default;
+}
+.nt-return-row > .nt-save-quick-link {
+  align-self: stretch;
+  width: 0;
+  height: auto;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+.nt-return-row:hover > .nt-save-quick-link,
+.nt-return-row:focus-within > .nt-save-quick-link,
+.nt-return-row[data-interacting='true'] > .nt-save-quick-link {
+  width: 32px;
+  opacity: 1;
+  pointer-events: auto;
+}
+@media (pointer: coarse) {
+  .nt-save-quick-link {
+    min-width: 36px;
+    min-height: 44px;
+  }
+  .nt-return-row > .nt-save-quick-link {
+    width: 36px;
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
 .nt-return-row {
   display: flex;
   align-items: stretch;
@@ -1284,6 +1334,101 @@
   }
 }
 
+.nt-add-site-dialog[data-slot='dialog-content'] {
+  display: flex;
+  flex-direction: column;
+  width: calc(100vw - 32px);
+  max-width: 30rem;
+  max-height: calc(100dvh - 32px);
+  overflow: hidden;
+  gap: 20px;
+  padding: 24px;
+}
+.nt-add-site-dialog [data-slot='dialog-header'] {
+  flex: none;
+  padding-right: 24px;
+}
+.nt-add-site-body {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 3px;
+  margin: -3px;
+}
+.nt-add-suggestions {
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid hsl(var(--border));
+}
+.nt-add-suggestions-heading {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 6px 12px;
+  margin-bottom: 12px;
+  font-size: 12px;
+}
+.nt-add-suggestions-heading h3 {
+  margin: 0;
+  font-weight: 500;
+}
+.nt-add-suggestions-heading span {
+  color: hsl(var(--muted-foreground));
+}
+.nt-add-suggestion-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.nt-add-suggestion {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  max-width: 100%;
+  min-width: 0;
+  padding: 8px 11px;
+  border: 1px solid hsl(var(--border));
+  border-radius: 8px;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+}
+.nt-add-suggestion:hover,
+.nt-add-suggestion[aria-pressed='true'] {
+  background: hsl(var(--muted));
+  border-color: hsl(var(--muted-foreground));
+}
+.nt-add-suggestion-icon {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+}
+.nt-add-suggestion-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.nt-add-suggestion:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+}
+.nt-add-suggestion:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+@media (max-width: 430px) {
+  .nt-add-site-dialog[data-slot='dialog-content'] {
+    padding: 20px;
+  }
+}
+@media (pointer: coarse) {
+  .nt-add-suggestion {
+    min-height: 44px;
+  }
+}
 .nt-settings-dialog {
   top: 0;
   right: 0;

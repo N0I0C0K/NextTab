@@ -32,6 +32,7 @@ export function SitePagesDialog({
 }) {
   const settings = useStorage(settingStorage)
   const quickUrls = useStorage(quickUrlItemsStorage)
+  const [savedAtOpen, setSavedAtOpen] = useState(quickUrls)
   const [history, setHistory] = useState<ReturnPage[]>([])
   const [bookmarks, setBookmarks] = useState<SiteBookmark[]>([])
   const [bookmarkScope, setBookmarkScope] = useState('')
@@ -52,6 +53,10 @@ export function SitePagesDialog({
       return ''
     }
   }, [url])
+  useEffect(() => {
+    // Saving a recent page must not move its focused row to another group mid-interaction.
+    if (!open) setSavedAtOpen(quickUrls)
+  }, [open, quickUrls])
   const matches = useCallback(
     (value: string) => {
       try {
@@ -150,7 +155,7 @@ export function SitePagesDialog({
   const saved =
     open && !fullSource
       ? unique([
-          ...quickUrls
+          ...savedAtOpen
             .filter(item => normalizePageUrl(item.url) !== normalizePageUrl(url))
             .map(item => ({ ...item, lastVisitTime: 0, activeDays: 0 })),
           ...visibleBookmarks.flatMap(item =>
