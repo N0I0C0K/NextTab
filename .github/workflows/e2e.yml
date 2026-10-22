@@ -53,11 +53,14 @@ jobs:
       - name: Build Firefox extension
         run: pnpm build:firefox
 
-      - name: Upload E2E failure artifacts
-        if: failure()
+      - name: Upload E2E failure and retry artifacts
+        if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
           name: playwright-test-results
-          path: test-results/
+          path: |
+            test-results/**/trace.zip
+            test-results/**/test-failed-*.png
+            test-results/**/error-context.md
           if-no-files-found: ignore
           retention-days: 7
