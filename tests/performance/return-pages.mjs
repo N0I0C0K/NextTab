@@ -18,6 +18,7 @@ for (const [name, source] of [
   ['scoring', 'utils/page-activity/scoring.ts'],
   ['store', 'utils/page-activity/store.ts'],
   ['return-pages', 'entrypoints/newtab/services/return-pages.ts'],
+  ['quick-link-suggestions', 'entrypoints/newtab/services/quick-link-suggestions.ts'],
 ]) {
   const input = await readFile(path.join(root, source), 'utf8')
   sourceHashes[source] = createHash('sha256').update(input).digest('hex')
@@ -35,6 +36,9 @@ for (const [name, source] of [
 }
 for (const source of [
   'entrypoints/background/page-activity.ts',
+  'entrypoints/newtab/components/quick-link-context-menu.tsx',
+  'entrypoints/newtab/components/add-button.tsx',
+  'entrypoints/newtab/components/quick-item-edit-form.tsx',
   'entrypoints/newtab/components/return-pages/index.tsx',
   'entrypoints/newtab/components/return-pages/page-list.tsx',
   'entrypoints/newtab/components/return-pages/page-row.tsx',
@@ -93,6 +97,7 @@ try {
       await page.evaluate(
         async ({ rate, tabFixtures }) => {
           const { scoreActivity } = await import('/scoring.js')
+          const { buildQuickLinkSuggestions, selectQuickLinkSuggestions } = await import('/quick-link-suggestions.js')
           const { ActivityLogStore } = await import('/store.js')
           const { fetchReturnPages, rankRecentPages, OPEN_TAB_MULTIPLIER } = await import('/return-pages.js')
           const { ACTIVITY_BYTE_BUDGET, ACTIVITY_WINDOW_MS, DAY_MS } = await import('/model.js')
@@ -160,6 +165,14 @@ try {
             const started = performance.now()
             const first = scoreActivity(snapshot)
             const firstRunMs = performance.now() - started
+            const sitesSnapshot = {
+              ...snapshot,
+              pages: snapshot.pages.map((page, index) => ({
+                ...page,
+                url: `https://site-${index % 100}.example/page/${index}`,
+                key: `https://site-${index % 100}.example/page/${index}`,
+              })),
+            }
             scoring.push({
               pages: snapshot.pages.length,
               events: snapshot.events.length,
@@ -168,6 +181,10 @@ try {
               firstRunMs,
               ...(await measure(() => scoreActivity(snapshot))),
               diagnostics: await measure(() => scoreActivity(snapshot, () => {})),
+              siteSuggestions: await measure(() => selectQuickLinkSuggestions(buildQuickLinkSuggestions(snapshot), [])),
+              siteSuggestions100Sites: await measure(() =>
+                selectQuickLinkSuggestions(buildQuickLinkSuggestions(sitesSnapshot), []),
+              ),
             })
           }
           const snapshot = scenarios[2]

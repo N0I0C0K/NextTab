@@ -20,7 +20,7 @@ import { QuickLinksDialog } from './navigation/quick-links-dialog'
 import { SearchEngineSettings } from './settings/SearchEngineSettings'
 import { QuickItemEditForm } from './quick-item-edit-form'
 import { useGlobalDialog } from '../providers'
-import { SaveQuickLinkButton } from './save-quick-link-button'
+import { QuickLinkContextMenu } from './quick-link-context-menu'
 
 const shortcutOrder = ['quickLinks', 'bookmarks', 'history', 'tabs', 'calculator']
 const shortLabels: Record<string, MessageKey> = {
@@ -63,6 +63,7 @@ export const CommandModule = forwardRef<
   const literalTriggerRef = useRef<string>()
   const panelId = useId()
   const [open, setOpen] = useState(false)
+  const resultMenuOpen = useRef(false)
   const [inputVal, setInputVal] = useState('')
   const [selectedPlugin, setSelectedPlugin] = useState<string>()
   const [sharedTrigger, setSharedTrigger] = useState(false)
@@ -294,7 +295,7 @@ export const CommandModule = forwardRef<
         ref={containerRef}
         data-expanded={open}
         onBlur={event => {
-          if (!event.currentTarget.contains(event.relatedTarget)) setOpen(false)
+          if (!resultMenuOpen.current && !event.currentTarget.contains(event.relatedTarget)) setOpen(false)
         }}>
         <command.Command className={cn('rounded-xl', className)} data-expanded={open} shouldFilter={false}>
           <command.CommandInput
@@ -432,43 +433,49 @@ export const CommandModule = forwardRef<
                         ) : (
                           val.result.map(res => {
                             return (
-                              <command.CommandItem
+                              <QuickLinkContextMenu
                                 key={res.id}
-                                value={`${val.groupName}:${res.id}`}
-                                data-testid="command-result"
-                                data-command-result-id={res.id}
-                                onClickCapture={event => {
-                                  if (
-                                    (event.ctrlKey || event.metaKey) &&
-                                    !(event.target as Element).closest('.nt-save-quick-link')
-                                  ) {
-                                    event.preventDefault()
-                                    event.stopPropagation()
-                                    void Promise.resolve(res.onSelect?.({ newTab: true })).catch(() =>
+                                title={res.title}
+                                url={res.url}
+                                onOpenChange={value => {
+                                  resultMenuOpen.current = value
+                                }}
+                                finalFocus={inputRef}>
+                                <command.CommandItem
+                                  value={`${val.groupName}:${res.id}`}
+                                  data-testid="command-result"
+                                  data-command-result-id={res.id}
+                                  onClickCapture={event => {
+                                    if (event.ctrlKey || event.metaKey) {
+                                      event.preventDefault()
+                                      event.stopPropagation()
+                                      void Promise.resolve(res.onSelect?.({ newTab: true })).catch(() =>
+                                        toast.error(t('returnOpenFailed')),
+                                      )
+                                      if (!res.keepOpen) setOpen(false)
+                                    }
+                                  }}
+                                  onSelect={() => {
+                                    if (composingRef.current) return
+                                    void Promise.resolve(res.onSelect?.()).catch(() =>
                                       toast.error(t('returnOpenFailed')),
                                     )
+                                    // Hide the panel after selection
+                                    inputRef.current?.focus()
                                     if (!res.keepOpen) setOpen(false)
-                                  }
-                                }}
-                                onSelect={() => {
-                                  if (composingRef.current) return
-                                  void Promise.resolve(res.onSelect?.()).catch(() => toast.error(t('returnOpenFailed')))
-                                  // Hide the panel after selection
-                                  inputRef.current?.focus()
-                                  if (!res.keepOpen) setOpen(false)
-                                }}
-                                className="nt-command-result">
-                                <CommandItemIcon iconUrl={res.iconUrl} IconType={res.IconType} />
-                                <div className="nt-command-result-copy">
-                                  <Text level="s" className="truncate" title={res.title}>
-                                    {res.title}
-                                  </Text>
-                                  <Text level="xs" className="truncate" gray title={res.description}>
-                                    {res.description}
-                                  </Text>
-                                </div>
-                                {res.url && <SaveQuickLinkButton title={res.title} url={res.url} />}
-                              </command.CommandItem>
+                                  }}
+                                  className="nt-command-result">
+                                  <CommandItemIcon iconUrl={res.iconUrl} IconType={res.IconType} />
+                                  <div className="nt-command-result-copy">
+                                    <Text level="s" className="truncate" title={res.title}>
+                                      {res.title}
+                                    </Text>
+                                    <Text level="xs" className="truncate" gray title={res.description}>
+                                      {res.description}
+                                    </Text>
+                                  </div>
+                                </command.CommandItem>
+                              </QuickLinkContextMenu>
                             )
                           })
                         )}

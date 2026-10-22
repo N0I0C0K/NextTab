@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight, X } from 'lucide-react'
 import { toast } from 'sonner'
 import { QuickLinkIcon } from '@/components/shared/custom/quick-link-icon'
 import { t } from '@/utils/i18n'
+import { QuickLinkContextMenu } from '../quick-link-context-menu'
 
 export type NavigationItem = { id: string; title: string; url: string; detail?: string; tabId?: number }
 
@@ -94,32 +95,34 @@ export function NavigationList({
       <div className="nt-navigation-scroll" ref={list}>
         {items.slice(start, end).map((item, index) => (
           <div className="nt-navigation-row" key={item.id} data-testid="navigation-row" data-item-id={item.id}>
-            <button
-              type="button"
-              className="nt-navigation-open"
-              onKeyDown={event => {
-                if (
-                  event.key === 'Enter' &&
-                  (event.ctrlKey || event.metaKey) &&
-                  !event.nativeEvent.isComposing &&
-                  event.nativeEvent.keyCode !== 229
-                ) {
-                  event.preventDefault()
-                  openItem(item, true)
-                } else handleRowKeyDown(event)
-              }}
-              title={`${item.title}\n${item.url}${item.detail ? '\n' + item.detail : ''}`}
-              onClick={event => openItem(item, event.ctrlKey || event.metaKey)}>
-              <QuickLinkIcon url={item.url} title={item.title} className="nt-link-icon" />
-              <span className="nt-navigation-copy">
-                <span className="nt-navigation-title">{item.title}</span>
-                <span className="nt-navigation-url">{item.url}</span>
-                {item.detail && <span className="nt-navigation-detail">{item.detail}</span>}
-              </span>
-              <span className="nt-navigation-action">
-                {t(item.tabId === undefined ? 'returnOpenPage' : 'returnSwitchTab')}
-              </span>
-            </button>
+            <QuickLinkContextMenu title={item.title} url={item.url}>
+              <button
+                type="button"
+                className="nt-navigation-open"
+                onKeyDown={event => {
+                  if (
+                    event.key === 'Enter' &&
+                    (event.ctrlKey || event.metaKey) &&
+                    !event.nativeEvent.isComposing &&
+                    event.nativeEvent.keyCode !== 229
+                  ) {
+                    event.preventDefault()
+                    openItem(item, true)
+                  } else handleRowKeyDown(event)
+                }}
+                title={`${item.title}\n${item.url}${item.detail ? '\n' + item.detail : ''}`}
+                onClick={event => openItem(item, event.ctrlKey || event.metaKey)}>
+                <QuickLinkIcon url={item.url} title={item.title} className="nt-link-icon" />
+                <span className="nt-navigation-copy">
+                  <span className="nt-navigation-title">{item.title}</span>
+                  <span className="nt-navigation-url">{item.url}</span>
+                  {item.detail && <span className="nt-navigation-detail">{item.detail}</span>}
+                </span>
+                <span className="nt-navigation-action">
+                  {t(item.tabId === undefined ? 'returnOpenPage' : 'returnSwitchTab')}
+                </span>
+              </button>
+            </QuickLinkContextMenu>
             {onClose && item.tabId !== undefined && (
               <button
                 type="button"
