@@ -190,7 +190,9 @@ test('settings navigation and cards stay aligned while long descriptions remain 
   const switchBounds = await cards.first().getByRole('switch').boundingBox()
   expect(switchBounds).not.toBeNull()
   expect(switchBounds!.x + switchBounds!.width).toBeLessThanOrEqual(390)
-  expect(await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth)).toBe(false)
+  // The focused description keeps its portalled tooltip open. Its positioner
+  // updates after the viewport resize, so assert the settled layout, not one frame.
+  await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth)).toBe(false)
 
   await page.getByTestId('settings-tab-server').click()
   const serverInputs = page.getByTestId('server-settings').locator('.nt-setting-item-stacked [data-slot="input"]')
