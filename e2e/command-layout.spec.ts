@@ -210,6 +210,36 @@ test('typed prefixes and clicks share the selected mode while normal words stay 
   )
 })
 
+test('keyboard navigation after closing results does not crash the command input', async ({ page, extensionId }) => {
+  const pageErrors: string[] = []
+  page.on('pageerror', error => pageErrors.push(error.message))
+  await prepare(page, extensionId)
+  const input = page.getByTestId('command-input')
+
+  await input.fill('= 1+1')
+  await expect(page.locator('[data-command-result-id="calc-result"]')).toContainText('1+1 = 2')
+  await input.press('Enter')
+  await expect(input).toBeFocused()
+  await expect(page.getByTestId('command-panel')).toHaveCount(0)
+
+  // The input remains focused while cmdk's list is unmounted. These keys must
+  // not enumerate a missing list or execute a stale, hidden result.
+  for (const key of ['ArrowDown', 'ArrowUp', 'Home', 'End', 'Enter']) {
+    await page.keyboard.press(key)
+  }
+  expect(pageErrors).toEqual([])
+  await expect(input).toBeFocused()
+  await expect(page.getByTestId('command-panel')).toHaveCount(0)
+
+  await input.fill('')
+  await input.press('Backspace')
+  await expect(page.getByTestId('command-clear-mode')).toHaveCount(0)
+  await expect(input).toBeFocused()
+  await input.fill('= 2+2')
+  await expect(page.locator('[data-command-result-id="calc-result"]')).toContainText('2+2 = 4')
+  expect(pageErrors).toEqual([])
+})
+
 test('leaving a mode preserves literal prefixes and composition does not change modes mid-input', async ({
   page,
   extensionId,
