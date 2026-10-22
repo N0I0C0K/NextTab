@@ -32,7 +32,7 @@
   "dependencies": {
     "@base-ui/react": "1.8.0",
     "@dnd-kit/helpers": "^0.1.21",
-    "@dnd-kit/react": "^0.1.21",
+    "@dnd-kit/react": "^0.5.1",
     "@hookform/resolvers": "^5.2.2",
     "class-variance-authority": "^0.7.0",
     "cmdk": "1.0.4",
