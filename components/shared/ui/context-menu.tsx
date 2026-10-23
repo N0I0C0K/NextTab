@@ -13,15 +13,20 @@ function ContextMenuPortal({ ...props }: ContextMenuPrimitive.Portal.Props) {
   return <ContextMenuPrimitive.Portal data-slot="context-menu-portal" {...props} />
 }
 
-function ContextMenuTrigger({ className, ...props }: ContextMenuPrimitive.Trigger.Props) {
+const ContextMenuTrigger = React.forwardRef<
+  React.ElementRef<typeof ContextMenuPrimitive.Trigger>,
+  React.ComponentPropsWithoutRef<typeof ContextMenuPrimitive.Trigger>
+>(({ className, ...props }, ref) => {
   return (
     <ContextMenuPrimitive.Trigger
+      ref={ref}
       data-slot="context-menu-trigger"
       className={cn('select-none', className)}
       {...props}
     />
   )
-}
+})
+ContextMenuTrigger.displayName = 'ContextMenuTrigger'
 
 function ContextMenuContent({
   className,

@@ -20,7 +20,7 @@ import { QuickLinksDialog } from './navigation/quick-links-dialog'
 import { SearchEngineSettings } from './settings/SearchEngineSettings'
 import { QuickItemEditForm } from './quick-item-edit-form'
 import { useGlobalDialog } from '../providers'
-import { QuickLinkContextMenu } from './quick-link-context-menu'
+import { openSelectedQuickLinkMenu, QuickLinkContextMenu } from './quick-link-context-menu'
 
 const shortcutOrder = ['quickLinks', 'bookmarks', 'history', 'tabs', 'calculator']
 const shortLabels: Record<string, MessageKey> = {
@@ -313,6 +313,7 @@ export const CommandModule = forwardRef<
               changeInput(event.currentTarget.value)
             }}
             onKeyDown={event => {
+              if (openSelectedQuickLinkMenu(event)) return
               if (
                 event.key === 'Enter' &&
                 (event.ctrlKey || event.metaKey) &&

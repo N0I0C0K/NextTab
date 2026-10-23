@@ -7,7 +7,7 @@ import { useDebounce } from '@/utils'
 import moment from 'moment'
 import { X } from 'lucide-react'
 import { Command } from 'cmdk'
-import { QuickLinkContextMenu } from '../quick-link-context-menu'
+import { openSelectedQuickLinkMenu, QuickLinkContextMenu } from '../quick-link-context-menu'
 
 interface DomainHistoryItem {
   id: string
@@ -122,6 +122,7 @@ export const DomainHistoryDialog: FC<DomainHistoryDialogProps> = ({ domain }) =>
           placeholder={t('searchInDomain')}
           value={searchQuery}
           onValueChange={setSearchQuery}
+          onKeyDown={openSelectedQuickLinkMenu}
           className="pr-9 placeholder:text-muted-foreground"
         />
         {searchQuery && (

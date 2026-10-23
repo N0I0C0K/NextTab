@@ -349,6 +349,7 @@ test('site previews show five records and the full source searches folders witho
   await expect(page.getByTestId('save-quick-link')).toHaveAttribute('aria-disabled', 'true')
   await page.keyboard.press('Escape')
   await expect(page.getByTestId('save-quick-link')).toHaveCount(0)
+  await expect(dialog).toHaveAttribute('data-open', '')
   await dialog.getByRole('textbox').fill('q=1')
   await expect(dialog.getByTestId('navigation-row').filter({ hasText: 'Duplicate bookmark' })).toHaveCount(1)
   for (const viewport of [

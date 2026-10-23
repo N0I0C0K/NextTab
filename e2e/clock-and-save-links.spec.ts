@@ -159,9 +159,117 @@ test('links already inside a context menu have no save action; domain history us
   await page.keyboard.press('Escape')
   await expect(save).toHaveCount(0)
   await expect(history).toBeVisible()
+  await expect(page.getByRole('dialog')).toHaveAttribute('data-open', '')
   await page.keyboard.press('Escape')
   await expect(history).toHaveCount(0)
 })
+
+for (const source of ['search', 'domain history'] as const) {
+  test(`${source} opens the selected link menu from the input keyboard and Escape dismisses one surface`, async ({
+    page,
+    context,
+    extensionId,
+  }) => {
+    const links = [
+      { title: 'First keyboard link', url: 'https://keyboard.save.test/first?view=full#section' },
+      { title: 'Second keyboard link', url: 'https://keyboard.save.test/second?view=full#section' },
+    ]
+    await context.route('https://keyboard.save.test/**', route => {
+      const link = links.find(item => item.url.split('#')[0] === route.request().url())
+      return route.fulfill({ contentType: 'text/html', body: `<title>${link?.title}</title>` })
+    })
+    await page.goto(`chrome-extension://${extensionId}/newtab.html`)
+    await page.evaluate(() =>
+      chrome.storage.local.set({
+        'onboarding-completed-key': true,
+        'quick-url-item-storage-key': [{ id: 'keyboard', title: 'Keyboard', url: 'https://keyboard.save.test/' }],
+      }),
+    )
+    for (const link of links) {
+      const visited = await context.newPage()
+      await visited.goto(link.url)
+      await visited.close()
+    }
+    await page.reload()
+    if (source === 'search') {
+      await page.getByTestId('command-shortcut-history').click()
+      await page.getByTestId('command-input').fill('keyboard.save.test')
+    } else {
+      await page.getByTestId('quick-link-card').click({ button: 'right' })
+      await page.getByTestId('quick-link-history').click()
+    }
+    const panel = page.getByTestId(source === 'search' ? 'command-panel' : 'domain-history-dialog')
+    const input = page.getByTestId(source === 'search' ? 'command-input' : 'domain-history-search')
+    const rows = panel.getByTestId(source === 'search' ? 'command-result' : 'domain-history-item')
+    await expect(rows).toHaveCount(2)
+    await expect(input).toBeFocused()
+    await input.press('ArrowDown')
+    const selected = rows.and(page.locator('[aria-selected="true"]'))
+    await expect(selected).toHaveCount(1)
+    const selectedText = await selected.textContent()
+    const selectedLink = links.find(link => selectedText?.includes(link.title))!
+    const save = page.getByTestId('save-quick-link')
+
+    await input.press('Shift+F10')
+    await expect(save).toBeVisible()
+    await expect(save).not.toHaveAttribute('aria-disabled', 'true')
+    await page.keyboard.press('Escape')
+    await expect(save).toHaveCount(0)
+    await expect(panel).toBeVisible()
+    await expect(input).toBeFocused()
+    await page.keyboard.press('Escape')
+    await expect(panel).not.toBeVisible()
+
+    if (source === 'search') {
+      await input.click()
+    } else {
+      await page.getByTestId('quick-link-card').click({ button: 'right' })
+      await page.getByTestId('quick-link-history').click()
+    }
+    await input.fill(selectedLink.title)
+    await expect(rows).toHaveCount(1)
+    await input.press('ArrowDown')
+    await expect(rows.and(page.locator('[aria-selected="true"]'))).toContainText(selectedLink.title)
+
+    await input.press('ContextMenu')
+    await expect(save).toBeVisible()
+    await expect
+      .poll(() => save.evaluate(element => element.closest('[role="menu"]')?.contains(document.activeElement)))
+      .toBe(true)
+    await page.keyboard.press('ArrowDown')
+    await expect(save).toBeFocused()
+    await page.keyboard.press('Enter')
+    await expect
+      .poll(() =>
+        page.evaluate(
+          async () => (await chrome.storage.local.get('quick-url-item-storage-key'))['quick-url-item-storage-key'],
+        ),
+      )
+      .toEqual([
+        { id: 'keyboard', title: 'Keyboard', url: 'https://keyboard.save.test/' },
+        { id: expect.any(String), title: expect.any(String), url: selectedLink.url },
+      ])
+    await expect(input).toBeFocused()
+    expect(page.url()).toContain('/newtab.html')
+    if (source === 'search') {
+      // Saving refreshes command results and may reset cmdk's virtual selection.
+      await input.fill(selectedLink.title)
+      await expect(rows).toHaveCount(1)
+      await input.press('ArrowDown')
+      await expect(rows.and(page.locator('[aria-selected="true"]'))).toContainText(selectedLink.title)
+    }
+
+    await input.press('Shift+F10')
+    await expect(save).toHaveAttribute('aria-disabled', 'true')
+    await page.keyboard.press('Escape')
+    await expect(save).toHaveCount(0)
+    await expect(panel).toBeVisible()
+    await expect(input).toBeFocused()
+    if (source === 'domain history') await expect(page.getByRole('dialog')).toHaveAttribute('data-open', '')
+    await page.keyboard.press('Escape')
+    await expect(panel).not.toBeVisible()
+  })
+}
 
 test('saving a site recent page keeps its row and keyboard focus until the dialog is reopened', async ({
   page,
