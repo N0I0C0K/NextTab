@@ -36,7 +36,7 @@ for (const [name, source] of [
 }
 for (const source of [
   'entrypoints/background/page-activity.ts',
-  'entrypoints/newtab/components/quick-link-context-menu.tsx',
+  'entrypoints/newtab/components/save-quick-link-menu-item.tsx',
   'entrypoints/newtab/components/add-button.tsx',
   'entrypoints/newtab/components/quick-item-edit-form.tsx',
   'entrypoints/newtab/components/return-pages/index.tsx',

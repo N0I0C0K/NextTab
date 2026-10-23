@@ -7,7 +7,6 @@ import { useDebounce } from '@/utils'
 import moment from 'moment'
 import { X } from 'lucide-react'
 import { Command } from 'cmdk'
-import { openSelectedQuickLinkMenu, QuickLinkContextMenu } from '../quick-link-context-menu'
 
 interface DomainHistoryItem {
   id: string
@@ -122,7 +121,6 @@ export const DomainHistoryDialog: FC<DomainHistoryDialogProps> = ({ domain }) =>
           placeholder={t('searchInDomain')}
           value={searchQuery}
           onValueChange={setSearchQuery}
-          onKeyDown={openSelectedQuickLinkMenu}
           className="pr-9 placeholder:text-muted-foreground"
         />
         {searchQuery && (
@@ -164,7 +162,6 @@ const DomainHistoryItem: FC<DomainHistoryItem> = ({ id, title, url, lastVisitTim
   }, [lastVisitTime])
 
   const handleClickCapture = (ev: React.MouseEvent<HTMLDivElement>) => {
-    if ((ev.target as HTMLElement).closest('button')) return
     if (ev.ctrlKey || ev.metaKey) {
       ev.preventDefault()
       ev.stopPropagation()
@@ -173,49 +170,44 @@ const DomainHistoryItem: FC<DomainHistoryItem> = ({ id, title, url, lastVisitTim
   }
 
   return (
-    <QuickLinkContextMenu
-      title={title}
-      url={url}
-      finalFocus={() => document.querySelector<HTMLInputElement>('[data-testid="domain-history-search"]')}>
-      <Command.Item
-        value={id}
-        data-testid="domain-history-item"
-        className={cn(
-          `grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-3 gap-y-1 py-3 px-3 cursor-pointer group
-          sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:py-3.5`,
-          'hover:bg-muted data-[selected=true]:bg-muted rounded-md outline-none transition-colors duration-200',
+    <Command.Item
+      value={id}
+      data-testid="domain-history-item"
+      className={cn(
+        `grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-3 gap-y-1 py-3 px-3 cursor-pointer group
+        sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:py-3.5`,
+        'hover:bg-muted data-[selected=true]:bg-muted rounded-md outline-none transition-colors duration-200',
+      )}
+      onClickCapture={handleClickCapture}
+      onSelect={() => chrome.tabs.update({ url })}>
+      <img
+        src={getDefaultIconUrl(url)}
+        alt=""
+        className="size-5 rounded-sm flex-shrink-0"
+        onError={e => {
+          e.currentTarget.style.display = 'none'
+        }}
+      />
+      <div className="flex flex-col min-w-0 gap-1">
+        <Text level="s" className="font-medium truncate" title={title}>
+          {title}
+        </Text>
+        <Text level="xs" className="text-muted-foreground truncate" title={url}>
+          {url}
+        </Text>
+      </div>
+      <div
+        className="col-start-2 flex items-center gap-3 sm:col-start-3 sm:row-start-1 sm:flex-col sm:items-end
+          sm:gap-0.5">
+        <Text level="xs" className="text-muted-foreground whitespace-nowrap">
+          {relativeTime}
+        </Text>
+        {visitCount && visitCount > 1 && (
+          <Text level="xs" className="text-muted-foreground/70 whitespace-nowrap">
+            {visitCount} {t('visits')}
+          </Text>
         )}
-        onClickCapture={handleClickCapture}
-        onSelect={() => chrome.tabs.update({ url })}>
-        <img
-          src={getDefaultIconUrl(url)}
-          alt=""
-          className="size-5 rounded-sm flex-shrink-0"
-          onError={e => {
-            e.currentTarget.style.display = 'none'
-          }}
-        />
-        <div className="flex flex-col min-w-0 gap-1">
-          <Text level="s" className="font-medium truncate" title={title}>
-            {title}
-          </Text>
-          <Text level="xs" className="text-muted-foreground truncate" title={url}>
-            {url}
-          </Text>
-        </div>
-        <div
-          className="col-start-2 flex items-center gap-3 sm:col-start-3 sm:row-start-1 sm:flex-col sm:items-end
-            sm:gap-0.5">
-          <Text level="xs" className="text-muted-foreground whitespace-nowrap">
-            {relativeTime}
-          </Text>
-          {visitCount && visitCount > 1 && (
-            <Text level="xs" className="text-muted-foreground/70 whitespace-nowrap">
-              {visitCount} {t('visits')}
-            </Text>
-          )}
-        </div>
-      </Command.Item>
-    </QuickLinkContextMenu>
+      </div>
+    </Command.Item>
   )
 }
