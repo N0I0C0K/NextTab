@@ -1,5 +1,34 @@
 import type { Page } from '@playwright/test'
 import { test, expect } from './fixtures'
+import type { ActivitySnapshot } from '../utils/page-activity/model'
+
+function activity(sites: { title: string; url: string }[]): ActivitySnapshot {
+  const now = Date.now()
+  return {
+    now,
+    bytes: 0,
+    activeViewId: null,
+    pages: sites.map((site, i) => ({ ...site, id: i + 1, key: new URL(site.url).origin + new URL(site.url).pathname })),
+    events: sites.flatMap((_, i) => [
+      {
+        id: i * 2,
+        pageId: i + 1,
+        viewId: String(i),
+        type: 'enter' as const,
+        source: 'tab' as const,
+        at: now - 1000000,
+      },
+      {
+        id: i * 2 + 1,
+        pageId: i + 1,
+        viewId: String(i),
+        type: 'leave' as const,
+        source: 'tab' as const,
+        at: now - 1000000 + (sites.length - i) * 60000,
+      },
+    ]),
+  }
+}
 
 test.use({ extensionLocale: 'zh-CN' })
 
@@ -26,9 +55,10 @@ async function prepare(page: Page, extensionId: string) {
     }),
   )
   await page.reload()
+  await expect(page.locator('.nt-return-pages')).toHaveAttribute('aria-busy', 'false')
   await page.evaluate(value => {
-    Object.defineProperty(chrome.topSites, 'get', { configurable: true, value: async () => value })
-  }, sites)
+    Object.defineProperty(chrome.runtime, 'sendMessage', { configurable: true, value: async () => value })
+  }, activity(sites))
 }
 
 test('suggestions only fill the editable form, keep keyboard focus and filter saved websites on reopening', async ({
@@ -88,6 +118,11 @@ test('suggestions only fill the editable form, keep keyboard focus and filter sa
         })
         .toBe(true)
       expect(await dialog.evaluate(element => element.scrollWidth <= element.clientWidth)).toBe(true)
+      expect(
+        await suggestions.evaluateAll(elements =>
+          elements.every(element => element.getBoundingClientRect().width <= 224.5),
+        ),
+      ).toBe(true)
       await dialog.locator('input[name=title]').scrollIntoViewIfNeeded()
       await expect(dialog.locator('input[name=title]')).toBeInViewport({ ratio: 1 })
       await page.screenshot({ path: testInfo.outputPath(`suggestions-${theme}-${viewport.width}.png`) })
@@ -106,7 +141,7 @@ test('optional recommendations do not block manual input, failed saves retain fi
 }) => {
   await prepare(page, extensionId)
   await page.evaluate(() => {
-    Object.defineProperty(chrome.topSites, 'get', {
+    Object.defineProperty(chrome.runtime, 'sendMessage', {
       configurable: true,
       value: async () => {
         throw new Error('Unavailable')
@@ -156,7 +191,7 @@ test('late recommendation results do not overwrite drafts, reappear after histor
   await prepare(page, extensionId)
   await page.evaluate(() => {
     let request = 0
-    Object.defineProperty(chrome.topSites, 'get', {
+    Object.defineProperty(chrome.runtime, 'sendMessage', {
       configurable: true,
       value: () =>
         new Promise(resolve => {
@@ -177,7 +212,7 @@ test('late recommendation results do not overwrite drafts, reappear after histor
   await dialog.locator('input[name=url]').fill('https://draft.suggest.test/')
   await page.evaluate(
     value => document.dispatchEvent(new CustomEvent('release-sites', { detail: { id: 1, sites: value } })),
-    sites,
+    activity(sites),
   )
   await expect(dialog.getByTestId('quick-link-suggestion')).toHaveCount(4)
   await expect(dialog.locator('input[name=title]')).toHaveValue('My draft')
@@ -189,7 +224,7 @@ test('late recommendation results do not overwrite drafts, reappear after histor
   await dialog.locator('input[name=title]').fill('Third draft')
   await page.evaluate(
     value => document.dispatchEvent(new CustomEvent('release-sites', { detail: { id: 2, sites: value } })),
-    sites,
+    activity(sites),
   )
   await expect(dialog.getByTestId('quick-link-suggestion')).toHaveCount(0)
   await page.evaluate(async () => {
@@ -199,7 +234,7 @@ test('late recommendation results do not overwrite drafts, reappear after histor
   await expect(dialog.locator('[aria-busy="true"]')).toHaveCount(0)
   await page.evaluate(
     value => document.dispatchEvent(new CustomEvent('release-sites', { detail: { id: 3, sites: value } })),
-    sites,
+    activity(sites),
   )
   await expect(dialog.getByTestId('quick-link-suggestion')).toHaveCount(0)
   await expect(dialog.locator('input[name=title]')).toHaveValue('Third draft')

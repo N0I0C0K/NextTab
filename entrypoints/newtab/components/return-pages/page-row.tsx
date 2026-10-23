@@ -22,7 +22,7 @@ import { t } from '@/utils/i18n'
 import { matchingPageTabs, normalizePageUrl, switchToPageTab, type ReturnPage } from '../../services/return-pages'
 import { formatPageTime } from './page-format'
 import { PageDetailsDialog } from './page-details-dialog'
-import { SaveQuickLinkButton } from '../save-quick-link-button'
+import { QuickLinkContextMenu, SaveQuickLinkMenuItem } from '../quick-link-context-menu'
 
 export function PageRow({
   page,
@@ -94,138 +94,148 @@ export function PageRow({
     })
   }
   return (
-    <div
-      className="nt-return-row"
-      data-testid="return-page-row"
-      data-page-url={page.url}
-      data-tab-id={tabId}
-      data-interacting={menuOpen || detailsOpen || (choices?.length ?? 0) > 0 || closingTab || undefined}>
-      <Tooltip disabled={menuOpen || !!detailsOpen || (choices?.length ?? 0) > 0 || closingTab}>
-        <TooltipTrigger
-          delay={350}
-          render={
-            <button type="button" className="nt-return-open" onClick={open} aria-label={`${page.title} — ${action}`} />
-          }>
-          <QuickLinkIcon url={page.url} title={page.title} className="nt-link-icon" />
-          <span className="nt-return-copy">
-            <span className="nt-return-title">{page.title}</span>
-            <span className="nt-return-meta">
-              {host} ·{' '}
-              {frequent
-                ? t('returnVisitDays', String(page.activeDays))
-                : page.lastVisitTime > 0
-                  ? `${isOpen ? `${t('returnAlreadyOpen')} · ` : ''}${formatPageTime(page.lastVisitTime)}`
-                  : t(isOpen ? 'returnAlreadyOpen' : 'returnSaved')}
-              {openedTab && matchingTabs.length > 1 && (
-                <>
-                  {' '}
-                  ·{' '}
-                  {t(
-                    'tabWindow',
-                    String([...new Set(tabs.map(tab => tab.windowId))].indexOf(openedTab.windowId) + 1),
-                  )}{' '}
-                  · {t('tabPosition', String(openedTab.index + 1))}
-                </>
-              )}
+    <QuickLinkContextMenu title={page.title} url={page.url} onOpenChange={setMenuOpen}>
+      <div
+        className="nt-return-row"
+        data-testid="return-page-row"
+        data-page-url={page.url}
+        data-tab-id={tabId}
+        data-interacting={menuOpen || detailsOpen || (choices?.length ?? 0) > 0 || closingTab || undefined}>
+        <Tooltip disabled={menuOpen || !!detailsOpen || (choices?.length ?? 0) > 0 || closingTab}>
+          <TooltipTrigger
+            delay={350}
+            render={
+              <button
+                type="button"
+                className="nt-return-open"
+                onClick={open}
+                aria-label={`${page.title} — ${action}`}
+              />
+            }>
+            <QuickLinkIcon url={page.url} title={page.title} className="nt-link-icon" />
+            <span className="nt-return-copy">
+              <span className="nt-return-title">{page.title}</span>
+              <span className="nt-return-meta">
+                {host} ·{' '}
+                {frequent
+                  ? t('returnVisitDays', String(page.activeDays))
+                  : page.lastVisitTime > 0
+                    ? `${isOpen ? `${t('returnAlreadyOpen')} · ` : ''}${formatPageTime(page.lastVisitTime)}`
+                    : t(isOpen ? 'returnAlreadyOpen' : 'returnSaved')}
+                {openedTab && matchingTabs.length > 1 && (
+                  <>
+                    {' '}
+                    ·{' '}
+                    {t(
+                      'tabWindow',
+                      String([...new Set(tabs.map(tab => tab.windowId))].indexOf(openedTab.windowId) + 1),
+                    )}{' '}
+                    · {t('tabPosition', String(openedTab.index + 1))}
+                  </>
+                )}
+              </span>
             </span>
-          </span>
-          <span className="nt-return-hint" aria-hidden="true">
-            {action} <ArrowUpRight size={14} />
-          </span>
-        </TooltipTrigger>
-        <TooltipContent
-          className="flex-col items-start gap-1 break-words"
-          style={{ maxWidth: 'min(24rem, calc(100vw - 24px))' }}>
-          <span>{page.title}</span>
-          {exactUrl && <span className="text-muted-foreground">{page.url}</span>}
-          <span>{action}</span>
-        </TooltipContent>
-      </Tooltip>
-      <SaveQuickLinkButton title={page.title} url={page.url} />
-      <DropdownMenu onOpenChange={setMenuOpen}>
-        <DropdownMenuTrigger
-          render={
-            <button
-              ref={moreRef}
-              type="button"
-              className="nt-return-more"
-              aria-label={t('returnPageActions', page.title)}
-            />
-          }>
-          <MoreHorizontal size={16} aria-hidden="true" />
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-48" finalFocus={closingTab || detailsOpen ? false : undefined}>
-          <DropdownMenuItem onClick={() => setDetailsOpen(true)}>{t('returnDetails')}</DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => {
-              void navigator.clipboard.writeText(page.url).then(
-                () => toast.success(t('returnLinkCopied')),
-                () => toast.error(t('returnCopyFailed'), { description: page.url }),
-              )
-            }}>
-            {t('returnCopyLink')}
-          </DropdownMenuItem>
-          {openedTab && (
-            <DropdownMenuItem variant="destructive" disabled={closingTab} onClick={() => void closeTab()}>
-              {t('returnCloseTab')}
+            <span className="nt-return-hint" aria-hidden="true">
+              {action} <ArrowUpRight size={14} />
+            </span>
+          </TooltipTrigger>
+          <TooltipContent
+            className="flex-col items-start gap-1 break-words"
+            style={{ maxWidth: 'min(24rem, calc(100vw - 24px))' }}>
+            <span>{page.title}</span>
+            {exactUrl && <span className="text-muted-foreground">{page.url}</span>}
+            <span>{action}</span>
+          </TooltipContent>
+        </Tooltip>
+        <DropdownMenu onOpenChange={setMenuOpen}>
+          <DropdownMenuTrigger
+            render={
+              <button
+                ref={moreRef}
+                type="button"
+                className="nt-return-more"
+                aria-label={t('returnPageActions', page.title)}
+              />
+            }>
+            <MoreHorizontal size={16} aria-hidden="true" />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-48" finalFocus={closingTab || detailsOpen ? false : undefined}>
+            <SaveQuickLinkMenuItem title={page.title} url={page.url} dropdown />
+            <DropdownMenuItem onClick={() => setDetailsOpen(true)}>{t('returnDetails')}</DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => {
+                void navigator.clipboard.writeText(page.url).then(
+                  () => toast.success(t('returnLinkCopied')),
+                  () => toast.error(t('returnCopyFailed'), { description: page.url }),
+                )
+              }}>
+              {t('returnCopyLink')}
             </DropdownMenuItem>
-          )}
-          {feedback && (
-            <>
-              <DropdownMenuItem onClick={() => void hide('hiddenUrls', normalized)}>
-                {t('returnHidePage')}
+            {openedTab && (
+              <DropdownMenuItem variant="destructive" disabled={closingTab} onClick={() => void closeTab()}>
+                {t('returnCloseTab')}
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => void hide('excludedHosts', host)}>
-                {t('returnExcludeSite')}
-              </DropdownMenuItem>
-            </>
-          )}
-        </DropdownMenuContent>
-      </DropdownMenu>
-      {detailsOpen !== null && (
-        <PageDetailsDialog
-          page={page}
-          frequent={frequent}
-          open={detailsOpen}
-          onOpenChange={setDetailsOpen}
-          finalFocus={moreRef}
-        />
-      )}
-      {choices !== null && (
-        <Dialog
-          open={choices.length > 0}
-          onOpenChange={value => {
-            if (!value) setChoices([])
-          }}>
-          <DialogContent className="nt-page-choice-dialog" finalFocus={triggerRef}>
-            <DialogTitle>{t('chooseOpenTab')}</DialogTitle>
-            <DialogDescription>{t('chooseOpenTabDescription')}</DialogDescription>
-            <div className="nt-page-choice-list">
-              {choices.map(tab => (
-                <button
-                  type="button"
-                  key={tab.id}
-                  className="nt-tab-choice"
-                  onClick={() => {
-                    void switchToPageTab(tab).then(
-                      () => setChoices([]),
-                      () => {
-                        setChoices([])
-                        toast.error(t('returnOpenFailed'))
-                      },
-                    )
-                  }}>
-                  <span>{tab.title || page.title}</span>
-                  <span className="nt-return-meta">
-                    {t('tabWindow', String([...new Set(choices.map(item => item.windowId))].indexOf(tab.windowId) + 1))}{' '}
-                    · {t('tabPosition', String(tab.index + 1))}
-                  </span>
-                </button>
-              ))}
-            </div>
-          </DialogContent>
-        </Dialog>
-      )}
-    </div>
+            )}
+            {feedback && (
+              <>
+                <DropdownMenuItem onClick={() => void hide('hiddenUrls', normalized)}>
+                  {t('returnHidePage')}
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => void hide('excludedHosts', host)}>
+                  {t('returnExcludeSite')}
+                </DropdownMenuItem>
+              </>
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
+        {detailsOpen !== null && (
+          <PageDetailsDialog
+            page={page}
+            frequent={frequent}
+            open={detailsOpen}
+            onOpenChange={setDetailsOpen}
+            finalFocus={moreRef}
+          />
+        )}
+        {choices !== null && (
+          <Dialog
+            open={choices.length > 0}
+            onOpenChange={value => {
+              if (!value) setChoices([])
+            }}>
+            <DialogContent className="nt-page-choice-dialog" finalFocus={triggerRef}>
+              <DialogTitle>{t('chooseOpenTab')}</DialogTitle>
+              <DialogDescription>{t('chooseOpenTabDescription')}</DialogDescription>
+              <div className="nt-page-choice-list">
+                {choices.map(tab => (
+                  <button
+                    type="button"
+                    key={tab.id}
+                    className="nt-tab-choice"
+                    onClick={() => {
+                      void switchToPageTab(tab).then(
+                        () => setChoices([]),
+                        () => {
+                          setChoices([])
+                          toast.error(t('returnOpenFailed'))
+                        },
+                      )
+                    }}>
+                    <span>{tab.title || page.title}</span>
+                    <span className="nt-return-meta">
+                      {t(
+                        'tabWindow',
+                        String([...new Set(choices.map(item => item.windowId))].indexOf(tab.windowId) + 1),
+                      )}{' '}
+                      · {t('tabPosition', String(tab.index + 1))}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </DialogContent>
+          </Dialog>
+        )}
+      </div>
+    </QuickLinkContextMenu>
   )
 }

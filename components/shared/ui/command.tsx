@@ -126,9 +126,13 @@ function CommandSeparator({ className, ...props }: React.ComponentProps<typeof C
   )
 }
 
-function CommandItem({ className, children, ...props }: React.ComponentProps<typeof CommandPrimitive.Item>) {
+const CommandItem = React.forwardRef<
+  React.ElementRef<typeof CommandPrimitive.Item>,
+  React.ComponentPropsWithoutRef<typeof CommandPrimitive.Item>
+>(({ className, children, ...props }, ref) => {
   return (
     <CommandPrimitive.Item
+      ref={ref}
       data-slot="command-item"
       className={cn(
         `group/command-item relative flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm
@@ -145,7 +149,8 @@ function CommandItem({ className, children, ...props }: React.ComponentProps<typ
       />
     </CommandPrimitive.Item>
   )
-}
+})
+CommandItem.displayName = 'CommandItem'
 
 function CommandShortcut({ className, ...props }: React.ComponentProps<'span'>) {
   return (

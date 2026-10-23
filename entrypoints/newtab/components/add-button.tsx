@@ -6,11 +6,15 @@ import { addQuickUrlIfMissing, quickUrlItemsStorage } from '@/utils/storage'
 import { useStorage } from '@/hooks/useStorage'
 import { t } from '@/utils/i18n'
 import { QuickItemEditForm, type IAddQuickUrlItemShema } from './quick-item-edit-form'
-import { selectQuickLinkSuggestions } from '../services/quick-link-suggestions'
+import {
+  fetchQuickLinkSuggestions,
+  selectQuickLinkSuggestions,
+  type QuickLinkSuggestion,
+} from '../services/quick-link-suggestions'
 
 function AddSiteForm({ onAdded }: { onAdded: () => void }) {
   const saved = useStorage(quickUrlItemsStorage)
-  const [sites, setSites] = useState<chrome.topSites.MostVisitedURL[]>([])
+  const [sites, setSites] = useState<QuickLinkSuggestion[]>([])
   const [loading, setLoading] = useState(true)
   const [submitError, setSubmitError] = useState<string>()
   const mounted = useRef(false)
@@ -23,7 +27,7 @@ function AddSiteForm({ onAdded }: { onAdded: () => void }) {
       setSites([])
       setLoading(false)
     }
-    void (chrome.topSites?.get ? chrome.topSites.get() : Promise.resolve([])).then(
+    void fetchQuickLinkSuggestions().then(
       result => {
         if (!cancelled) {
           setSites(result)
