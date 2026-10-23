@@ -4,7 +4,7 @@ NextTab 是一个基于 [WXT](https://wxt.dev/) 和 React 18 的单项目浏览�
 
 ## 环境与启动
 
-- Node.js >= 20.19（见 `.nvmrc`）
+- Node.js >= 24.22.1（开发与 CI 使用 `.nvmrc` 固定的版本）
 - pnpm 9.9
 
 ```bash
