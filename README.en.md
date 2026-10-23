@@ -143,7 +143,7 @@ The development guide includes:
 
 ### Quick Start
 
-Requires Node.js 20.19+ and pnpm 9.9.
+Requires Node.js 24.22.1+ and pnpm 9.9.
 
 ```bash
 # Clone the project

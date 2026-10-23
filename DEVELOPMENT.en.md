@@ -4,7 +4,7 @@ NextTab is a single-project browser extension built with [WXT](https://wxt.dev/)
 
 ## Setup
 
-- Node.js >= 20.19 (see `.nvmrc`)
+- Node.js >= 24.22.1 (development and CI use the version pinned in `.nvmrc`)
 - pnpm 9.9
 
 ```bash
