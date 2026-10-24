@@ -42,6 +42,8 @@ for (const source of [
   'entrypoints/newtab/components/return-pages/index.tsx',
   'entrypoints/newtab/components/return-pages/page-list.tsx',
   'entrypoints/newtab/components/return-pages/page-row.tsx',
+  'entrypoints/newtab/components/return-pages/page-details-dialog.tsx',
+  'entrypoints/newtab/services/page-details.ts',
   'entrypoints/newtab/components/command.tsx',
   'entrypoints/newtab/components/navigation/navigation-list.tsx',
   'entrypoints/newtab/components/navigation/quick-links-dialog.tsx',
