@@ -28,6 +28,8 @@ pnpm build:firefox
 pnpm zip
 pnpm zip:firefox
 pnpm check           # Types, lint, unit tests, and both browser builds
+pnpm icons:generate  # Generate icons and wordmarks from the SVG source
+pnpm update-version 1.5.1 # Update both manifests and ZIP filenames through package.json
 ```
 
 Install the Playwright browser before the first E2E run:
@@ -77,3 +79,11 @@ Local wallpaper data remains in IndexedDB because large base64 values should not
 - CI runs unit tests, Chrome E2E, and a Firefox build.
 
 The project uses TypeScript, Tailwind CSS, shadcn/ui, and Prettier. Run `pnpm check` before submitting changes.
+
+See [Brand assets](doc/BRANDING.md) for the Logo source, exports, and usage.
+
+See [Store submission materials](doc/STORE_LISTING.md) for package files, permission purposes, and the first Firefox submission. The Firefox build targets desktop 140+, with its stable ID and optional MQTT data consent declared in `wxt.config.ts`. Keep the same ID when signing and updating.
+
+For a release, run `pnpm update-version <version>` and update the [Changelog](CHANGELOG.md) and the source version in both READMEs. WXT generates Chrome and Firefox manifest versions from the root `package.json`; About reads the installed manifest version.
+
+After `pnpm check` and `pnpm test:e2e`, run `pnpm zip` and `pnpm zip:firefox`. Verify the packaged manifests, icons, and pages. Use the matching `v<version>` GitHub Release tag and changelog entry. The workflow checks the tag against `package.json`, runs type checks, lint, and unit tests, and uploads both browser ZIPs and Firefox sources. Upload the production ZIP to the store and use `public/icon-128.png` as its icon.

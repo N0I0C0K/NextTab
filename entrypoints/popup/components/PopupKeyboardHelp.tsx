@@ -1,14 +1,15 @@
 import { useLayoutEffect, useRef, useState } from 'react'
 import { X } from 'lucide-react'
 import { t, type MessageKey } from '@/utils/i18n'
+import { isMacOS } from '@/utils/platform'
 
 export function PopupKeyboardHelp({ onClose }: { onClose: () => void }) {
   const dialog = useRef<HTMLDialogElement>(null)
   const close = useRef<HTMLButtonElement>(null)
   const body = useRef<HTMLDivElement>(null)
   const [shortcut, setShortcut] = useState<string | null>()
-  const mac = /Mac/i.test(navigator.userAgent)
-  const control = mac ? '⌘' : 'Ctrl'
+  const mac = isMacOS()
+  const control = mac ? '⌘' : t('keyboardControlKey')
   useLayoutEffect(() => {
     const element = dialog.current!
     element.showModal()

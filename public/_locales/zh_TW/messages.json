@@ -113,6 +113,10 @@
     "description": "Popup keyboard shortcuts hint",
     "message": "Ctrl/⌘+點選：新標籤頁開啟 | Shift + Ctrl/⌘ + 點選：在當前 Tab 旁邊開啟"
   },
+  "keyboardControlKey": {
+    "description": "Localized label for the Control key",
+    "message": "Ctrl"
+  },
   "addCurrentPage": {
     "description": "Add current page to quick links",
     "message": "新增當前頁面"
@@ -880,7 +884,7 @@
   },
   "mqttPermissionDescription": {
     "description": "Description for MQTT broker permission",
-    "message": "需要授權才能連線到 MQTT 伺服器"
+    "message": "可選：連線後會向 MQTT 服務及同頻道裝置傳送顯示名稱、頻道密鑰和訊息中繼資料。"
   },
   "returnPagesHeading": {
     "message": "回到頁面"

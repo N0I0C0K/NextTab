@@ -1104,7 +1104,9 @@ test('data settings export, import, and restart onboarding', async ({ page, exte
   const downloadPromise = page.waitForEvent('download')
   await page.getByTestId('export-settings').click()
   const download = await downloadPromise
-  expect(download.suggestedFilename()).toMatch(/^nexttab-settings-1\.4\.1-\d{4}-\d{2}-\d{2}\.json$/)
+  const version = await page.evaluate(() => chrome.runtime.getManifest().version)
+  expect(download.suggestedFilename()).toContain(`nexttab-settings-${version}-`)
+  expect(download.suggestedFilename()).toMatch(/^nexttab-settings-\d+\.\d+\.\d+-\d{4}-\d{2}-\d{2}\.json$/)
 
   await page.getByTestId('import-settings-input').setInputFiles({
     name: 'settings.json',
@@ -1165,7 +1167,7 @@ test('about page exposes version and opens project links', async ({ page, contex
   await page.getByTestId('settings-tab-about').click()
 
   const about = page.getByTestId('about-settings')
-  await expect(about).toContainText('1.4.1')
+  await expect(about).toContainText(await page.evaluate(() => chrome.runtime.getManifest().version))
   await expect(page.getByTestId('open-repository')).toBeVisible()
   await expect(page.getByTestId('open-issue')).toBeVisible()
   await expect(page.getByTestId('open-releases')).toBeVisible()

@@ -24,6 +24,24 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --prefer-offline
 
+      - name: Validate release version
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          node --input-type=module -e '
+            import { readFileSync } from "node:fs";
+            const { version } = JSON.parse(readFileSync("package.json", "utf8"));
+            if (process.env.RELEASE_TAG !== `v${version}`) {
+              throw new Error(`Release tag ${process.env.RELEASE_TAG} must match v${version}`);
+            }
+          '
+
+      - name: Check release
+        run: |
+          pnpm type-check
+          pnpm lint
+          pnpm test
+
       - name: Build Chrome extension
         run: pnpm zip
 

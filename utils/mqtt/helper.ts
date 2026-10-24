@@ -86,6 +86,8 @@ export class MqttSecretPrefixTopicRegisterService {
 
   async setMqttClient(client: MqttClient) {
     if (this._client === client) return
+    // Subscription state belongs to one client/broker, while raw topics survive reconnects.
+    this.registeredSecretTopics = new Set()
     this._client = client
 
     if (client.connected) {
@@ -145,8 +147,9 @@ export class MqttSecretPrefixTopicRegisterService {
     }
     const topics = Array.from(this.rawTopics).map(topic => this.joinSecretPrefix(topic))
     if (topics.length === 0) return
+    const registeredSecretTopics = this.registeredSecretTopics
     const res = await this._client!.subscribeAsync(topics)
-    res.forEach(it => this.registeredSecretTopics.add(it.topic))
+    res.forEach(it => registeredSecretTopics.add(it.topic))
   }
 
   // Unsubscribe from all registered secret topics
@@ -154,9 +157,10 @@ export class MqttSecretPrefixTopicRegisterService {
     if (!this.connected) {
       return
     }
-    const topics = Array.from(this.registeredSecretTopics)
+    const registeredSecretTopics = this.registeredSecretTopics
+    const topics = Array.from(registeredSecretTopics)
     if (topics.length === 0) return
     await this._client!.unsubscribeAsync(topics)
-    this.registeredSecretTopics.clear()
+    registeredSecretTopics.clear()
   }
 }

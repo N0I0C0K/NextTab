@@ -109,6 +109,10 @@
     "description": "Popup keyboard shortcuts hint",
     "message": "Strg/⌘ + Klick zum Öffnen in neuem Tab | Umschalt + Strg/⌘ + Klick zum Öffnen neben dem aktuellen Tab"
   },
+  "keyboardControlKey": {
+    "description": "Localized label for the Control key",
+    "message": "Strg"
+  },
   "addCurrentPage": {
     "description": "Add current page to quick links",
     "message": "Aktuelle Seite hinzufügen"
@@ -880,7 +884,7 @@
   },
   "mqttPermissionDescription": {
     "description": "Description for MQTT broker permission",
-    "message": "Autorisierung erforderlich, um eine Verbindung zum MQTT-Server herzustellen"
+    "message": "Optional: Die Verbindung übermittelt Ihren Anzeigenamen, Kanalschlüssel und Nachrichtenmetadaten an den MQTT-Broker und Geräte im selben Kanal."
   },
   "returnPagesHeading": {
     "message": "Zurück zu einer Seite"
