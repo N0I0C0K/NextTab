@@ -7,19 +7,19 @@
 - 图标：`public/icon-128.png`；大图备用 `public/icon-512.png`。
 - 版本更新说明：[CHANGELOG.md](../CHANGELOG.md)。
 - 隐私说明：[PRIVACY.md](../PRIVACY.md)。合并发布后，可将该文件的公开 GitHub 页面作为商店隐私说明链接。
-- 截图：`doc/images/` 中的中英文图片可作为构图参考；正式商店素材应使用当前发布版本和示例数据重新拍摄，保留最新 Logo 与平台快捷键。
+- 截图：2026-10-24 已上传五张 1.5.1 功能图，包含 NextTab Logo、示意网站图标和中英文说明。依次介绍首页、统一搜索、站点页面、工具栏 Popup 与本地数据／深色主题；原有两张明暗主题截图保留。
 
-建议按顺序展示四个场景：有回访推荐和常用网站的首页、带搜索结果的命令面板、包含标签／书签／最近访问的站点详情、有内容的深色首页。使用统一尺寸与语言，不包含真实浏览记录。
+本次图片使用 1.5.1 生产界面、模拟浏览器 API 和示例数据制作，并非 Firefox 原生窗口实拍。图片尺寸为 1600 × 1000，不包含真实浏览记录。制作文件、完整中英文文案和公开页面存档保存在本地忽略目录 `artifacts/requirements/amo-151/`，不提交到 Git。后续素材继续使用当前发布版本，保留最新 Logo 与平台快捷键；`doc/images/` 中的旧图仅作为构图参考。
 
 ## 产品描述
 
 名称：NextTab
 
-简体中文简述：简洁的新标签页：搜索标签、书签与历史，找回最近浏览的页面，管理常用网站。
+简体中文简述：一个搜索框找标签、书签和历史；从最近使用记录继续工作，在工具栏快速切换同站点页面。核心数据留在本地，无广告、无分析追踪。
 
-English summary: A clean new tab for searching tabs, bookmarks and history, returning to recent pages, and managing quick links.
+English summary: Find tabs, bookmarks and history in one search. Return to recent work and switch pages from a keyboard-friendly popup. Local-first, no ads or analytics.
 
-详细描述可使用中英文 README 的简介与功能展示。不要将当前 MQTT 提醒功能描述为已实现的数据同步。
+AMO 中英文详细介绍已更新，按“能做什么”“为什么选择”“本地数据与可选联网功能”说明统一搜索、回到页面、站点详情、Popup、键盘操作和个性化。MQTT 默认关闭，只用于提醒，不用于同步浏览记录或设置；频道密钥不是端到端加密。
 
 ## 权限用途
 
@@ -36,16 +36,23 @@ English summary: A clean new tab for searching tabs, bookmarks and history, retu
 | GitHub 可选站点权限              | 用户授权后检查本项目最新版本                           |
 | MQTT 可选站点与 Firefox 数据权限 | 用户授权后向选定服务发送显示名称、频道密钥和消息元数据 |
 
-## Firefox 首次提交
+## Firefox 配置与发布状态
 
-- 固定 ID：`nexttab@n0i0c0k.github.io`，后续更新沿用此 ID。AMO 在首次签名时校验唯一性。
+- 固定 ID：`nexttab@n0i0c0k.github.io`。2026-10-24 已与 AMO 后台实际 UUID 核对，和源码、生产 manifest 一致；后续更新沿用此 ID。
 - 桌面最低版本：Firefox 140.0，以使用内置的可选数据授权。
-- 1.5.1 已移除 `gecko_android` 声明，仅面向桌面 Firefox；Android 不支持当前首页使用的 `chrome_url_overrides.newtab`。此前提交的 1.5.0 仍含 Android 声明，需用匹配的 1.5.1 发布包与源码更新 AMO，仓库修复不会自动修改商店中已上传的版本。
+- 1.5.1 已移除 `gecko_android` 声明，仅面向桌面 Firefox；Android 不支持当前首页使用的 `chrome_url_overrides.newtab`。此前提交的 1.5.0 仍含 Android 声明，已用匹配的 1.5.1 发布包与源码更新 AMO。
 - 必需数据类型：`none`；可选类型：`authenticationInfo`、`personallyIdentifyingInfo`、`technicalAndInteraction`，对应 MQTT 频道密钥、显示名称和消息元数据。核心搜索与推荐不依赖这些可选权限。
 - 构建方法：Node.js 24.22.1+（使用 `.nvmrc` 固定版本）、pnpm 9.9，`pnpm install --frozen-lockfile` 后执行 `pnpm build:firefox`。PNG 与字标已包含在源码中，构建无需运行图标生成器或安装 Chromium。
 - 上传前用 `pnpm exec web-ext lint --source-dir .output/firefox-mv3` 校验包，再在 Firefox 140+ 中核对新标签页、Popup、明暗主题及 MQTT 授权／撤销。
 
-1.5.0 曾由用户在 AMO 完成首次提交；2026-10-14 记录为等待审核，此状态不代表当前商店状态，提交前需在 AMO 后台核实。1.5.1 包含后续首页、站点详情与 Popup 键盘导航改进，应使用本次构建生成的包及匹配源码，并更新正式截图。本地构建的 ZIP 是未签名原始包，签名与审核由 AMO 处理。
+2026-10-24 实际核查：1.5.0 已于 10 月 15 日通过审核。现已提交 1.5.1 生产包、匹配源码、更新说明与审核构建说明；AMO 后台显示“已通过审核”，[公开页面](https://addons.mozilla.org/zh-CN/firefox/addon/nexttab1/) 已显示版本 1.5.1、新介绍和五张新增截图。AMO 版本记录 ID 为 `6616671`，对应源码提交为 `4ac68a522c00f482eba6f25132f815ededeb5576`。本地 ZIP 为未签名原始包，公开 XPI 由 AMO 签名分发。
+
+提交文件的 SHA-256：
+
+- `.output/nexttab-1.5.1-firefox.zip`：`024ae11e0ad8e60a02cd1a4793f6f7f979d3dffe5d95d22ebbba56c7c4241f9d`。
+- `.output/nexttab-1.5.1-sources.zip`：`57c66b281b8ba4bb2b9f10a43e607325246fbda32c04a2ff718fd1d49d9f670b`。
+
+本次未进行原生 Firefox 的 MQTT 授权／撤销人工测试；AMO 上架状态不替代该项验证。
 
 依据：[Firefox 扩展 ID](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/manifest.json/browser_specific_settings)、[内置数据授权](https://extensionworkshop.com/documentation/develop/firefox-builtin-data-consent/)、[Android 兼容声明与 AMO 控制](https://extensionworkshop.com/documentation/publish/version-compatibility/)。
 
