@@ -1424,9 +1424,66 @@
     "message": "Speichern fehlgeschlagen. Erneut versuchen."
   },
   "popupNavigationHint": {
-    "message": "↑↓ Auswahl · Enter Öffnen"
+    "message": "Pfeile Auswahl · Tippen zur Suche"
   },
   "popupLoadFailed": {
     "message": "Gespeicherte Links konnten nicht geladen werden."
+  },
+  "popupOpenTab": {
+    "message": "In neuem Tab öffnen"
+  },
+  "popupOpenWindow": {
+    "message": "In neuem Fenster öffnen"
+  },
+  "popupOpenAdjacent": {
+    "message": "Neben aktuellem Tab öffnen"
+  },
+  "popupKeyboardHelp": {
+    "message": "Tastenkürzel"
+  },
+  "popupHelpOpen": {
+    "message": "NextTab öffnen"
+  },
+  "popupHelpAllSaved": {
+    "message": "Alle gespeicherten Websites"
+  },
+  "popupHelpAllSite": {
+    "message": "Alle Seiten dieser Website"
+  },
+  "popupHelpSelect": {
+    "message": "Suchergebnis auswählen"
+  },
+  "popupHelpGrid": {
+    "message": "Raster bei leerer Suche durchlaufen"
+  },
+  "popupHelpPage": {
+    "message": "Eine Bildschirmseite bewegen"
+  },
+  "popupHelpExecute": {
+    "message": "Seite wechseln oder öffnen"
+  },
+  "popupHelpControls": {
+    "message": "Weitere Aktionen erreichen"
+  },
+  "popupHelpBack": {
+    "message": "Eine Ebene zurück oder schließen"
+  },
+  "popupShortcutUnassigned": {
+    "message": "Nicht zugewiesen · im Browser einstellen"
+  },
+  "popupSearchScopeHost": {
+    "message": "Gespeicherte Links und Tabs / neuer Verlauf von $1"
+  },
+  "popupSearchScopeSaved": {
+    "message": "Gespeicherte Links durchsuchen"
+  },
+  "popupStartSelection": {
+    "message": "↓ Seite auswählen"
+  },
+  "popupSearchKeyboardHint": {
+    "message": "↑↓ Auswahl · Esc Leeren"
+  },
+  "popupShortcutUnavailable": {
+    "message": "Lesen fehlgeschlagen · Browsereinstellungen prüfen"
   }
 }

@@ -1424,9 +1424,66 @@
     "message": "Could not save. Try again."
   },
   "popupNavigationHint": {
-    "message": "↑↓ Select · Enter Open"
+    "message": "Arrows Select · Type to search"
   },
   "popupLoadFailed": {
     "message": "Could not load saved links."
+  },
+  "popupOpenTab": {
+    "message": "Open in new tab"
+  },
+  "popupOpenWindow": {
+    "message": "Open in new window"
+  },
+  "popupOpenAdjacent": {
+    "message": "Open beside current tab"
+  },
+  "popupKeyboardHelp": {
+    "message": "Keyboard shortcuts"
+  },
+  "popupHelpOpen": {
+    "message": "Open NextTab"
+  },
+  "popupHelpAllSaved": {
+    "message": "View all saved sites"
+  },
+  "popupHelpAllSite": {
+    "message": "View all current-site pages"
+  },
+  "popupHelpSelect": {
+    "message": "Select a search result"
+  },
+  "popupHelpGrid": {
+    "message": "Browse the empty-search grid"
+  },
+  "popupHelpPage": {
+    "message": "Move by one screen"
+  },
+  "popupHelpExecute": {
+    "message": "Switch or open a page"
+  },
+  "popupHelpControls": {
+    "message": "Access other controls"
+  },
+  "popupHelpBack": {
+    "message": "Go back one level or close"
+  },
+  "popupShortcutUnassigned": {
+    "message": "Not assigned · set in browser"
+  },
+  "popupSearchScopeHost": {
+    "message": "Saved links and $1 tabs / recent history"
+  },
+  "popupSearchScopeSaved": {
+    "message": "Search saved links"
+  },
+  "popupStartSelection": {
+    "message": "↓ Select a page"
+  },
+  "popupSearchKeyboardHint": {
+    "message": "↑↓ Select · Esc Clear"
+  },
+  "popupShortcutUnavailable": {
+    "message": "Could not read · check browser settings"
   }
 }

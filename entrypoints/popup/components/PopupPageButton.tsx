@@ -3,6 +3,7 @@ import type { MouseEvent, KeyboardEvent } from 'react'
 import { QuickLinkIcon } from '@/components/shared/custom/quick-link-icon'
 import { t } from '@/utils/i18n'
 import type { PopupPage } from '../popup-pages'
+import { popupAction, type PopupModifiers } from '../popup-keyboard'
 
 export function PopupPageButton({
   item,
@@ -10,6 +11,11 @@ export function PopupPageButton({
   previewIndex,
   currentWindowId,
   disabled,
+  selected,
+  listbox,
+  total,
+  column,
+  modifiers,
   onOpen,
 }: {
   item: PopupPage
@@ -17,6 +23,11 @@ export function PopupPageButton({
   previewIndex: number
   currentWindowId?: number
   disabled: boolean
+  selected: boolean
+  listbox: boolean
+  total: number
+  column: number
+  modifiers: PopupModifiers
   onOpen: (page: PopupPage, event: MouseEvent | KeyboardEvent) => Promise<void>
 }) {
   const isTab = item.tabId !== undefined
@@ -34,13 +45,22 @@ export function PopupPageButton({
   return (
     <button
       type="button"
+      id={`popup-result-${encodeURIComponent(item.id)}`}
+      role={listbox ? 'option' : 'gridcell'}
+      tabIndex={-1}
+      aria-selected={selected}
+      aria-posinset={listbox ? previewIndex + 1 : undefined}
+      aria-setsize={listbox ? total : undefined}
+      aria-colindex={listbox ? undefined : column + 1}
       data-popup-result={item.id}
       data-testid={tile ? 'popup-quick-link' : 'popup-page-row'}
       data-preview-index={previewIndex}
       data-popup-index={previewIndex}
+      data-modified={selected && (modifiers.ctrlKey || modifiers.metaKey || modifiers.shiftKey)}
       className={tile ? 'popup-quick-link' : 'popup-page-row'}
       title={`${item.title}\n${item.url}`}
       aria-label={item.title}
+      aria-describedby={selected ? 'popup-current-action' : undefined}
       disabled={disabled}
       onClick={event => void onOpen(item, event)}>
       <QuickLinkIcon
@@ -59,7 +79,10 @@ export function PopupPageButton({
           </span>
           <span className="popup-row-action">
             {isTab && <span className="popup-live-dot" />}
-            {t(isTab ? 'popupSwitch' : isHistory ? 'popupReopen' : 'popupOpen')}
+            {selected && <kbd aria-hidden="true">↵</kbd>}
+            <span className="popup-row-action-label">
+              {t(popupAction(item, selected ? modifiers : { ctrlKey: false, metaKey: false, shiftKey: false }))}
+            </span>
             {isTab ? <CornerUpRight size={13} /> : <ArrowUpRight size={13} />}
           </span>
         </>

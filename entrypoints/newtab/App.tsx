@@ -1,4 +1,5 @@
 import './App.css'
+import { BrandMark } from '@/components/shared/custom/brand-mark'
 import { Suspense, useEffect, useRef, useState } from 'react'
 import { CommandModule, SettingPanel, ScrollLinkCardPage, OnboardingDialog, AddButton } from './components'
 import type { CommandModuleRef } from './components/command'
@@ -61,7 +62,7 @@ export default function NewTab() {
       }}>
       <header className="nt-topbar">
         <div className="nt-brand" aria-label="NextTab">
-          <span className="nt-brand-mark" aria-hidden="true" />
+          <BrandMark />
           <span>NextTab</span>
         </div>
         <SettingPanel />

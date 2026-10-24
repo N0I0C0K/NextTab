@@ -1424,9 +1424,66 @@
     "message": "保存失败，请重试"
   },
   "popupNavigationHint": {
-    "message": "↑↓ 选择 · Enter 打开"
+    "message": "方向键选择 · 直接输入搜索"
   },
   "popupLoadFailed": {
     "message": "常用网站读取失败"
+  },
+  "popupOpenTab": {
+    "message": "新开标签"
+  },
+  "popupOpenWindow": {
+    "message": "新开窗口"
+  },
+  "popupOpenAdjacent": {
+    "message": "在当前标签旁打开"
+  },
+  "popupKeyboardHelp": {
+    "message": "快捷键说明"
+  },
+  "popupHelpOpen": {
+    "message": "打开 NextTab"
+  },
+  "popupHelpAllSaved": {
+    "message": "查看全部常用网站"
+  },
+  "popupHelpAllSite": {
+    "message": "查看当前站点全部页面"
+  },
+  "popupHelpSelect": {
+    "message": "选择搜索结果"
+  },
+  "popupHelpGrid": {
+    "message": "空搜索时浏览网格"
+  },
+  "popupHelpPage": {
+    "message": "向前／后移动一屏"
+  },
+  "popupHelpExecute": {
+    "message": "切换标签或打开页面"
+  },
+  "popupHelpControls": {
+    "message": "访问其他操作按钮"
+  },
+  "popupHelpBack": {
+    "message": "退回一层或关闭"
+  },
+  "popupShortcutUnassigned": {
+    "message": "未分配 · 请在浏览器中设置"
+  },
+  "popupSearchScopeHost": {
+    "message": "已保存链接及 $1 标签／近期历史"
+  },
+  "popupSearchScopeSaved": {
+    "message": "搜索已保存链接"
+  },
+  "popupStartSelection": {
+    "message": "↓ 开始选择"
+  },
+  "popupSearchKeyboardHint": {
+    "message": "↑↓ 选择 · Esc 清空"
+  },
+  "popupShortcutUnavailable": {
+    "message": "无法读取快捷键 · 请查看浏览器设置"
   }
 }

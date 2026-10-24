@@ -1204,7 +1204,10 @@ test('popup renders and shares quick links through extension storage', async ({ 
   expect(pageErrors).toEqual([])
 })
 
-test('popup previews eight links and scrolls the compact full list', async ({ page, extensionId }) => {
+test('popup expands saved previews into unused space and scrolls the compact full list', async ({
+  page,
+  extensionId,
+}) => {
   await page.goto(`chrome-extension://${extensionId}/popup.html`)
   await page.evaluate(
     key =>
@@ -1219,7 +1222,7 @@ test('popup previews eight links and scrolls the compact full list', async ({ pa
   )
 
   const links = page.getByTestId('popup-quick-link')
-  await expect(links).toHaveCount(8)
+  await expect(links).toHaveCount(24)
   const layout = await page.evaluate(() => {
     const scrollArea = document.querySelector<HTMLElement>('.popup-content')!
     const grid = document.querySelector<HTMLElement>('.quick-url-grid')!
@@ -1232,7 +1235,7 @@ test('popup previews eight links and scrolls the compact full list', async ({ pa
       scrollable: scrollArea.scrollHeight > scrollArea.clientHeight,
     }
   })
-  expect(layout).toEqual({ columns: 4, cardHeight: 46, headerBorder: '0px', scrollable: false })
+  expect(layout).toEqual({ columns: 4, cardHeight: 44, headerBorder: '0px', scrollable: false })
 
   await page.locator('.popup-section-heading button').click()
   await expect(links).toHaveCount(30)

@@ -63,6 +63,12 @@ for (const source of [
   'entrypoints/newtab/components/setting-pannel.tsx',
   'entrypoints/newtab/components/settings/SearchEngineSettings.tsx',
   'entrypoints/popup/App.tsx',
+  'entrypoints/newtab/App.tsx',
+  'entrypoints/newtab/App.css',
+  'components/shared/custom/brand-mark.tsx',
+  'components/shared/custom/brand-mark.css',
+  'entrypoints/popup/popup-keyboard.ts',
+  'entrypoints/popup/components/PopupKeyboardHelp.tsx',
   'entrypoints/popup/main.tsx',
   'components/shared/provider/theme.tsx',
   'entrypoints/popup/App.css',
@@ -377,6 +383,7 @@ try {
   const ui = []
   const navigationUi = []
   const popupUi = []
+  const popupPreviewUi = []
   try {
     let [worker] = context.serviceWorkers()
     worker ??= await context.waitForEvent('serviceworker')
@@ -549,7 +556,7 @@ try {
             childList: true,
             subtree: true,
             attributes: true,
-            attributeFilter: ['data-total'],
+            attributeFilter: ['data-total', 'aria-selected'],
           })
           document.addEventListener(
             eventType,
@@ -658,6 +665,8 @@ try {
     await popup.addInitScript(
       ({ tabs }) => {
         const current = { id: -1, windowId: 0, index: 0, incognito: false, url: 'https://perf.example/current' }
+        const preview = new URLSearchParams(location.search).get('preview')
+        const expectedRows = preview === 'hostless' ? 24 : preview === 'one' ? 21 : preview === 'empty' ? 20 : 12
         const history = Array.from({ length: 1000 }, (_, index) => ({
           id: String(index),
           url: `https://perf.example/history/${index}`,
@@ -668,7 +677,7 @@ try {
         window.popupHomeReadyMs = 0
         const observer = new MutationObserver(() => {
           const list = document.querySelector('.popup-content[aria-busy="false"]')
-          if (!list || list.querySelectorAll('[data-popup-result]').length !== 12) return
+          if (!list || list.querySelectorAll('[data-popup-result]').length !== expectedRows) return
           observer.disconnect()
           requestAnimationFrame(() => {
             window.popupHomeReadyMs = performance.now()
@@ -678,13 +687,18 @@ try {
         Object.defineProperty(chrome.tabs, 'query', {
           value: async query => {
             window.popupApiCalls[query.active ? 'activeTabs' : 'tabs']++
-            return query.active ? [current] : tabs
+            if (query.active) return [{ ...current, url: preview === 'hostless' ? 'chrome://newtab/' : current.url }]
+            if (preview)
+              return preview === 'one'
+                ? tabs.filter(tab => tab.url.startsWith('https://perf.example/')).slice(0, 1)
+                : []
+            return tabs
           },
         })
         Object.defineProperty(chrome.history, 'search', {
           value: async () => {
             window.popupApiCalls.history++
-            return history
+            return preview ? [] : history
           },
         })
       },
@@ -712,6 +726,7 @@ try {
           '[data-popup-result]',
         ),
       )
+      const firstPopupTabId = await popup.locator('[data-popup-result]').first().getAttribute('data-popup-result')
       measurements.push(
         await measureNavigation(
           'popup-site-scroll-end',
@@ -727,10 +742,29 @@ try {
           '[data-popup-result]',
         ),
       )
+      for (const [key, id] of [
+        ['Home', firstPopupTabId],
+        ['End', 'history:https://perf.example/history/999'],
+      ]) {
+        measurements.push(
+          await measureNavigation(
+            `popup-keyboard-${key.toLowerCase()}`,
+            () => popup.getByRole('combobox').press(key),
+            '.popup-content',
+            1800,
+            { min: 1, max: 20, contains: `[data-popup-result="${id}"][aria-selected="true"]` },
+            'keydown',
+            popup,
+            '[data-popup-result]',
+          ),
+        )
+        if (!(await popup.getByRole('combobox').evaluate(element => document.activeElement === element)))
+          throw new Error('Popup keyboard navigation moved input focus')
+      }
       measurements.push(
         await measureNavigation(
           'popup-site-search',
-          () => popup.getByRole('searchbox').fill('ref=tab-999'),
+          () => popup.getByRole('combobox').fill('ref=tab-999'),
           '.popup-content',
           1,
           1,
@@ -739,7 +773,8 @@ try {
           '[data-popup-result]',
         ),
       )
-      await popup.getByRole('searchbox').press('Escape')
+      await popup.getByRole('combobox').press('Escape')
+      await popup.getByRole('combobox').press('Escape')
       measurements.push(
         await measureNavigation(
           'popup-saved-open',
@@ -783,6 +818,31 @@ try {
         heapMiB: (await popupSession.send('Runtime.getHeapUsage')).usedSize / 1024 ** 2,
       })
       console.log(`Completed popup UI at ${rate}x CPU slowdown`)
+      for (const [fixture, expected] of [
+        ['empty', 20],
+        ['one', 21],
+        ['hostless', 24],
+      ]) {
+        await popup.goto(`chrome-extension://${extensionId}/popup.html?preview=${fixture}`)
+        await popup.waitForFunction(() => window.popupHomeReadyMs > 0)
+        const snapshot = await popup.evaluate(() => {
+          const content = document.querySelector('.popup-content')
+          return {
+            homeReadyMs: window.popupHomeReadyMs,
+            mounted: content.querySelectorAll('[data-popup-result]').length,
+            savedMounted: content.querySelectorAll('[data-testid="popup-quick-link"]').length,
+            overflows: content.scrollHeight > content.clientHeight,
+            apiCalls: window.popupApiCalls,
+          }
+        })
+        if (snapshot.mounted !== expected || snapshot.overflows)
+          throw new Error(`Popup preview budget failed: ${fixture}`)
+        const calls =
+          fixture === 'hostless' ? { activeTabs: 1, tabs: 0, history: 0 } : { activeTabs: 1, tabs: 1, history: 1 }
+        if (Object.keys(calls).some(key => snapshot.apiCalls[key] !== calls[key]))
+          throw new Error('Adaptive preview repeated API queries')
+        popupPreviewUi.push({ cpuSlowdown: rate, fixture, savedLinks: 100, ...snapshot })
+      }
     }
   } finally {
     await context.close()
@@ -800,6 +860,7 @@ try {
     ui,
     navigationUi,
     popupUi,
+    popupPreviewUi,
   }
   const output = path.join(root, 'artifacts/performance-return-pages')
   await mkdir(output, { recursive: true })
