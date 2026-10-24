@@ -161,7 +161,7 @@ test('search and standalone history keep their original interactions without ext
   await expect(history).toHaveCount(0)
 })
 
-test('saving a site recent page keeps its row and keyboard focus until the dialog is reopened', async ({
+test('saving a site history page keeps its row and keyboard focus and appears in Saved', async ({
   page,
   context,
   extensionId,
@@ -187,17 +187,16 @@ test('saving a site recent page keeps its row and keyboard focus until the dialo
   await page.setViewportSize({ width: 900, height: 360 })
   await page.getByTestId('quick-link-card').first().locator('.nt-link-expand').click()
   const dialog = page.getByTestId('site-pages-dialog')
+  await dialog.getByTestId('site-tab-history').click()
   const row = dialog.locator(`[data-page-url="${url}"]`)
-  const group = row.locator('xpath=ancestor::section').locator('h3')
   const save = page.getByTestId('save-quick-link')
   const primary = row.locator('.nt-return-open')
-  const recentGroup = await group.textContent()
   await row.hover()
   await row.locator('.nt-return-more').click()
   await save.press('Enter')
   await expect(row.locator('.nt-return-more')).toBeFocused()
   await expect(primary).toBeInViewport()
-  await expect(group).toHaveText(recentGroup!)
+  await expect(dialog.getByTestId('site-tab-history')).toHaveAttribute('aria-selected', 'true')
   // External storage changes update the button without regrouping the opened list.
   await page.evaluate(async value => {
     const key = 'quick-url-item-storage-key'
@@ -212,7 +211,7 @@ test('saving a site recent page keeps its row and keyboard focus until the dialo
   await row.locator('.nt-return-more').press('Escape')
   await expect(dialog).toHaveCount(0)
   await page.getByTestId('quick-link-card').first().locator('.nt-link-expand').click()
-  await expect(group).not.toHaveText(recentGroup!)
+  await dialog.getByTestId('site-tab-saved').click()
   await row.hover()
   await row.locator('.nt-return-more').click()
   await expect(save).toHaveAttribute('aria-disabled', 'true')

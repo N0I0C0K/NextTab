@@ -595,16 +595,16 @@ try {
       await view.getByTestId('all-site-bookmarks').waitFor()
       measurements.push(
         await measureNavigation(
-          'site-bookmarks-open',
+          'site-saved-open',
           () => view.getByTestId('all-site-bookmarks').click(),
           '[data-testid="site-pages-dialog"] [data-testid="navigation-list"]',
-          2000,
+          2100,
           20,
         ),
       )
       measurements.push(
         await measureNavigation(
-          'site-bookmarks-search',
+          'site-saved-search',
           () => view.locator('[data-testid="site-pages-dialog"] input').fill('saved/1999'),
           '[data-testid="site-pages-dialog"] [data-testid="navigation-list"]',
           1,

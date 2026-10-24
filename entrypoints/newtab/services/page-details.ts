@@ -2,6 +2,8 @@ import { ACTIVITY_SNAPSHOT_MESSAGE, ACTIVITY_WINDOW_MS, type ActivitySnapshot } 
 import { scoreActivity, type PageActivitySummary } from '@/utils/page-activity/scoring'
 import { getHistoryWindowStart, normalizePageUrl, type ReturnPage } from './return-pages'
 
+type DetailsPage = Pick<ReturnPage, 'url' | 'ranking'>
+
 export type PageDetails = {
   evaluatedAt: number
   historyDays: number
@@ -10,7 +12,7 @@ export type PageDetails = {
   activityUnavailable: boolean
 }
 
-async function pageHistory(page: ReturnPage, days: number, now: number, signal: AbortSignal) {
+async function pageHistory(page: DetailsPage, days: number, now: number, signal: AbortSignal) {
   const key = normalizePageUrl(page.url)
   const start = days === 7 ? now - ACTIVITY_WINDOW_MS : getHistoryWindowStart(days, now)
   const history = await chrome.history.search({ text: new URL(page.url).hostname, startTime: start, maxResults: 1000 })
@@ -41,7 +43,7 @@ async function pageHistory(page: ReturnPage, days: number, now: number, signal: 
   }
 }
 
-async function pageActivity(page: ReturnPage, now: number): Promise<PageDetails['activity']> {
+async function pageActivity(page: DetailsPage, now: number): Promise<PageDetails['activity']> {
   const snapshot: ActivitySnapshot | undefined = await chrome.runtime.sendMessage({
     type: ACTIVITY_SNAPSHOT_MESSAGE,
     incognito: chrome.extension?.inIncognitoContext,
@@ -64,7 +66,11 @@ async function pageActivity(page: ReturnPage, now: number): Promise<PageDetails[
 }
 
 /** Read additional information only when requested; never slow down homepage recommendations. */
-export async function fetchPageDetails(page: ReturnPage, frequent: boolean, signal: AbortSignal): Promise<PageDetails> {
+export async function fetchPageDetails(
+  page: ReturnPage | DetailsPage,
+  frequent: boolean,
+  signal: AbortSignal,
+): Promise<PageDetails> {
   if (signal.aborted) throw new DOMException('Aborted', 'AbortError')
   // A row can remain on screen across many revisits. Details always read fresh records.
   const evaluatedAt = Date.now()

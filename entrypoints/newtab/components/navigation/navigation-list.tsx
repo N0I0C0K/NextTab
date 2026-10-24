@@ -1,8 +1,10 @@
-import { useLayoutEffect, useRef, useState, type KeyboardEvent } from 'react'
+import { useLayoutEffect, useRef, useState, type KeyboardEvent, type ReactNode } from 'react'
 import { ChevronLeft, ChevronRight, X } from 'lucide-react'
 import { toast } from 'sonner'
 import { QuickLinkIcon } from '@/components/shared/custom/quick-link-icon'
 import { t } from '@/utils/i18n'
+
+const OPEN_SELECTOR = '.nt-navigation-open, .nt-return-open'
 
 export type NavigationItem = { id: string; title: string; url: string; detail?: string; tabId?: number }
 
@@ -16,9 +18,7 @@ export function focusNavigationFromSearch(event: KeyboardEvent<HTMLInputElement>
   )
     return
   if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') return
-  const rows = event.currentTarget
-    .closest('[role="dialog"]')
-    ?.querySelectorAll<HTMLButtonElement>('.nt-navigation-open')
+  const rows = event.currentTarget.closest('[role="dialog"]')?.querySelectorAll<HTMLButtonElement>(OPEN_SELECTOR)
   const row = event.key === 'ArrowDown' ? rows?.[0] : rows?.[(rows?.length ?? 0) - 1]
   if (row) {
     event.preventDefault()
@@ -34,13 +34,17 @@ export function NavigationList({
   onClose,
   emptyText,
   unknown = false,
+  renderItem,
+  footerAction,
 }: {
   items: NavigationItem[]
   resetKey: string
   onOpen: (item: NavigationItem, newTab: boolean) => Promise<void>
   onClose?: (item: NavigationItem) => Promise<void>
-  emptyText?: string
+  emptyText?: ReactNode
   unknown?: boolean
+  renderItem?: (item: NavigationItem, actions: { close: () => Promise<void>; closing: boolean }) => ReactNode
+  footerAction?: ReactNode
 }) {
   const [page, setPage] = useState({ key: resetKey, offset: 0 })
   const [closing, setClosing] = useState<string>()
@@ -55,12 +59,12 @@ export function NavigationList({
       previous.key === resetKey && previous.offset === start ? previous : { key: resetKey, offset: start },
     )
     if (list.current) list.current.scrollTop = 0
-    if (firstAfterPage.current) list.current?.querySelector<HTMLButtonElement>('.nt-navigation-open')?.focus()
+    if (firstAfterPage.current) list.current?.querySelector<HTMLButtonElement>(OPEN_SELECTOR)?.focus()
     firstAfterPage.current = false
   }, [start, resetKey])
   useLayoutEffect(() => {
     if (afterClose.current === undefined || closing !== undefined) return
-    const rows = list.current?.querySelectorAll<HTMLButtonElement>('.nt-navigation-open')
+    const rows = list.current?.querySelectorAll<HTMLButtonElement>(OPEN_SELECTOR)
     const index = Math.min(Math.max(0, afterClose.current - start), (rows?.length ?? 0) - 1)
     if (index >= 0) rows?.[index].focus()
     else list.current?.closest('[role="dialog"]')?.querySelector<HTMLInputElement>('input')?.focus()
@@ -72,10 +76,23 @@ export function NavigationList({
   }
   const openItem = (item: NavigationItem, newTab: boolean) =>
     void onOpen(item, newTab).catch(() => toast.error(t('returnOpenFailed')))
-  const handleRowKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
+  const closeItem = async (item: NavigationItem, position: number) => {
+    if (closingRef.current) throw new Error('Tab close already in progress')
+    closingRef.current = true
+    setClosing(item.id)
+    afterClose.current = position
+    try {
+      await onClose?.(item)
+    } finally {
+      closingRef.current = false
+      setClosing(undefined)
+    }
+  }
+  const handleRowKeyDown = (event: KeyboardEvent<HTMLElement>) => {
+    if (event.defaultPrevented) return
     if (event.altKey || event.ctrlKey || event.metaKey || event.nativeEvent.isComposing) return
     if (!['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) return
-    const rows = [...(list.current?.querySelectorAll<HTMLButtonElement>('.nt-navigation-open') ?? [])]
+    const rows = [...(list.current?.querySelectorAll<HTMLButtonElement>(OPEN_SELECTOR) ?? [])]
     const index = rows.findIndex(row => row.closest('.nt-navigation-row')?.contains(event.currentTarget))
     if (index < 0) return
     event.preventDefault()
@@ -93,33 +110,59 @@ export function NavigationList({
     <div className="nt-navigation-body" data-testid="navigation-list" data-total={items.length}>
       <div className="nt-navigation-scroll" ref={list}>
         {items.slice(start, end).map((item, index) => (
-          <div className="nt-navigation-row" key={item.id} data-testid="navigation-row" data-item-id={item.id}>
-            <button
-              type="button"
-              className="nt-navigation-open"
-              onKeyDown={event => {
-                if (
-                  event.key === 'Enter' &&
-                  (event.ctrlKey || event.metaKey) &&
-                  !event.nativeEvent.isComposing &&
-                  event.nativeEvent.keyCode !== 229
-                ) {
-                  event.preventDefault()
-                  openItem(item, true)
-                } else handleRowKeyDown(event)
-              }}
-              title={`${item.title}\n${item.url}${item.detail ? '\n' + item.detail : ''}`}
-              onClick={event => openItem(item, event.ctrlKey || event.metaKey)}>
-              <QuickLinkIcon url={item.url} title={item.title} className="nt-link-icon" />
-              <span className="nt-navigation-copy">
-                <span className="nt-navigation-title">{item.title}</span>
-                <span className="nt-navigation-url">{item.url}</span>
-                {item.detail && <span className="nt-navigation-detail">{item.detail}</span>}
-              </span>
-              <span className="nt-navigation-action">
-                {t(item.tabId === undefined ? 'returnOpenPage' : 'returnSwitchTab')}
-              </span>
-            </button>
+          <div
+            className="nt-navigation-row"
+            role="presentation"
+            key={item.id}
+            data-testid="navigation-row"
+            data-item-id={item.id}
+            data-tab-id={renderItem ? undefined : item.tabId}
+            onKeyDown={
+              renderItem
+                ? event => {
+                    if (
+                      event.key === 'Enter' &&
+                      (event.ctrlKey || event.metaKey) &&
+                      !event.nativeEvent.isComposing &&
+                      event.nativeEvent.keyCode !== 229 &&
+                      (event.target as HTMLElement).matches('.nt-return-open')
+                    ) {
+                      event.preventDefault()
+                      openItem(item, true)
+                    } else handleRowKeyDown(event)
+                  }
+                : undefined
+            }>
+            {renderItem ? (
+              renderItem(item, { close: () => closeItem(item, start + index), closing: closing !== undefined })
+            ) : (
+              <button
+                type="button"
+                className="nt-navigation-open"
+                onKeyDown={event => {
+                  if (
+                    event.key === 'Enter' &&
+                    (event.ctrlKey || event.metaKey) &&
+                    !event.nativeEvent.isComposing &&
+                    event.nativeEvent.keyCode !== 229
+                  ) {
+                    event.preventDefault()
+                    openItem(item, true)
+                  } else handleRowKeyDown(event)
+                }}
+                title={`${item.title}\n${item.url}${item.detail ? '\n' + item.detail : ''}`}
+                onClick={event => openItem(item, event.ctrlKey || event.metaKey)}>
+                <QuickLinkIcon url={item.url} title={item.title} className="nt-link-icon" />
+                <span className="nt-navigation-copy">
+                  <span className="nt-navigation-title">{item.title}</span>
+                  <span className="nt-navigation-url">{item.url}</span>
+                  {item.detail && <span className="nt-navigation-detail">{item.detail}</span>}
+                </span>
+                <span className="nt-navigation-action">
+                  {t(item.tabId === undefined ? 'returnOpenPage' : 'returnSwitchTab')}
+                </span>
+              </button>
+            )}
             {onClose && item.tabId !== undefined && (
               <button
                 type="button"
@@ -127,21 +170,7 @@ export function NavigationList({
                 onKeyDown={handleRowKeyDown}
                 disabled={closing !== undefined}
                 aria-label={t('navigationCloseNamedTab', item.title)}
-                onClick={async () => {
-                  if (closingRef.current) return
-                  closingRef.current = true
-                  setClosing(item.id)
-                  afterClose.current = start + index
-                  try {
-                    await onClose(item)
-                  } catch {
-                    afterClose.current = undefined
-                    toast.error(t('returnCloseTabFailed'))
-                  } finally {
-                    closingRef.current = false
-                    setClosing(undefined)
-                  }
-                }}>
+                onClick={() => void closeItem(item, start + index).catch(() => toast.error(t('returnCloseTabFailed')))}>
                 <X size={16} />
               </button>
             )}
@@ -149,9 +178,12 @@ export function NavigationList({
         ))}
         {!items.length && !unknown && <p className="nt-return-empty">{emptyText ?? t('noResultsFound')}</p>}
       </div>
-      <nav className="nt-navigation-pagination" aria-label={t('returnPagination')}>
+      <nav
+        className="nt-navigation-pagination"
+        data-single-page={items.length <= 20 || undefined}
+        aria-label={t('returnPagination')}>
         <span role="status">
-          {unknown && !items.length
+          {unknown
             ? '—'
             : t('returnPageRange', [String(items.length ? start + 1 : 0), String(end), String(items.length)])}
         </span>
@@ -166,6 +198,7 @@ export function NavigationList({
             onClick={() => move(start + 20)}>
             <ChevronRight size={16} />
           </button>
+          {footerAction}
         </div>
       </nav>
     </div>

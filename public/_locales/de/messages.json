@@ -28,11 +28,21 @@
   "addSite": {
     "message": "Website hinzufügen"
   },
-  "addToQuickLinks": { "message": "Zu Schnellzugriffen hinzufügen" },
-  "quickLinkSaved": { "message": "Bereits in Schnellzugriffen" },
-  "quickLinkAdded": { "message": "Zu Schnellzugriffen hinzugefügt" },
-  "quickLinkAddFailed": { "message": "Hinzufügen fehlgeschlagen. Bitte erneut versuchen." },
-  "quickLinkSuggestionHint": { "message": "Zum Bearbeiten auswählen" },
+  "addToQuickLinks": {
+    "message": "Zu Schnellzugriffen hinzufügen"
+  },
+  "quickLinkSaved": {
+    "message": "Bereits in Schnellzugriffen"
+  },
+  "quickLinkAdded": {
+    "message": "Zu Schnellzugriffen hinzugefügt"
+  },
+  "quickLinkAddFailed": {
+    "message": "Hinzufügen fehlgeschlagen. Bitte erneut versuchen."
+  },
+  "quickLinkSuggestionHint": {
+    "message": "Zum Bearbeiten auswählen"
+  },
   "addQuickLinkTitle": {
     "message": "Schnellzugriff hinzufügen"
   },
@@ -1334,5 +1344,35 @@
   },
   "engineInvalidConfig": {
     "message": "Ungültige Suchmaschinen wurden übersprungen."
+  },
+  "siteSavedTab": {
+    "message": "Gespeichert"
+  },
+  "siteHistoryTab": {
+    "message": "Verlauf"
+  },
+  "sitePageSources": {
+    "message": "Seitenquellen der Website"
+  },
+  "siteSearchTabs": {
+    "message": "Tabs dieser Website durchsuchen"
+  },
+  "siteSearchSaved": {
+    "message": "Gespeicherte Titel, URLs oder Ordner durchsuchen"
+  },
+  "siteSearchHistory": {
+    "message": "Verlauf dieser Website durchsuchen"
+  },
+  "siteQuickLinkSource": {
+    "message": "Schnelllink der Startseite"
+  },
+  "siteBookmarkSource": {
+    "message": "Lesezeichen"
+  },
+  "siteTabsDisabled": {
+    "message": "Offene Tabs sind in den Startseiteneinstellungen ausgeblendet."
+  },
+  "siteSourceEmpty": {
+    "message": "Keine Einträge für „$1“ von dieser Website."
   }
 }

@@ -83,6 +83,7 @@ export function PageDetailsDialog({
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
   const [info, setInfo] = useState<'usage' | 'history' | null>(null)
+  const { url, ranking } = page
   useEffect(() => {
     if (!open) return
     const controller = new AbortController()
@@ -90,7 +91,7 @@ export function PageDetailsDialog({
     setResult(null)
     setError(false)
     setInfo(null)
-    void fetchPageDetails(page, frequent, controller.signal).then(
+    void fetchPageDetails({ url, ranking }, frequent, controller.signal).then(
       value => {
         if (!controller.signal.aborted) {
           setResult(value)
@@ -105,7 +106,7 @@ export function PageDetailsDialog({
       },
     )
     return () => controller.abort()
-  }, [open, page, frequent])
+  }, [open, url, ranking, frequent])
 
   const activity = result?.activity
   const history = result?.history
