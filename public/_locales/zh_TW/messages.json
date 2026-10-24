@@ -1374,5 +1374,59 @@
   },
   "siteSourceEmpty": {
     "message": "目前沒有此網站的$1"
+  },
+  "popupSearchPlaceholder": {
+    "message": "搜尋常用網站或目前網站頁面…"
+  },
+  "popupCurrentSite": {
+    "message": "目前網站"
+  },
+  "popupCurrentHost": {
+    "message": "目前網站 · $1"
+  },
+  "popupNoSitePages": {
+    "message": "暫無同網站的其他分頁或最近造訪頁面"
+  },
+  "popupSiteLoadFailed": {
+    "message": "部分網站頁面讀取失敗"
+  },
+  "popupBack": {
+    "message": "返回"
+  },
+  "popupSearchResults": {
+    "message": "搜尋結果"
+  },
+  "popupPages": {
+    "message": "常用網站與網站頁面"
+  },
+  "popupThisWindow": {
+    "message": "目前視窗"
+  },
+  "popupOtherWindow": {
+    "message": "其他視窗"
+  },
+  "popupSwitch": {
+    "message": "切換"
+  },
+  "popupReopen": {
+    "message": "重開"
+  },
+  "popupOpen": {
+    "message": "開啟"
+  },
+  "popupSaveCurrent": {
+    "message": "儲存目前頁面"
+  },
+  "popupSaved": {
+    "message": "已儲存"
+  },
+  "popupSaveFailed": {
+    "message": "儲存失敗，請重試"
+  },
+  "popupNavigationHint": {
+    "message": "↑↓ 選擇 · Enter 開啟"
+  },
+  "popupLoadFailed": {
+    "message": "常用網站讀取失敗"
   }
 }

@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react'
-import { exampleThemeStorage } from '@/utils/storage'
-import { useMediaQuery, useStorage } from '@/utils'
+import { exampleThemeStorage } from '@/utils/storage/impl/exampleThemeStorage'
+import { useMediaQuery } from '@/hooks/common'
+import { useStorage } from '@/hooks/useStorage'
 
 type Theme = 'dark' | 'light' | 'system'
 type RealTheme = 'dark' | 'light'

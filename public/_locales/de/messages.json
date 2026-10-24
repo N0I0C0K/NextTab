@@ -1374,5 +1374,59 @@
   },
   "siteSourceEmpty": {
     "message": "Keine Einträge für „$1“ von dieser Website."
+  },
+  "popupSearchPlaceholder": {
+    "message": "Links oder Seiten dieser Website suchen…"
+  },
+  "popupCurrentSite": {
+    "message": "Aktuelle Website"
+  },
+  "popupCurrentHost": {
+    "message": "Aktuelle Website · $1"
+  },
+  "popupNoSitePages": {
+    "message": "Keine weiteren offenen oder zuletzt besuchten Seiten dieser Website."
+  },
+  "popupSiteLoadFailed": {
+    "message": "Einige Seiten konnten nicht geladen werden."
+  },
+  "popupBack": {
+    "message": "Zurück"
+  },
+  "popupSearchResults": {
+    "message": "Suchergebnisse"
+  },
+  "popupPages": {
+    "message": "Links und Seiten der Website"
+  },
+  "popupThisWindow": {
+    "message": "Dieses Fenster"
+  },
+  "popupOtherWindow": {
+    "message": "Anderes Fenster"
+  },
+  "popupSwitch": {
+    "message": "Wechseln"
+  },
+  "popupReopen": {
+    "message": "Öffnen"
+  },
+  "popupOpen": {
+    "message": "Öffnen"
+  },
+  "popupSaveCurrent": {
+    "message": "Seite speichern"
+  },
+  "popupSaved": {
+    "message": "Gespeichert"
+  },
+  "popupSaveFailed": {
+    "message": "Speichern fehlgeschlagen. Erneut versuchen."
+  },
+  "popupNavigationHint": {
+    "message": "↑↓ Auswahl · Enter Öffnen"
+  },
+  "popupLoadFailed": {
+    "message": "Gespeicherte Links konnten nicht geladen werden."
   }
 }

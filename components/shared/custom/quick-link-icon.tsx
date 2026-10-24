@@ -5,13 +5,16 @@ interface QuickLinkIconProps {
   url: string
   title: string
   className: string
+  iconUrl?: string
 }
 
-export function QuickLinkIcon({ url, title, className }: QuickLinkIconProps) {
+export function QuickLinkIcon({ url, title, className, iconUrl }: QuickLinkIconProps) {
   const [resolved, setResolved] = useState<{ url: string; src: string | null } | null>(null)
   const [failedSrc, setFailedSrc] = useState<string | null>(null)
+  const preferIcon = Boolean(iconUrl && failedSrc !== iconUrl)
 
   useEffect(() => {
+    if (preferIcon) return
     let active = true
     void resolveFaviconUrl(url).then(src => {
       if (active) setResolved({ url, src })
@@ -19,10 +22,16 @@ export function QuickLinkIcon({ url, title, className }: QuickLinkIconProps) {
     return () => {
       active = false
     }
-  }, [url])
+  }, [url, preferIcon])
 
-  const src = resolved?.url === url ? resolved.src : null
-  const status = resolved?.url === url ? (src && failedSrc !== src ? 'loaded' : 'fallback') : 'loading'
+  const src = preferIcon ? iconUrl : resolved?.url === url ? resolved.src : null
+  const status = preferIcon
+    ? 'loaded'
+    : resolved?.url === url
+      ? src && failedSrc !== src
+        ? 'loaded'
+        : 'fallback'
+      : 'loading'
 
   return (
     <span className={className} data-icon-status={status} aria-hidden="true">
