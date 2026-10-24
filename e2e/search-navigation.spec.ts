@@ -379,8 +379,19 @@ test('custom engines validate, retain unsaved drafts, persist and return one res
   await prepare(page, extensionId, 1)
   await page.getByTestId('settings-trigger').click()
   await page.getByTestId('settings-tab-command').click()
-  await page.getByTestId('command-plugin-webSearch').getByRole('button').first().click()
+  const webSearch = page.getByTestId('command-plugin-webSearch')
+  await webSearch.getByRole('button').first().click()
+  // The button can have stable bounds while its accordion still expands and scrolls.
+  await webSearch.locator('[data-slot="accordion-content"]').evaluate(async panel => {
+    await Promise.all(
+      panel
+        .getAnimations({ subtree: true })
+        .filter(animation => animation.effect?.getComputedTiming().iterations !== Infinity)
+        .map(animation => animation.finished.catch(() => {})),
+    )
+  })
   await page.getByTestId('engine-add').click()
+  await expect(page.getByTestId('engine-editor')).toBeVisible()
   await page.getByTestId('engine-name').fill('GitHub')
   await page.getByTestId('engine-url').fill('https://github.com/search')
   await expect(page.getByTestId('engine-save')).toBeDisabled()
