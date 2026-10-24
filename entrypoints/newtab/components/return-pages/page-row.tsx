@@ -33,6 +33,10 @@ export function PageRow({
   exactUrl = false,
   tabId,
   onTabClosed,
+  detail,
+  onOpen,
+  onCloseTab,
+  closeDisabled = false,
 }: {
   page: ReturnPage
   tabs: chrome.tabs.Tab[]
@@ -42,6 +46,10 @@ export function PageRow({
   exactUrl?: boolean
   tabId?: number
   onTabClosed?: (tabId: number) => void
+  detail?: string
+  onOpen?: (newTab: boolean) => Promise<void>
+  onCloseTab?: () => Promise<void>
+  closeDisabled?: boolean
 }) {
   // Mount dialogs on first use, then keep them for close animations and focus restoration.
   const [choices, setChoices] = useState<chrome.tabs.Tab[] | null>(null)
@@ -55,10 +63,14 @@ export function PageRow({
   const host = parsedUrl.hostname || parsedUrl.protocol
   const openedTab = tabId === undefined ? undefined : matchingTabs.find(tab => tab.id === tabId)
   const isOpen = tabId === undefined ? matchingTabs.length > 0 : !!openedTab
-  const action = t(isOpen ? 'returnSwitchTab' : 'returnOpenPage')
+  const action = t((!onOpen || tabId !== undefined) && isOpen ? 'returnSwitchTab' : 'returnOpenPage')
   const open = async (event: MouseEvent<HTMLButtonElement>) => {
     triggerRef.current = event.currentTarget
     try {
+      if (onOpen) {
+        await onOpen(event.ctrlKey || event.metaKey)
+        return
+      }
       if (event.ctrlKey || event.metaKey) {
         await chrome.tabs.create({ url: page.url, active: true })
         return
@@ -75,10 +87,11 @@ export function PageRow({
     }
   }
   const closeTab = async () => {
-    if (tabId === undefined || closingTab) return
+    if (tabId === undefined || closingTab || closeDisabled) return
     setClosingTab(true)
     try {
-      await chrome.tabs.remove(tabId)
+      if (onCloseTab) await onCloseTab()
+      else await chrome.tabs.remove(tabId)
       onTabClosed?.(tabId)
       toast.success(t('returnTabClosed'))
     } catch {
@@ -110,13 +123,19 @@ export function PageRow({
           <span className="nt-return-copy">
             <span className="nt-return-title">{page.title}</span>
             <span className="nt-return-meta">
-              {host} ·{' '}
-              {frequent
-                ? t('returnVisitDays', String(page.activeDays))
-                : page.lastVisitTime > 0
-                  ? `${isOpen ? `${t('returnAlreadyOpen')} · ` : ''}${formatPageTime(page.lastVisitTime)}`
-                  : t(isOpen ? 'returnAlreadyOpen' : 'returnSaved')}
-              {openedTab && matchingTabs.length > 1 && (
+              {detail ? (
+                <span className="nt-site-saved-source">{detail}</span>
+              ) : (
+                <>
+                  {host} ·{' '}
+                  {frequent
+                    ? t('returnVisitDays', String(page.activeDays))
+                    : page.lastVisitTime > 0
+                      ? `${isOpen ? `${t('returnAlreadyOpen')} · ` : ''}${formatPageTime(page.lastVisitTime)}`
+                      : t(isOpen ? 'returnAlreadyOpen' : 'returnSaved')}
+                </>
+              )}
+              {!detail && openedTab && matchingTabs.length > 1 && (
                 <>
                   {' '}
                   ·{' '}
@@ -137,7 +156,7 @@ export function PageRow({
           className="flex-col items-start gap-1 break-words"
           style={{ maxWidth: 'min(24rem, calc(100vw - 24px))' }}>
           <span>{page.title}</span>
-          {exactUrl && <span className="text-muted-foreground">{page.url}</span>}
+          {(exactUrl || detail) && <span className="text-muted-foreground">{page.url}</span>}
           <span>{action}</span>
         </TooltipContent>
       </Tooltip>
@@ -166,7 +185,10 @@ export function PageRow({
             {t('returnCopyLink')}
           </DropdownMenuItem>
           {openedTab && (
-            <DropdownMenuItem variant="destructive" disabled={closingTab} onClick={() => void closeTab()}>
+            <DropdownMenuItem
+              variant="destructive"
+              disabled={closingTab || closeDisabled}
+              onClick={() => void closeTab()}>
               {t('returnCloseTab')}
             </DropdownMenuItem>
           )}

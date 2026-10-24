@@ -28,11 +28,21 @@
   "addSite": {
     "message": "添加网站"
   },
-  "addToQuickLinks": { "message": "添加到常用网站" },
-  "quickLinkSaved": { "message": "已在常用网站中" },
-  "quickLinkAdded": { "message": "已添加到常用网站" },
-  "quickLinkAddFailed": { "message": "添加失败，请重试。" },
-  "quickLinkSuggestionHint": { "message": "点选后可编辑" },
+  "addToQuickLinks": {
+    "message": "添加到常用网站"
+  },
+  "quickLinkSaved": {
+    "message": "已在常用网站中"
+  },
+  "quickLinkAdded": {
+    "message": "已添加到常用网站"
+  },
+  "quickLinkAddFailed": {
+    "message": "添加失败，请重试。"
+  },
+  "quickLinkSuggestionHint": {
+    "message": "点选后可编辑"
+  },
   "addQuickLinkTitle": {
     "message": "添加常用网站"
   },
@@ -1334,5 +1344,35 @@
   },
   "engineInvalidConfig": {
     "message": "已跳过无效的引擎配置。"
+  },
+  "siteSavedTab": {
+    "message": "已保存"
+  },
+  "siteHistoryTab": {
+    "message": "历史记录"
+  },
+  "sitePageSources": {
+    "message": "网站页面来源"
+  },
+  "siteSearchTabs": {
+    "message": "搜索此网站的标签页"
+  },
+  "siteSearchSaved": {
+    "message": "搜索已保存的标题、网址或文件夹"
+  },
+  "siteSearchHistory": {
+    "message": "搜索此网站的历史记录"
+  },
+  "siteQuickLinkSource": {
+    "message": "首页快捷链接"
+  },
+  "siteBookmarkSource": {
+    "message": "书签"
+  },
+  "siteTabsDisabled": {
+    "message": "已在首页设置中关闭显示打开的页面。"
+  },
+  "siteSourceEmpty": {
+    "message": "当前没有此网站的$1"
   }
 }

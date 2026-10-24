@@ -265,12 +265,13 @@ test('deleting history while bookmarks load does not cancel their first result',
     await chrome.history.deleteAll()
   })
   await expect.poll(() => page.evaluate(() => sessionStorage.getItem('review-history-deleted'))).toBe('true')
-  await expect(dialog.locator('.nt-navigation-pagination')).toContainText('—')
+  await expect(dialog.getByTestId('site-tab-saved')).toContainText('—')
+  await expect(dialog.locator('.nt-navigation-pagination [role="status"]')).toHaveText('—')
   await page.evaluate(() => {
     window.dispatchEvent(new Event('review-release-bookmarks'))
   })
-  await expect(dialog.getByTestId('navigation-row')).toHaveCount(6)
-  await expect(dialog.locator('.nt-navigation-pagination')).toContainText('共 6 条')
+  await expect(dialog.getByTestId('navigation-row')).toHaveCount(7)
+  await expect(dialog.locator('.nt-navigation-pagination')).toContainText('共 7 条')
 })
 
 test('a bookmark refresh failure preserves the last list and can be retried', async ({ page, extensionId }) => {
@@ -282,7 +283,7 @@ test('a bookmark refresh failure preserves the last list and can be retried', as
   await page.getByTestId('quick-link-card').click({ button: 'right' })
   await page.getByTestId('all-site-bookmarks').click()
   const dialog = page.getByTestId('site-pages-dialog')
-  await expect(dialog.getByTestId('navigation-row')).toHaveCount(6)
+  await expect(dialog.getByTestId('navigation-row')).toHaveCount(7)
   await dialog.getByRole('textbox').press('Escape')
   await page.getByTestId('quick-link-card').click({ button: 'right' })
   await expect(page.getByTestId('related-bookmark')).toHaveCount(5)
@@ -300,11 +301,11 @@ test('a bookmark refresh failure preserves the last list and can be retried', as
     })
   })
   await page.getByTestId('all-site-bookmarks').click()
-  await expect(dialog.getByTestId('navigation-row')).toHaveCount(6)
+  await expect(dialog.getByTestId('navigation-row')).toHaveCount(7)
   await expect(dialog.getByRole('button', { name: '重试', exact: true })).toBeVisible()
   await dialog.getByRole('button', { name: '重试', exact: true }).click()
   await expect(dialog.getByRole('button', { name: '重试', exact: true })).toHaveCount(0)
-  await expect(dialog.getByTestId('navigation-row')).toHaveCount(6)
+  await expect(dialog.getByTestId('navigation-row')).toHaveCount(7)
 })
 
 test('site previews show five records and the full source searches folders without merging duplicates', async ({
@@ -339,7 +340,7 @@ test('site previews show five records and the full source searches folders witho
   await expect(dialog.getByTestId('navigation-row')).toHaveCount(20)
   await dialog.getByRole('textbox').fill('Research folder q=26')
   await expect(dialog.getByTestId('navigation-row')).toHaveCount(1)
-  const bookmarkLink = dialog.locator('.nt-navigation-open').first()
+  const bookmarkLink = dialog.locator('.nt-return-open').first()
   await bookmarkLink.click({ button: 'right' })
   await expect(page.getByRole('menu')).toHaveCount(0)
   await expect(page.getByTestId('save-quick-link')).toHaveCount(0)
@@ -378,8 +379,19 @@ test('custom engines validate, retain unsaved drafts, persist and return one res
   await prepare(page, extensionId, 1)
   await page.getByTestId('settings-trigger').click()
   await page.getByTestId('settings-tab-command').click()
-  await page.getByTestId('command-plugin-webSearch').getByRole('button').first().click()
+  const webSearch = page.getByTestId('command-plugin-webSearch')
+  await webSearch.getByRole('button').first().click()
+  // The button can have stable bounds while its accordion still expands and scrolls.
+  await webSearch.locator('[data-slot="accordion-content"]').evaluate(async panel => {
+    await Promise.all(
+      panel
+        .getAnimations({ subtree: true })
+        .filter(animation => animation.effect?.getComputedTiming().iterations !== Infinity)
+        .map(animation => animation.finished.catch(() => {})),
+    )
+  })
   await page.getByTestId('engine-add').click()
+  await expect(page.getByTestId('engine-editor')).toBeVisible()
   await page.getByTestId('engine-name').fill('GitHub')
   await page.getByTestId('engine-url').fill('https://github.com/search')
   await expect(page.getByTestId('engine-save')).toBeDisabled()
@@ -447,7 +459,7 @@ test('duplicate open tabs stay independent and close targets a single current ta
   const target = Number(await first.getAttribute('data-item-id'))
   await first.getByRole('button', { name: /关闭标签页/ }).click()
   await expect(dialog.getByTestId('navigation-row')).toHaveCount(6)
-  await expect(dialog.locator('.nt-navigation-open').first()).toBeFocused()
+  await expect(dialog.locator('.nt-return-open').first()).toBeFocused()
   const current = await page.evaluate(async () => (await chrome.tabs.query({})).map(tab => tab.id))
   expect(current).not.toContain(target)
   expect(ids.filter(id => id !== target).every(id => current.includes(id))).toBe(true)
@@ -473,11 +485,11 @@ test('closing the only tab on the last page focuses its preceding record', async
   await expect(dialog.getByTestId('navigation-row')).toHaveCount(1)
   await dialog.getByRole('button', { name: /关闭标签页/ }).click()
   await expect(dialog.getByTestId('navigation-row')).toHaveCount(20)
-  await expect(dialog.locator('.nt-navigation-open').last()).toBeFocused()
+  await expect(dialog.locator('.nt-return-open').last()).toBeFocused()
   await page.evaluate(async () => {
     await chrome.tabs.create({ url: 'https://navigation.example/page?index=new', active: false })
   })
   await expect(dialog.getByTestId('navigation-list')).toHaveAttribute('data-total', '21')
   await expect(dialog.getByTestId('navigation-row')).toHaveCount(20)
-  await expect(dialog.locator('.nt-navigation-open').last()).toBeFocused()
+  await expect(dialog.locator('.nt-return-open').last()).toBeFocused()
 })

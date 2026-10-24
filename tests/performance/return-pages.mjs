@@ -42,6 +42,8 @@ for (const source of [
   'entrypoints/newtab/components/return-pages/index.tsx',
   'entrypoints/newtab/components/return-pages/page-list.tsx',
   'entrypoints/newtab/components/return-pages/page-row.tsx',
+  'entrypoints/newtab/components/return-pages/page-details-dialog.tsx',
+  'entrypoints/newtab/services/page-details.ts',
   'entrypoints/newtab/components/command.tsx',
   'entrypoints/newtab/components/navigation/navigation-list.tsx',
   'entrypoints/newtab/components/navigation/quick-links-dialog.tsx',
@@ -595,16 +597,16 @@ try {
       await view.getByTestId('all-site-bookmarks').waitFor()
       measurements.push(
         await measureNavigation(
-          'site-bookmarks-open',
+          'site-saved-open',
           () => view.getByTestId('all-site-bookmarks').click(),
           '[data-testid="site-pages-dialog"] [data-testid="navigation-list"]',
-          2000,
+          2100,
           20,
         ),
       )
       measurements.push(
         await measureNavigation(
-          'site-bookmarks-search',
+          'site-saved-search',
           () => view.locator('[data-testid="site-pages-dialog"] input').fill('saved/1999'),
           '[data-testid="site-pages-dialog"] [data-testid="navigation-list"]',
           1,

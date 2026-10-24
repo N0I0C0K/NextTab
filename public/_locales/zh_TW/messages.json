@@ -28,11 +28,21 @@
   "addSite": {
     "message": "新增網站"
   },
-  "addToQuickLinks": { "message": "新增至常用網站" },
-  "quickLinkSaved": { "message": "已在常用網站中" },
-  "quickLinkAdded": { "message": "已新增至常用網站" },
-  "quickLinkAddFailed": { "message": "新增失敗，請重試。" },
-  "quickLinkSuggestionHint": { "message": "點選後可編輯" },
+  "addToQuickLinks": {
+    "message": "新增至常用網站"
+  },
+  "quickLinkSaved": {
+    "message": "已在常用網站中"
+  },
+  "quickLinkAdded": {
+    "message": "已新增至常用網站"
+  },
+  "quickLinkAddFailed": {
+    "message": "新增失敗，請重試。"
+  },
+  "quickLinkSuggestionHint": {
+    "message": "點選後可編輯"
+  },
   "addQuickLinkTitle": {
     "message": "新增常用網站"
   },
@@ -1334,5 +1344,35 @@
   },
   "engineInvalidConfig": {
     "message": "已略過無效的引擎設定。"
+  },
+  "siteSavedTab": {
+    "message": "已儲存"
+  },
+  "siteHistoryTab": {
+    "message": "歷史記錄"
+  },
+  "sitePageSources": {
+    "message": "網站頁面來源"
+  },
+  "siteSearchTabs": {
+    "message": "搜尋此網站的分頁"
+  },
+  "siteSearchSaved": {
+    "message": "搜尋已儲存的標題、網址或資料夾"
+  },
+  "siteSearchHistory": {
+    "message": "搜尋此網站的歷史記錄"
+  },
+  "siteQuickLinkSource": {
+    "message": "首頁快速連結"
+  },
+  "siteBookmarkSource": {
+    "message": "書籤"
+  },
+  "siteTabsDisabled": {
+    "message": "已在首頁設定中關閉顯示開啟的頁面。"
+  },
+  "siteSourceEmpty": {
+    "message": "目前沒有此網站的$1"
   }
 }

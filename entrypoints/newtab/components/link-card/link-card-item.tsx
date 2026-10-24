@@ -181,7 +181,6 @@ export const SortableLinkCardItem: FC<LinkCardProps> = ({
       <SitePagesDialog
         url={url}
         title={title}
-        tabs={tabs}
         open={siteOpen}
         initialSource={siteSource}
         onOpenChange={setSiteOpen}

@@ -28,11 +28,21 @@
   "addSite": {
     "message": "Add site"
   },
-  "addToQuickLinks": { "message": "Add to favorite sites" },
-  "quickLinkSaved": { "message": "Already in favorite sites" },
-  "quickLinkAdded": { "message": "Added to favorite sites" },
-  "quickLinkAddFailed": { "message": "Could not add site. Please try again." },
-  "quickLinkSuggestionHint": { "message": "Select to edit" },
+  "addToQuickLinks": {
+    "message": "Add to favorite sites"
+  },
+  "quickLinkSaved": {
+    "message": "Already in favorite sites"
+  },
+  "quickLinkAdded": {
+    "message": "Added to favorite sites"
+  },
+  "quickLinkAddFailed": {
+    "message": "Could not add site. Please try again."
+  },
+  "quickLinkSuggestionHint": {
+    "message": "Select to edit"
+  },
   "addQuickLinkTitle": {
     "message": "Add a quick link"
   },
@@ -1334,5 +1344,35 @@
   },
   "engineInvalidConfig": {
     "message": "Some invalid engines were skipped."
+  },
+  "siteSavedTab": {
+    "message": "Saved"
+  },
+  "siteHistoryTab": {
+    "message": "History"
+  },
+  "sitePageSources": {
+    "message": "Website page sources"
+  },
+  "siteSearchTabs": {
+    "message": "Search tabs from this website"
+  },
+  "siteSearchSaved": {
+    "message": "Search saved titles, URLs or folders"
+  },
+  "siteSearchHistory": {
+    "message": "Search history from this website"
+  },
+  "siteQuickLinkSource": {
+    "message": "Homepage quick link"
+  },
+  "siteBookmarkSource": {
+    "message": "Bookmark"
+  },
+  "siteTabsDisabled": {
+    "message": "Open tabs are hidden in homepage settings."
+  },
+  "siteSourceEmpty": {
+    "message": "No $1 from this website."
   }
 }

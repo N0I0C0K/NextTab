@@ -178,7 +178,7 @@ export const LinkCardContextMenuContent = ({
                 </span>
               </ContextMenuItem>
             ))}
-            {(relatedBookmarks.length > 5 || bookmarkError) && (
+            {(relatedBookmarks.length > 0 || bookmarkError) && (
               <ContextMenuItem data-testid="all-site-bookmarks" onClick={() => onShowAll('bookmarks')}>
                 {bookmarkError
                   ? t('navigationReadFailed') + ' · ' + t('retryAction')
@@ -229,7 +229,7 @@ export const LinkCardContextMenuContent = ({
                 </span>
               </ContextMenuItem>
             ))}
-            {relatedTabs.length > 5 && (
+            {relatedTabs.length > 0 && (
               <ContextMenuItem data-testid="all-site-tabs" onClick={() => onShowAll('tabs')}>
                 {t('navigationAllTabs', String(relatedTabs.length))}
               </ContextMenuItem>
