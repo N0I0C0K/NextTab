@@ -280,13 +280,6 @@
   font-weight: 600;
   letter-spacing: 0.035em;
 }
-.nt-brand-mark {
-  width: 20px;
-  height: 20px;
-  border: 5px solid currentColor;
-  border-radius: 7px;
-  transform: rotate(-12deg);
-}
 .nt-main {
   width: min(100%, 784px);
   margin: 36px auto 0;

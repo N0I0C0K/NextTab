@@ -1,5 +1,6 @@
 import {
   forwardRef,
+  useCallback,
   useImperativeHandle,
   useLayoutEffect,
   useRef,
@@ -9,45 +10,36 @@ import {
 } from 'react'
 import type { PopupPage } from '../popup-pages'
 
-export type PopupScrollListHandle = { focusItem: (index: number) => void }
+export type PopupScrollListHandle = { scrollToItem: (index: number) => void }
 
-/** Native scrolling, with bounded rendering for long lists and a retained focused row. */
+/** Keep the active descendant mounted without moving input focus or fighting wheel scrolling. */
 export const PopupScrollList = forwardRef<
   PopupScrollListHandle,
   {
     items: PopupPage[]
     tiles: boolean
+    listbox: boolean
+    activeIndex: number
     scroll: RefObject<HTMLElement>
     renderItem: (item: PopupPage, tile: boolean, index: number) => ReactNode
   }
->(function PopupScrollList({ items, tiles, scroll, renderItem }, ref) {
-  const root = useRef<HTMLDivElement>(null)
-  const pendingFocus = useRef<number>()
-  const measuredLayout = useRef('')
-  const [focused, setFocused] = useState<number>()
-  const [viewport, setViewport] = useState({ top: 0, height: 400, columns: tiles ? 4 : 1, step: 52 })
+>(function PopupScrollList({ items, tiles, listbox, activeIndex, scroll, renderItem }, ref) {
+  const [viewport, setViewport] = useState({ ready: false, top: 0, height: 400, columns: tiles ? 4 : 1, step: 52 })
   useLayoutEffect(() => {
     const element = scroll.current
     if (!element) return
-    element.scrollTop = 0
     const measure = () => {
       const style = getComputedStyle(element)
       const columns = tiles ? Number(style.getPropertyValue('--popup-columns')) || 4 : 1
       const step = Number(style.getPropertyValue(tiles ? '--popup-grid-step' : '--popup-row-step')) || 52
-      const layout = `${columns}:${step}:${element.clientHeight}`
-      if (measuredLayout.current !== layout) {
-        const active = document.activeElement as HTMLElement | null
-        if (active && root.current?.contains(active) && active.dataset.popupIndex !== undefined)
-          pendingFocus.current = Number(active.dataset.popupIndex)
-        measuredLayout.current = layout
-      }
       setViewport(previous =>
+        previous.ready &&
         previous.top === element.scrollTop &&
         previous.height === element.clientHeight &&
         previous.columns === columns &&
         previous.step === step
           ? previous
-          : { top: element.scrollTop, height: element.clientHeight, columns, step },
+          : { ready: true, top: element.scrollTop, height: element.clientHeight, columns, step },
       )
     }
     measure()
@@ -60,56 +52,49 @@ export const PopupScrollList = forwardRef<
     }
   }, [scroll, tiles])
   const { columns, step, height, top } = viewport
+  const lastSelectionLayout = useRef('')
+  const activeId = items[activeIndex]?.id
+  const scrollToItem = useCallback(
+    (index: number) => {
+      const element = scroll.current
+      if (!element || index < 0 || index >= items.length) return
+      const itemTop = Math.floor(index / columns) * step
+      if (itemTop < element.scrollTop) element.scrollTop = itemTop
+      else if (itemTop + step > element.scrollTop + element.clientHeight)
+        element.scrollTop = itemTop + step - element.clientHeight
+      setViewport(previous => (previous.top === element.scrollTop ? previous : { ...previous, top: element.scrollTop }))
+    },
+    [columns, step, scroll, items.length],
+  )
+  useImperativeHandle(ref, () => ({ scrollToItem }), [scrollToItem])
+  useLayoutEffect(() => {
+    if (!viewport.ready) return
+    // A disappearing retry notice changes content height without a window resize.
+    const layout = `${activeId}:${columns}:${step}:${window.innerHeight}`
+    if (lastSelectionLayout.current === layout) return
+    const initial = !lastSelectionLayout.current
+    lastSelectionLayout.current = layout
+    // The parent owns initial scroll, including restoring search's previous position.
+    if (!initial) scrollToItem(activeIndex)
+  }, [activeId, activeIndex, columns, step, scrollToItem, height, viewport.ready])
   const rowCount = Math.ceil(items.length / columns)
   const renderAll = items.length <= (tiles ? 60 : 20)
   const first = renderAll ? 0 : Math.max(0, Math.floor(top / step) - 2)
   const last = renderAll ? rowCount : Math.min(rowCount, Math.ceil((top + height) / step) + 2)
   const rows = new Set(Array.from({ length: Math.max(0, last - first) }, (_, index) => first + index))
-  if (focused !== undefined && focused < items.length) rows.add(Math.floor(focused / columns))
-
-  useImperativeHandle(
-    ref,
-    () => ({
-      focusItem(index) {
-        const element = scroll.current
-        if (!element || index < 0 || index >= items.length) return
-        const itemTop = Math.floor(index / columns) * step
-        if (itemTop < element.scrollTop) element.scrollTop = itemTop
-        else if (itemTop + step > element.scrollTop + element.clientHeight)
-          element.scrollTop = itemTop + step - element.clientHeight
-        pendingFocus.current = index
-        setFocused(index)
-        setViewport(previous => ({ ...previous, top: element.scrollTop }))
-      },
-    }),
-    [columns, step, scroll, items.length],
-  )
-  useLayoutEffect(() => {
-    if (pendingFocus.current === undefined) return
-    const button = root.current?.querySelector<HTMLButtonElement>(`[data-popup-index="${pendingFocus.current}"]`)
-    if (button) {
-      button.focus({ preventScroll: true })
-      button.scrollIntoView({ block: 'nearest' })
-      pendingFocus.current = undefined
-    }
-  })
+  if (activeIndex >= 0 && activeIndex < items.length) rows.add(Math.floor(activeIndex / columns))
   return (
     <div
-      ref={root}
       className="popup-scroll-list"
       style={{ height: Math.max(0, rowCount * step - (tiles ? 6 : 0)) }}
-      onFocusCapture={event => {
-        const button = (event.target as HTMLElement).closest<HTMLButtonElement>('[data-popup-index]')
-        if (button) setFocused(Number(button.dataset.popupIndex))
-      }}
-      onBlurCapture={event => {
-        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setFocused(undefined)
-      }}>
+      role="presentation">
       {[...rows]
         .sort((a, b) => a - b)
         .map(row => (
           <div
             key={row}
+            role={listbox ? 'presentation' : 'row'}
+            aria-rowindex={listbox ? undefined : row + 1}
             className={tiles ? 'popup-scroll-row quick-url-grid' : 'popup-scroll-row'}
             style={{ top: row * step }}>
             {items

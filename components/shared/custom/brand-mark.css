@@ -1,0 +1,7 @@
+.nt-brand-mark {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  overflow: visible;
+  transform: rotate(-12deg);
+}

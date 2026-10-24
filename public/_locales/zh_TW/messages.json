@@ -1424,9 +1424,66 @@
     "message": "儲存失敗，請重試"
   },
   "popupNavigationHint": {
-    "message": "↑↓ 選擇 · Enter 開啟"
+    "message": "方向鍵選擇 · 直接輸入搜尋"
   },
   "popupLoadFailed": {
     "message": "常用網站讀取失敗"
+  },
+  "popupOpenTab": {
+    "message": "開啟新分頁"
+  },
+  "popupOpenWindow": {
+    "message": "開啟新視窗"
+  },
+  "popupOpenAdjacent": {
+    "message": "在目前分頁旁開啟"
+  },
+  "popupKeyboardHelp": {
+    "message": "快捷鍵說明"
+  },
+  "popupHelpOpen": {
+    "message": "開啟 NextTab"
+  },
+  "popupHelpAllSaved": {
+    "message": "查看全部常用網站"
+  },
+  "popupHelpAllSite": {
+    "message": "查看目前網站全部頁面"
+  },
+  "popupHelpSelect": {
+    "message": "選擇搜尋結果"
+  },
+  "popupHelpGrid": {
+    "message": "空白搜尋時瀏覽網格"
+  },
+  "popupHelpPage": {
+    "message": "向前／後移動一頁"
+  },
+  "popupHelpExecute": {
+    "message": "切換分頁或開啟頁面"
+  },
+  "popupHelpControls": {
+    "message": "存取其他操作按鈕"
+  },
+  "popupHelpBack": {
+    "message": "返回一層或關閉"
+  },
+  "popupShortcutUnassigned": {
+    "message": "未指派 · 請在瀏覽器中設定"
+  },
+  "popupSearchScopeHost": {
+    "message": "已儲存連結及 $1 分頁／近期記錄"
+  },
+  "popupSearchScopeSaved": {
+    "message": "搜尋已儲存連結"
+  },
+  "popupStartSelection": {
+    "message": "↓ 開始選擇"
+  },
+  "popupSearchKeyboardHint": {
+    "message": "↑↓ 選擇 · Esc 清空"
+  },
+  "popupShortcutUnavailable": {
+    "message": "無法讀取快捷鍵 · 請查看瀏覽器設定"
   }
 }
