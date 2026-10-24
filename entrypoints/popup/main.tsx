@@ -1,7 +1,7 @@
 import { createRoot } from 'react-dom/client'
 import '@/assets/global.css'
 import './style.css'
-import { ThemeProvider } from '@/components/shared'
+import { ThemeProvider } from '@/components/shared/provider/theme'
 import Popup from './App'
 
 function init() {

@@ -1204,7 +1204,7 @@ test('popup renders and shares quick links through extension storage', async ({ 
   expect(pageErrors).toEqual([])
 })
 
-test('popup quick links use compact rows and remain scrollable with many sites', async ({ page, extensionId }) => {
+test('popup previews eight links and scrolls the compact full list', async ({ page, extensionId }) => {
   await page.goto(`chrome-extension://${extensionId}/popup.html`)
   await page.evaluate(
     key =>
@@ -1219,7 +1219,7 @@ test('popup quick links use compact rows and remain scrollable with many sites',
   )
 
   const links = page.getByTestId('popup-quick-link')
-  await expect(links).toHaveCount(30)
+  await expect(links).toHaveCount(8)
   const layout = await page.evaluate(() => {
     const scrollArea = document.querySelector<HTMLElement>('.popup-content')!
     const grid = document.querySelector<HTMLElement>('.quick-url-grid')!
@@ -1232,8 +1232,10 @@ test('popup quick links use compact rows and remain scrollable with many sites',
       scrollable: scrollArea.scrollHeight > scrollArea.clientHeight,
     }
   })
-  expect(layout).toEqual({ columns: 2, cardHeight: 60, headerBorder: '0px', scrollable: true })
+  expect(layout).toEqual({ columns: 4, cardHeight: 46, headerBorder: '0px', scrollable: false })
 
+  await page.locator('.popup-section-heading button').click()
+  await expect(links).toHaveCount(30)
   await page.locator('.popup-content').evaluate(element => {
     element.scrollTop = element.scrollHeight
   })
@@ -1248,7 +1250,10 @@ test('popup quick links use compact rows and remain scrollable with many sites',
   // itself must establish its width instead of inheriting that viewport width.
   await page.setViewportSize({ width: 25, height: 600 })
   await expect(page.locator('body')).toHaveCSS('width', '480px')
-  await expect(page.locator('.quick-url-grid')).toHaveCSS('grid-template-columns', /\d+px \d+px/)
+  await expect(page.locator('.quick-url-grid').first()).toHaveCSS(
+    'grid-template-columns',
+    /[\d.]+px [\d.]+px [\d.]+px [\d.]+px/,
+  )
 })
 
 test('popup warns for a same-host page but only blocks exact duplicates', async ({ page, extensionId }) => {

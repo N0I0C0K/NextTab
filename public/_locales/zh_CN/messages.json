@@ -1374,5 +1374,59 @@
   },
   "siteSourceEmpty": {
     "message": "当前没有此网站的$1"
+  },
+  "popupSearchPlaceholder": {
+    "message": "搜索常用网站或当前站点页面…"
+  },
+  "popupCurrentSite": {
+    "message": "当前站点"
+  },
+  "popupCurrentHost": {
+    "message": "当前站点 · $1"
+  },
+  "popupNoSitePages": {
+    "message": "暂无同站点的其他标签或最近访问页面"
+  },
+  "popupSiteLoadFailed": {
+    "message": "部分站点页面读取失败"
+  },
+  "popupBack": {
+    "message": "返回"
+  },
+  "popupSearchResults": {
+    "message": "搜索结果"
+  },
+  "popupPages": {
+    "message": "常用网站与站点页面"
+  },
+  "popupThisWindow": {
+    "message": "当前窗口"
+  },
+  "popupOtherWindow": {
+    "message": "其他窗口"
+  },
+  "popupSwitch": {
+    "message": "切换"
+  },
+  "popupReopen": {
+    "message": "重开"
+  },
+  "popupOpen": {
+    "message": "打开"
+  },
+  "popupSaveCurrent": {
+    "message": "保存当前页"
+  },
+  "popupSaved": {
+    "message": "已保存"
+  },
+  "popupSaveFailed": {
+    "message": "保存失败，请重试"
+  },
+  "popupNavigationHint": {
+    "message": "↑↓ 选择 · Enter 打开"
+  },
+  "popupLoadFailed": {
+    "message": "常用网站读取失败"
   }
 }

@@ -19,6 +19,7 @@ for (const [name, source] of [
   ['store', 'utils/page-activity/store.ts'],
   ['return-pages', 'entrypoints/newtab/services/return-pages.ts'],
   ['quick-link-suggestions', 'entrypoints/newtab/services/quick-link-suggestions.ts'],
+  ['popup-pages', 'entrypoints/popup/popup-pages.ts'],
 ]) {
   const input = await readFile(path.join(root, source), 'utf8')
   sourceHashes[source] = createHash('sha256').update(input).digest('hex')
@@ -61,6 +62,16 @@ for (const source of [
   'components/shared/ui/dialog.tsx',
   'entrypoints/newtab/components/setting-pannel.tsx',
   'entrypoints/newtab/components/settings/SearchEngineSettings.tsx',
+  'entrypoints/popup/App.tsx',
+  'entrypoints/popup/main.tsx',
+  'components/shared/provider/theme.tsx',
+  'entrypoints/popup/App.css',
+  'entrypoints/popup/style.css',
+  'entrypoints/popup/usePopupSite.ts',
+  'entrypoints/popup/components/PopupPageButton.tsx',
+  'entrypoints/popup/components/PopupScrollList.tsx',
+  'components/shared/custom/quick-link-icon.tsx',
+  'entrypoints/popup/components/AddCurrentPageButton.tsx',
 ]) {
   sourceHashes[source] = createHash('sha256')
     .update(await readFile(path.join(root, source)))
@@ -103,6 +114,7 @@ try {
           const { ActivityLogStore } = await import('/store.js')
           const { fetchReturnPages, rankRecentPages, OPEN_TAB_MULTIPLIER } = await import('/return-pages.js')
           const { ACTIVITY_BYTE_BUDGET, ACTIVITY_WINDOW_MS, DAY_MS } = await import('/model.js')
+          const { buildPopupSitePages, previewPopupSitePages } = await import('/popup-pages.js')
           const now = Date.now()
           const encoder = new TextEncoder()
           const bytes = value => encoder.encode(JSON.stringify(value)).length
@@ -312,6 +324,11 @@ try {
           const recentWith1000Tabs = await measure(() => fetchReturnPages('recent'), 12)
           const queriesWith1000Tabs = tabQueries - beforeQueries
           if (queriesWith1000Tabs !== 13) throw new Error('Recommendation queries tabs more than once per request')
+          const popupContext = { id: -1, windowId: 0, incognito: false, url: 'https://perf.example/current' }
+          const popupSitePages = await measure(() => {
+            const { opened, recent } = buildPopupSitePages(popupContext, openTabs, history)
+            if (previewPopupSitePages(opened, recent).length !== 4) throw new Error('Popup preview exceeds its budget')
+          })
           // Retain only the largest snapshot for a post-GC memory measurement and UI stress test.
           window.performanceSnapshot = snapshot
           delete window.chrome
@@ -319,6 +336,7 @@ try {
             cpuSlowdown: rate,
             scoring,
             openTabRanking,
+            popupSitePages: { ...popupSitePages, tabs: openTabs.length, history: history.length },
             storage,
             recentWithApiDoubles: recent,
             recentWith1000Tabs: { ...recentWith1000Tabs, tabs: openTabs.length, tabQueries: queriesWith1000Tabs },
@@ -358,6 +376,7 @@ try {
   })
   const ui = []
   const navigationUi = []
+  const popupUi = []
   try {
     let [worker] = context.serviceWorkers()
     worker ??= await context.waitForEvent('serviceworker')
@@ -499,20 +518,28 @@ try {
         ],
       })
     })
-    const measureNavigation = async (name, action, selector, total, rows, eventType = 'click') => {
-      await view.evaluate(
-        ({ selector, total, rows, eventType }) => {
+    const measureNavigation = async (
+      name,
+      action,
+      selector,
+      total,
+      rows,
+      eventType = 'click',
+      target = view,
+      rowSelector = '[data-testid="navigation-row"]',
+    ) => {
+      await target.evaluate(
+        ({ selector, total, rows, eventType, rowSelector }) => {
           window.navigationMeasurement = null
           let start = 0
           const observer = new MutationObserver(() => {
             const list = document.querySelector(selector)
-            if (
-              !start ||
-              !list ||
-              Number(list.dataset.total) !== total ||
-              list.querySelectorAll('[data-testid="navigation-row"]').length !== rows
-            )
-              return
+            const mounted = list?.querySelectorAll(rowSelector).length ?? 0
+            const readyRows =
+              typeof rows === 'number'
+                ? mounted === rows
+                : mounted >= rows.min && mounted <= rows.max && (!rows.contains || list?.querySelector(rows.contains))
+            if (!start || !list || Number(list.dataset.total) !== total || !readyRows) return
             observer.disconnect()
             requestAnimationFrame(() => {
               window.navigationMeasurement = { readyMs: performance.now() - start }
@@ -532,15 +559,15 @@ try {
             { capture: true, once: true },
           )
         },
-        { selector, total, rows, eventType },
+        { selector, total, rows, eventType, rowSelector },
       )
       await action()
-      await view.waitForFunction(() => window.navigationMeasurement, undefined, { timeout: 60000 })
+      await target.waitForFunction(() => window.navigationMeasurement, undefined, { timeout: 60000 })
       return {
         name,
-        ...(await view.evaluate(() => window.navigationMeasurement)),
+        ...(await target.evaluate(() => window.navigationMeasurement)),
         candidates: total,
-        mountedRows: rows,
+        mountedRows: await target.locator(selector).locator(rowSelector).count(),
       }
     }
     for (const rate of [1, 6]) {
@@ -626,6 +653,137 @@ try {
       await view.locator('[data-testid="site-pages-dialog"] input').press('Escape')
       console.log(`Completed search/navigation UI at ${rate}x CPU slowdown`)
     }
+    const popup = await context.newPage()
+    await popup.setViewportSize({ width: 480, height: 700 })
+    await popup.addInitScript(
+      ({ tabs }) => {
+        const current = { id: -1, windowId: 0, index: 0, incognito: false, url: 'https://perf.example/current' }
+        const history = Array.from({ length: 1000 }, (_, index) => ({
+          id: String(index),
+          url: `https://perf.example/history/${index}`,
+          title: `History ${index}`,
+          lastVisitTime: Date.now() - index * 1000,
+        }))
+        window.popupApiCalls = { activeTabs: 0, tabs: 0, history: 0 }
+        window.popupHomeReadyMs = 0
+        const observer = new MutationObserver(() => {
+          const list = document.querySelector('.popup-content[aria-busy="false"]')
+          if (!list || list.querySelectorAll('[data-popup-result]').length !== 12) return
+          observer.disconnect()
+          requestAnimationFrame(() => {
+            window.popupHomeReadyMs = performance.now()
+          })
+        })
+        observer.observe(document, { childList: true, subtree: true, attributes: true, attributeFilter: ['aria-busy'] })
+        Object.defineProperty(chrome.tabs, 'query', {
+          value: async query => {
+            window.popupApiCalls[query.active ? 'activeTabs' : 'tabs']++
+            return query.active ? [current] : tabs
+          },
+        })
+        Object.defineProperty(chrome.history, 'search', {
+          value: async () => {
+            window.popupApiCalls.history++
+            return history
+          },
+        })
+      },
+      { tabs: makeTabs(1000, 2000) },
+    )
+    const popupSession = await context.newCDPSession(popup)
+    for (const rate of [1, 6]) {
+      await popupSession.send('Emulation.setCPUThrottlingRate', { rate })
+      await popup.goto(`chrome-extension://${extensionId}/popup.html`)
+      await popup.locator('.popup-content[aria-busy="false"]').waitFor()
+      await popup.waitForFunction(() => window.popupHomeReadyMs > 0)
+      const homeReadyMs = await popup.evaluate(() => window.popupHomeReadyMs)
+      const homeRows = await popup.locator('[data-popup-result]').count()
+      if (homeRows !== 12) throw new Error('Popup mounted too many preview rows')
+      const measurements = []
+      measurements.push(
+        await measureNavigation(
+          'popup-site-open',
+          () => popup.locator('.popup-site-section .popup-section-heading button').click(),
+          '.popup-content',
+          1800,
+          { min: 1, max: 20 },
+          'click',
+          popup,
+          '[data-popup-result]',
+        ),
+      )
+      measurements.push(
+        await measureNavigation(
+          'popup-site-scroll-end',
+          () =>
+            popup.locator('.popup-content').evaluate(element => {
+              element.scrollTop = element.scrollHeight
+            }),
+          '.popup-content',
+          1800,
+          { min: 1, max: 20, contains: '[data-popup-result="history:https://perf.example/history/999"]' },
+          'scroll',
+          popup,
+          '[data-popup-result]',
+        ),
+      )
+      measurements.push(
+        await measureNavigation(
+          'popup-site-search',
+          () => popup.getByRole('searchbox').fill('ref=tab-999'),
+          '.popup-content',
+          1,
+          1,
+          'input',
+          popup,
+          '[data-popup-result]',
+        ),
+      )
+      await popup.getByRole('searchbox').press('Escape')
+      measurements.push(
+        await measureNavigation(
+          'popup-saved-open',
+          () => popup.locator('.popup-section-heading button').first().click(),
+          '.popup-content',
+          100,
+          { min: 1, max: 60 },
+          'click',
+          popup,
+          '[data-popup-result]',
+        ),
+      )
+      measurements.push(
+        await measureNavigation(
+          'popup-saved-scroll-end',
+          () =>
+            popup.locator('.popup-content').evaluate(element => {
+              element.scrollTop = element.scrollHeight
+            }),
+          '.popup-content',
+          100,
+          { min: 1, max: 60, contains: '[data-popup-result="saved:99"]' },
+          'scroll',
+          popup,
+          '[data-popup-result]',
+        ),
+      )
+      const apiCalls = await popup.evaluate(() => window.popupApiCalls)
+      if (Object.values(apiCalls).some(count => count !== 1))
+        throw new Error('Popup repeated API queries during search')
+      await popupSession.send('HeapProfiler.collectGarbage')
+      popupUi.push({
+        cpuSlowdown: rate,
+        tabs: 1000,
+        history: 1000,
+        savedLinks: 100,
+        homeRows,
+        homeReadyMs,
+        measurements,
+        apiCalls,
+        heapMiB: (await popupSession.send('Runtime.getHeapUsage')).usedSize / 1024 ** 2,
+      })
+      console.log(`Completed popup UI at ${rate}x CPU slowdown`)
+    }
   } finally {
     await context.close()
   }
@@ -641,6 +799,7 @@ try {
     runs,
     ui,
     navigationUi,
+    popupUi,
   }
   const output = path.join(root, 'artifacts/performance-return-pages')
   await mkdir(output, { recursive: true })

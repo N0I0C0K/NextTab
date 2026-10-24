@@ -53,6 +53,11 @@ export default defineConfig({
     action: {
       default_icon: 'icon-34.png',
     },
+    commands: {
+      _execute_action: {
+        suggested_key: { default: 'Alt+Shift+K' },
+      },
+    },
     icons: {
       128: 'icon-128.png',
     },

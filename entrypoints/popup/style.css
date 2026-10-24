@@ -8,3 +8,10 @@ body {
 .dark body {
   background: #101114;
 }
+
+/* Keep the popup's initial measuring viewport from collapsing its requested width. */
+@media (min-width: 100px) and (max-width: 479px) {
+  body {
+    width: 100vw;
+  }
+}

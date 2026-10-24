@@ -1374,5 +1374,59 @@
   },
   "siteSourceEmpty": {
     "message": "No $1 from this website."
+  },
+  "popupSearchPlaceholder": {
+    "message": "Search saved links or this site’s pages…"
+  },
+  "popupCurrentSite": {
+    "message": "Current site"
+  },
+  "popupCurrentHost": {
+    "message": "Current site · $1"
+  },
+  "popupNoSitePages": {
+    "message": "No other open or recently visited pages on this site."
+  },
+  "popupSiteLoadFailed": {
+    "message": "Some site pages could not be loaded."
+  },
+  "popupBack": {
+    "message": "Back"
+  },
+  "popupSearchResults": {
+    "message": "Search results"
+  },
+  "popupPages": {
+    "message": "Saved links and site pages"
+  },
+  "popupThisWindow": {
+    "message": "This window"
+  },
+  "popupOtherWindow": {
+    "message": "Another window"
+  },
+  "popupSwitch": {
+    "message": "Switch"
+  },
+  "popupReopen": {
+    "message": "Reopen"
+  },
+  "popupOpen": {
+    "message": "Open"
+  },
+  "popupSaveCurrent": {
+    "message": "Save page"
+  },
+  "popupSaved": {
+    "message": "Saved"
+  },
+  "popupSaveFailed": {
+    "message": "Could not save. Try again."
+  },
+  "popupNavigationHint": {
+    "message": "↑↓ Select · Enter Open"
+  },
+  "popupLoadFailed": {
+    "message": "Could not load saved links."
   }
 }
