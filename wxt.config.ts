@@ -10,7 +10,15 @@ export default defineConfig({
   modules: ['@wxt-dev/module-react'],
   zip: {
     // WXT source ZIPs do not use .gitignore; keep local traces and credentials out.
-    excludeSources: ['artifacts/**', 'test-results/**', 'playwright-report/**', 'coverage/**', '.env', '.env.*'],
+    excludeSources: [
+      'artifacts/**',
+      'test-results/**',
+      'playwright-report/**',
+      'coverage/**',
+      '**/*.timestamp-*',
+      '.env',
+      '.env.*',
+    ],
   },
   // Keep Chrome's locale files as the single source while avoiding /public module requests in dev.
   vite: () => ({

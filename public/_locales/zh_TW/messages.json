@@ -111,10 +111,7 @@
   },
   "popupKeyboardHint": {
     "description": "Popup keyboard shortcuts hint",
-    "message": "$modifier$ + 點選：新標籤頁開啟 | Shift + $modifier$ + 點選：在當前 Tab 旁邊開啟",
-    "placeholders": {
-      "modifier": { "content": "$1" }
-    }
+    "message": "Ctrl/⌘+點選：新標籤頁開啟 | Shift + Ctrl/⌘ + 點選：在當前 Tab 旁邊開啟"
   },
   "keyboardControlKey": {
     "description": "Localized label for the Control key",

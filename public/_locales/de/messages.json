@@ -107,10 +107,7 @@
   },
   "popupKeyboardHint": {
     "description": "Popup keyboard shortcuts hint",
-    "message": "$modifier$ + Klick zum Öffnen in neuem Tab | Umschalt + $modifier$ + Klick zum Öffnen neben dem aktuellen Tab",
-    "placeholders": {
-      "modifier": { "content": "$1" }
-    }
+    "message": "Strg/⌘ + Klick zum Öffnen in neuem Tab | Umschalt + Strg/⌘ + Klick zum Öffnen neben dem aktuellen Tab"
   },
   "keyboardControlKey": {
     "description": "Localized label for the Control key",

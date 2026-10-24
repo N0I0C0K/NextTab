@@ -42,10 +42,10 @@ English summary: A clean new tab for searching tabs, bookmarks and history, retu
 - 桌面最低版本：Firefox 140.0，以使用内置的可选数据授权。
 - 1.5.1 已移除 `gecko_android` 声明，仅面向桌面 Firefox；Android 不支持当前首页使用的 `chrome_url_overrides.newtab`。此前提交的 1.5.0 仍含 Android 声明，需用匹配的 1.5.1 发布包与源码更新 AMO，仓库修复不会自动修改商店中已上传的版本。
 - 必需数据类型：`none`；可选类型：`authenticationInfo`、`personallyIdentifyingInfo`、`technicalAndInteraction`，对应 MQTT 频道密钥、显示名称和消息元数据。核心搜索与推荐不依赖这些可选权限。
-- 构建方法：Node.js 20.19+、pnpm 9.9，`pnpm install --frozen-lockfile` 后执行 `pnpm build:firefox`。PNG 与字标已包含在源码中，构建无需运行图标生成器或安装 Chromium。
+- 构建方法：Node.js 24.22.1+（使用 `.nvmrc` 固定版本）、pnpm 9.9，`pnpm install --frozen-lockfile` 后执行 `pnpm build:firefox`。PNG 与字标已包含在源码中，构建无需运行图标生成器或安装 Chromium。
 - 上传前用 `pnpm exec web-ext lint --source-dir .output/firefox-mv3` 校验包，再在 Firefox 140+ 中核对新标签页、Popup、明暗主题及 MQTT 授权／撤销。
 
-1.5.0 已由用户在 AMO 完成首次提交；上次核对时等待审核，尚未公开上架。源码、版本说明、审核说明、隐私说明、图标和两张主题截图已保存。1.5.1 是本轮 review 后的修复版本，尚待用户最终确认提交；正式截图仍需按上述场景完善。本地构建的 ZIP 是未签名原始包，签名与审核由 AMO 处理。
+1.5.0 曾由用户在 AMO 完成首次提交；2026-10-14 记录为等待审核，此状态不代表当前商店状态，提交前需在 AMO 后台核实。1.5.1 包含后续首页、站点详情与 Popup 键盘导航改进，应使用本次构建生成的包及匹配源码，并更新正式截图。本地构建的 ZIP 是未签名原始包，签名与审核由 AMO 处理。
 
 依据：[Firefox 扩展 ID](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/manifest.json/browser_specific_settings)、[内置数据授权](https://extensionworkshop.com/documentation/develop/firefox-builtin-data-consent/)、[Android 兼容声明与 AMO 控制](https://extensionworkshop.com/documentation/publish/version-compatibility/)。
 

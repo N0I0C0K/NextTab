@@ -111,10 +111,7 @@
   },
   "popupKeyboardHint": {
     "description": "Popup keyboard shortcuts hint",
-    "message": "$modifier$ + 点击：新标签页打开 | Shift + $modifier$ + 点击：在当前 Tab 旁边打开",
-    "placeholders": {
-      "modifier": { "content": "$1" }
-    }
+    "message": "Ctrl/⌘+点击：新标签页打开 | Shift + Ctrl/⌘ + 点击：在当前 Tab 旁边打开"
   },
   "keyboardControlKey": {
     "description": "Localized label for the Control key",

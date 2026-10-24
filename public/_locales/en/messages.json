@@ -107,10 +107,7 @@
   },
   "popupKeyboardHint": {
     "description": "Popup keyboard shortcuts hint",
-    "message": "$modifier$ + Click to open in new tab | Shift + $modifier$ + Click to open next to current tab",
-    "placeholders": {
-      "modifier": { "content": "$1" }
-    }
+    "message": "Ctrl/⌘ + Click to open in new tab | Shift + Ctrl/⌘ + Click to open next to current tab"
   },
   "keyboardControlKey": {
     "description": "Localized label for the Control key",

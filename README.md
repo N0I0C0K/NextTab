@@ -165,7 +165,7 @@ pnpm dev
 ## 浏览器支持
 
 - ✅ Chrome/Edge (推荐)
-- ✅ 桌面 Firefox 140+（首次提交等待审核，尚未公开上架）
+- ✅ 桌面 Firefox 140+（构建与商店提交说明见 [商店提交材料](doc/STORE_LISTING.md)）
 - ⚠️ 其他基于 Chromium 的浏览器（未测试）
 
 ## 开源协议

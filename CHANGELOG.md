@@ -4,11 +4,17 @@
 
 ### 简体中文
 
+- 完善 Popup 同站点页面切换、搜索、键盘帮助和自适应预览，支持 Alt/Option + 1、2 进入完整列表。
+- 新增常用网站搜索、自定义搜索引擎和站点详情分组，优化首页时钟及保存入口。
+- 将构建环境统一到 Node.js 24.22.1+。
 - 移除 Android 兼容声明；Firefox Android 不支持当前首页使用的新标签页覆盖接口，此轮仅发布桌面 Firefox 140+。
 - 修复 MQTT 更换服务与频道后向新服务发送旧频道主题的问题；新客户端保留提醒主题定义，但不继承旧会话的订阅状态，旧订阅确认晚到也不会污染新会话。
 
 ### English
 
+- Improved popup contextual navigation, search, keyboard help, and adaptive previews, with Alt/Option + 1 and 2 opening full lists.
+- Added saved-site search, custom search engines, and grouped site details; improved the homepage clock and save actions.
+- Standardized builds on Node.js 24.22.1+.
 - Removed the Android compatibility declaration because Firefox for Android does not support the new-tab override used by NextTab. This release targets desktop Firefox 140+.
 - Prevented old MQTT channel topics from being sent to a replacement broker. New clients retain reminder topic definitions without inheriting prior subscription state, including late acknowledgements from an old client.
 

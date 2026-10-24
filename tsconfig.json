@@ -10,5 +10,6 @@
     "noImplicitOverride": false,
     "noUncheckedIndexedAccess": false,
     "types": ["chrome", "node"]
-  }
+  },
+  "exclude": ["**/node_modules/**", ".output/**", "artifacts/**"]
 }

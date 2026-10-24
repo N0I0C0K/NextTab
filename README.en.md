@@ -165,7 +165,7 @@ For more details, please refer to [DEVELOPMENT.en.md](DEVELOPMENT.en.md).
 ## Browser Support
 
 - ✅ Chrome/Edge (Recommended)
-- ✅ Desktop Firefox 140+ (first submission awaiting review; not publicly listed yet)
+- ✅ Desktop Firefox 140+ (see [store submission materials](doc/STORE_LISTING.md) for builds and submission details)
 - ⚠️ Other Chromium-based browsers (Untested)
 
 ## License

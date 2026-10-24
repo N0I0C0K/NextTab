@@ -1,4 +1,6 @@
 import { test, expect } from './fixtures'
+import { mkdir } from 'node:fs/promises'
+import path from 'node:path'
 
 const platforms = [
   { name: 'Windows', userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)', mac: false },
@@ -7,22 +9,9 @@ const platforms = [
 ]
 
 for (const locale of [
-  {
-    code: 'en-US',
-    control: 'Ctrl',
-    hint: (key: string) => `${key} + Click to open in new tab | Shift + ${key} + Click to open next to current tab`,
-  },
-  {
-    code: 'zh-CN',
-    control: 'Ctrl',
-    hint: (key: string) => `${key} + 点击：新标签页打开 | Shift + ${key} + 点击：在当前 Tab 旁边打开`,
-  },
-  {
-    code: 'de',
-    control: 'Strg',
-    hint: (key: string) =>
-      `${key} + Klick zum Öffnen in neuem Tab | Umschalt + ${key} + Klick zum Öffnen neben dem aktuellen Tab`,
-  },
+  { code: 'en-US', control: 'Ctrl' },
+  { code: 'zh-CN', control: 'Ctrl' },
+  { code: 'de', control: 'Strg' },
 ]) {
   test.describe(`platform shortcuts in ${locale.code}`, () => {
     test.use({ extensionLocale: locale.code })
@@ -31,7 +20,7 @@ for (const locale of [
       test(`shows ${platform.name} keys and focuses the command input with the advertised shortcut`, async ({
         page,
         extensionId,
-      }, testInfo) => {
+      }) => {
         await page.addInitScript(userAgent => {
           Object.defineProperty(navigator, 'userAgent', { get: () => userAgent })
         }, platform.userAgent)
@@ -43,16 +32,34 @@ for (const locale of [
             'quick-url-item-storage-key': [{ id: 'shortcut', title: 'Shortcut example', url: 'https://example.com/' }],
           }),
         )
-        const hint = page.getByTestId('popup-keyboard-hint')
-        await expect(hint).toHaveText(locale.hint(platform.mac ? '⌘' : locale.control))
-        await expect(hint).toBeInViewport({ ratio: 1 })
+        await page.locator('.popup-help-button').click()
+        const help = page.getByRole('dialog')
+        await expect(help).toBeVisible()
+        const labels = await page.evaluate(() => ({
+          newTab: chrome.i18n.getMessage('popupOpenTab'),
+          allSaved: chrome.i18n.getMessage('popupHelpAllSaved'),
+        }))
+        await expect(help.getByText(labels.newTab, { exact: true }).locator('..').locator('kbd')).toHaveText([
+          platform.mac ? '⌘' : locale.control,
+          'Enter',
+        ])
+        await expect(help.getByText(labels.allSaved, { exact: true }).locator('..').locator('kbd')).toHaveText([
+          platform.mac ? 'Option' : 'Alt',
+          '1',
+        ])
         if (locale.code === 'zh-CN') {
-          await page.screenshot({ path: testInfo.outputPath('popup-light.png') })
-          await page.setViewportSize({ width: 480, height: 340 })
+          const folder = path.resolve('artifacts/requirements/pr-108-release')
+          await mkdir(folder, { recursive: true })
+          await page.screenshot({ path: path.join(folder, `popup-${platform.name}-light.png`) })
+          await page.setViewportSize({ width: 320, height: 340 })
           await page.evaluate(() => chrome.storage.local.set({ 'theme-storage-key': 'dark' }))
           await expect(page.locator('html')).toHaveClass(/dark/)
-          await expect(hint).toBeInViewport({ ratio: 1 })
-          await page.screenshot({ path: testInfo.outputPath('popup-dark-short.png') })
+          await expect(help.getByRole('button')).toBeInViewport()
+          await help.locator('.popup-help-body').evaluate(element => {
+            element.scrollTop = element.scrollHeight
+          })
+          await expect(help.locator('.popup-help-body > div').last()).toBeInViewport()
+          await page.screenshot({ path: path.join(folder, `popup-${platform.name}-dark-short.png`) })
         }
         await page.setViewportSize({ width: 1440, height: 1000 })
         await page.goto(`chrome-extension://${extensionId}/newtab.html`)
@@ -63,6 +70,19 @@ for (const locale of [
         await expect(command).not.toBeFocused()
         await page.keyboard.press(platform.mac ? 'Meta+k' : 'Alt+k')
         await expect(command).toBeFocused()
+        if (locale.code === 'zh-CN' && platform.name === 'Windows') {
+          const folder = path.resolve('artifacts/requirements/pr-108-release')
+          for (const [width, height] of [
+            [1440, 1000],
+            [390, 700],
+            [900, 360],
+          ]) {
+            await page.setViewportSize({ width, height })
+            await expect(command).toBeInViewport()
+            await expect(page.locator('svg.nt-brand-mark')).toBeVisible()
+            await page.screenshot({ path: path.join(folder, `newtab-${width}-${height}.png`) })
+          }
+        }
       })
     }
   })

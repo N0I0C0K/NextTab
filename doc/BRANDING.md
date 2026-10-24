@@ -1,6 +1,6 @@
 # NextTab Logo
 
-`public/icon.svg` 是图形源文件：逆时针倾斜 12° 的粗边圆角方框。新标签页和 Popup 用它作为 CSS mask，颜色跟随当前主题。
+`public/icon.svg` 是图标导出的图形源文件：逆时针倾斜 12° 的粗边圆角方框。新标签页和 Popup 复用 `components/shared/custom/brand-mark.tsx` 中相同几何图形的内联 SVG，按各自尺寸等比缩放，颜色跟随当前主题。修改图形时同步两处定义，保留共享组件及现有布局。
 
 扩展图标在同一图形外添加浅色圆角底和细边界，使它在明暗工具栏上都能辨认。`public/icon-128.png` 同时用于扩展安装、商店图标和通知。图标尺寸与格式遵循 [Chrome 扩展图标文档](https://developer.chrome.com/docs/extensions/reference/manifest/icons) 和 [工具栏图标文档](https://developer.chrome.com/docs/extensions/reference/api/action#icon)。
 
