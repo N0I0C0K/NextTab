@@ -49,7 +49,6 @@ NextTab is a new tab page extension focused on boosting browser efficiency with 
 - 📱 **Responsive Design** - Adapts to various screen sizes for a consistent experience
 - 🔒 **Privacy Focused** - Core features run locally. Page usage records and recommendation preferences stay in your browser, with no user data collection
 - 💾 **Data Backups** - Export and import quick links and settings for backups or migration
-- 🌐 **Cross-Device Reminders** - Send and receive drink-water reminders via MQTT (optional), with data disclosure and authorization before connecting
 
 ## 📸 Feature Showcase
 
