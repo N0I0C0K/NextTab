@@ -1,5 +1,15 @@
 # 更新日志 / Changelog
 
+## Unreleased / 未发布
+
+### 简体中文
+
+<!-- 在此记录尚未发布的用户可感知变更；发版时移入带版本号和日期的章节。 -->
+
+### English
+
+<!-- Record unreleased user-visible changes here; move them to a dated version section when releasing. -->
+
 ## 1.5.1
 
 ### 简体中文

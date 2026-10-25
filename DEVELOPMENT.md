@@ -93,7 +93,9 @@ Logo 源文件、导出命令和使用规则见 [品牌资源](doc/BRANDING.md)�
 
 双浏览器商店提交文件、权限用途和 Firefox 首次上架配置见 [商店提交材料](doc/STORE_LISTING.md)。Firefox 包面向桌面 140+，固定 ID 和 MQTT 可选数据权限由 `wxt.config.ts` 声明；首次签名与后续更新应沿用同一 ID。
 
-发布时先用 `pnpm update-version <版本>` 更新根目录 `package.json`，同步更新 [更新日志](CHANGELOG.md) 和中英文 README 中的源码版本。WXT 从 `package.json` 生成 Chrome 与 Firefox manifest，「关于」页面读取当前 manifest 的版本。
+完成新功能、用户可感知的改进或问题修复时，在同一次变更中更新 [更新日志](CHANGELOG.md) 顶部的 `Unreleased / 未发布` 区域，保持中英文对应。描述用户能感知的行为与收益；不影响用户的内部重构、测试和文档修改无需记录。开发新功能本身不触发版本升级或发布。
+
+发布时将待发布条目归入带版本号和发布日期的章节，保留空的未发布区域。用 `pnpm update-version <版本>` 更新根目录 `package.json`，同步更新中英文 README 中的源码版本。WXT 从 `package.json` 生成 Chrome 与 Firefox manifest，「关于」页面读取当前 manifest 的版本。
 
 完成 `pnpm check` 和 `pnpm test:e2e` 后，运行 `pnpm zip` 与 `pnpm zip:firefox`，核对包内 manifest 的版本、图标和页面。GitHub Release 使用对应的 `v<版本>` 标签及更新日志；工作流会校验标签与 `package.json` 一致，再检查类型、lint、单测并上传双浏览器 ZIP 和 Firefox 源码包。商店上传使用生产 ZIP，商店图标使用 `public/icon-128.png`。
 
