@@ -4,11 +4,11 @@
 
 ### 简体中文
 
-<!-- 在此记录尚未发布的用户可感知变更；发版时移入带版本号和日期的章节。 -->
+<!-- 未发布草稿：同一功能持续更新已有条目。发版前核对实际发布范围、合并去重并整理中英文说明，再移入带版本号和日期的章节。 -->
 
 ### English
 
-<!-- Record unreleased user-visible changes here; move them to a dated version section when releasing. -->
+<!-- Working draft: update existing entries as a feature evolves. Before releasing, reconcile the shipping scope, merge duplicates, and edit matching Chinese and English notes, then move them to a dated version section. -->
 
 ## 1.5.1
 
