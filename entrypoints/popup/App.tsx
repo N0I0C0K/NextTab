@@ -8,6 +8,7 @@ import { getDisplayQuickUrls, quickUrlItemsStorage } from '@/utils/storage/impl/
 import { settingStorage } from '@/utils/storage/impl/settingsStorage'
 import { matchesSearch, searchQuickLinks } from '@/utils/quick-link-search'
 import { t } from '@/utils/i18n'
+import { isMacOS } from '@/utils/platform'
 import { AddCurrentPageButton } from './components/AddCurrentPageButton'
 import { PopupPageButton } from './components/PopupPageButton'
 import { PopupScrollList, type PopupScrollListHandle } from './components/PopupScrollList'
@@ -36,7 +37,7 @@ function SectionHeading({
         <button type="button" onClick={onAll} aria-keyshortcuts={`Alt+${shortcut}`}>
           {t('returnViewAll')}
           <kbd aria-hidden="true">
-            {/Mac/i.test(navigator.userAgent) ? 'Option' : 'Alt'} {shortcut}
+            {isMacOS() ? 'Option' : 'Alt'} {shortcut}
           </kbd>
           <ChevronRight size={12} />
         </button>

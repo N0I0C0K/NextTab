@@ -36,6 +36,12 @@ Preserve current Profile and normal/incognito boundaries when reading tabs, acti
 
 Reuse `utils/i18n` and `public/_locales/` for visible strings, with existing platform-aware shortcut conventions. Reuse current extension API and message patterns.
 
+## Changelog and releases
+
+When implementing a feature, user-visible improvement, or bug fix, update the top `Unreleased / 未发布` section of [CHANGELOG.md](CHANGELOG.md) in the same change. Treat it as a concise working draft: update an existing entry when iterating on the same feature, remove entries for reverted changes, and avoid a new bullet for every commit or draft iteration. Keep Simplified Chinese and English entries aligned and describe the behavior and benefit to users. Internal refactors, tests, and documentation-only edits do not need entries unless they affect users. Preserve published version history.
+
+When the user requests a release, first reconcile the draft against the changes actually shipping since the previous published version. Merge overlapping entries, remove reverted or unshipped work and implementation chatter, group by user-facing topic, and rewrite concise release notes with matching Chinese and English content. Only then move the finalized notes into a version section with its release date and retain an empty Unreleased section. Use these finalized notes for GitHub and store release descriptions. Follow [DEVELOPMENT.md](DEVELOPMENT.md) to update versions, validate, package, and publish; ordinary feature work does not itself authorize a version bump or release.
+
 ## Verification and review
 
 Choose checks for the changed behavior and use [DEVELOPMENT.md](DEVELOPMENT.md) for the commands:

@@ -28,6 +28,8 @@ pnpm build:firefox
 pnpm zip
 pnpm zip:firefox
 pnpm check           # Types, lint, unit tests, and both browser builds
+pnpm icons:generate  # Generate icons and wordmarks from the SVG source
+pnpm update-version 1.5.1 # Update both manifests and ZIP filenames through package.json
 ```
 
 Install the Playwright browser before the first E2E run:
@@ -77,3 +79,15 @@ Local wallpaper data remains in IndexedDB because large base64 values should not
 - CI runs unit tests, Chrome E2E, and a Firefox build.
 
 The project uses TypeScript, Tailwind CSS, shadcn/ui, and Prettier. Run `pnpm check` before submitting changes.
+
+See [Brand assets](doc/BRANDING.md) for the Logo source, exports, and usage.
+
+See [Store submission materials](doc/STORE_LISTING.md) for package files, permission purposes, and the first Firefox submission. The Firefox build targets desktop 140+, with its stable ID and optional MQTT data consent declared in `wxt.config.ts`. Keep the same ID when signing and updating.
+
+When completing a feature, user-visible improvement, or bug fix, update the top `Unreleased / 未发布` draft in the [Changelog](CHANGELOG.md) in the same change, keeping Chinese and English entries aligned. Update existing entries as a feature evolves and remove entries for reverted features; do not append a bullet for each commit or draft iteration. Describe the behavior and benefit to users. Internal refactors, tests, and documentation-only edits need no entry unless they affect users. Ordinary feature work does not itself trigger a version bump or release.
+
+Before publishing, reconcile the draft against the changes actually shipping since the previous published version. Merge overlapping entries, remove reverted or unshipped work and implementation chatter, group by user-facing topic, and edit concise notes with matching Chinese and English content. Use these finalized notes for the changelog, GitHub Release, and store release descriptions.
+
+After editing, move the finalized notes to a section with the version and release date, retaining an empty Unreleased section. Run `pnpm update-version <version>` and update the source version in both READMEs. WXT generates Chrome and Firefox manifest versions from the root `package.json`; About reads the installed manifest version.
+
+After `pnpm check` and `pnpm test:e2e`, run `pnpm zip` and `pnpm zip:firefox`. Verify the packaged manifests, icons, and pages. Use the matching `v<version>` GitHub Release tag and changelog entry. The workflow checks the tag against `package.json`, runs type checks, lint, and unit tests, and uploads both browser ZIPs and Firefox sources. Upload the production ZIP to the store and use `public/icon-128.png` as its icon.

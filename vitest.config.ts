@@ -6,7 +6,7 @@ export default defineConfig({
   test: {
     clearMocks: true,
     include: ['**/*.test.{ts,tsx}'],
-    exclude: ['e2e/**', 'node_modules/**'],
+    exclude: ['e2e/**', 'node_modules/**', 'artifacts/**'],
     coverage: { reporter: ['text', 'html'] },
   },
 })

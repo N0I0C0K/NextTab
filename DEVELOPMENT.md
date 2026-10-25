@@ -29,6 +29,8 @@ pnpm build:firefox
 pnpm zip
 pnpm zip:firefox
 pnpm check           # 类型、lint、单测及双浏览器构建
+pnpm icons:generate  # 从 SVG 源文件生成图标和字标
+pnpm update-version 1.5.1 # 更新版本，自动用于双浏览器 manifest 和 ZIP 文件名
 ```
 
 首次运行 E2E 前需要安装浏览器：
@@ -86,6 +88,18 @@ React 组件用 `useStorage(item)` 订阅。涉及“读取后更新”的业务
 - CI 会运行单测、Chrome E2E 和 Firefox 构建。
 
 代码使用 TypeScript、Tailwind CSS、shadcn/ui 和 Prettier；提交前建议运行 `pnpm check`。
+
+Logo 源文件、导出命令和使用规则见 [品牌资源](doc/BRANDING.md)。
+
+双浏览器商店提交文件、权限用途和 Firefox 首次上架配置见 [商店提交材料](doc/STORE_LISTING.md)。Firefox 包面向桌面 140+，固定 ID 和 MQTT 可选数据权限由 `wxt.config.ts` 声明；首次签名与后续更新应沿用同一 ID。
+
+完成新功能、用户可感知的改进或问题修复时，在同一次变更中更新 [更新日志](CHANGELOG.md) 顶部的 `Unreleased / 未发布` 草稿，保持中英文对应。同一功能反复调整时更新已有条目，撤回功能时移除对应条目，不按每次提交或草稿迭代逐条累加。描述用户能感知的行为与收益；不影响用户的内部重构、测试和文档修改无需记录。开发新功能本身不触发版本升级或发布。
+
+正式发布前必须整理草稿：核对上次已发布版本以来本次实际包含的变更，合并重复条目，删除已撤回、未随版本发布的内容和实现过程记录，按用户关注的主题组织，改写为简洁的中英文版本说明。整理后的说明统一用于 CHANGELOG、GitHub Release 和商店更新说明。
+
+整理完成后，将条目归入带版本号和发布日期的章节，保留空的未发布区域。用 `pnpm update-version <版本>` 更新根目录 `package.json`，同步更新中英文 README 中的源码版本。WXT 从 `package.json` 生成 Chrome 与 Firefox manifest，「关于」页面读取当前 manifest 的版本。
+
+完成 `pnpm check` 和 `pnpm test:e2e` 后，运行 `pnpm zip` 与 `pnpm zip:firefox`，核对包内 manifest 的版本、图标和页面。GitHub Release 使用对应的 `v<版本>` 标签及更新日志；工作流会校验标签与 `package.json` 一致，再检查类型、lint、单测并上传双浏览器 ZIP 和 Firefox 源码包。商店上传使用生产 ZIP，商店图标使用 `public/icon-128.png`。
 
 ## 推荐日志排查
 

@@ -20,6 +20,7 @@ import { QuickLinksDialog } from './navigation/quick-links-dialog'
 import { SearchEngineSettings } from './settings/SearchEngineSettings'
 import { QuickItemEditForm } from './quick-item-edit-form'
 import { useGlobalDialog } from '../providers'
+import { isMacOS } from '@/utils/platform'
 
 const shortcutOrder = ['quickLinks', 'bookmarks', 'history', 'tabs', 'calculator']
 const shortLabels: Record<string, MessageKey> = {
@@ -78,10 +79,8 @@ export const CommandModule = forwardRef<
   const inputDelay = useDebounce(inputVal, 200)
   const setting = useStorage(settingStorage)
   const pluginSettings = useStorage(commandSettingsStorage)
-  const [isWindows] = useState(() => {
-    return navigator.userAgent.toLowerCase().includes('windows')
-  })
-  const keyBindings = isWindows ? 'Alt+K' : '⌘+K'
+  const [isMac] = useState(isMacOS)
+  const keyBindings = isMac ? '⌘+K' : 'Alt+K'
 
   const plugins = commandResolverService.registeredResolvers.filter(plugin => {
     return (pluginSettings[plugin.properties.name] ?? plugin.getSettings()).active
@@ -175,8 +174,8 @@ export const CommandModule = forwardRef<
   useEffect(() => {
     const listener = (ev: KeyboardEvent) => {
       if (
-        (isWindows && ev.altKey && (ev.key === 'k' || ev.key === 'K')) ||
-        (!isWindows && ev.metaKey && (ev.key === 'k' || ev.key === 'K'))
+        (!isMac && ev.altKey && (ev.key === 'k' || ev.key === 'K')) ||
+        (isMac && ev.metaKey && (ev.key === 'k' || ev.key === 'K'))
       ) {
         ev.preventDefault()
         setOpen(true)
@@ -192,7 +191,7 @@ export const CommandModule = forwardRef<
     return () => {
       window.removeEventListener('keydown', listener)
     }
-  }, [isWindows])
+  }, [isMac])
 
   useImperativeHandle(ref, () => ({
     focus: () => {

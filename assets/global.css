@@ -1,6 +1,14 @@
-@import 'tailwindcss';
+@import 'tailwindcss' source(none);
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
+
+/* Keep store builds reproducible when tests and local artifacts are absent. */
+@source '../components';
+@source '../entrypoints';
+@source '../hooks';
+@source '../utils';
+@source not '../**/*.test.*';
+@source not '../**/*.spec.*';
 
 @custom-variant dark (&:is(.dark *));
 
