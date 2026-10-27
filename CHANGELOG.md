@@ -4,9 +4,13 @@
 
 ### 简体中文
 
+- 搜索结果打开失败时保留查询和选择以便重试；标签搜索支持标题与网址多词匹配，书签和历史预览新增分页入口，历史明确限定为最近最多 1,000 条匹配。
+
 <!-- 未发布草稿：同一功能持续更新已有条目。发版前核对实际发布范围、合并去重并整理中英文说明，再移入带版本号和日期的章节。 -->
 
 ### English
+
+- Keep search and selection when opening a result fails; search tabs by title and URL, and browse beyond bookmark/history previews with pagination and an explicit 1,000-match history limit.
 
 <!-- Working draft: update existing entries as a feature evolves. Before releasing, reconcile the shipping scope, merge duplicates, and edit matching Chinese and English notes, then move them to a dated version section. -->
 
