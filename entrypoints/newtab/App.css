@@ -461,7 +461,9 @@
   background: hsl(var(--muted));
 }
 .nt-command-keyboard-hint {
-  display: block;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px 12px;
   margin-top: 7px;
   font-size: 11px;
   color: hsl(var(--muted-foreground));
@@ -1645,4 +1647,38 @@
   .nt-setting-item-stacked [data-slot='select-trigger'] {
     width: 100%;
   }
+}
+
+.nt-command-group-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  padding: 6px 12px;
+  color: hsl(var(--muted-foreground));
+  font-size: 12px;
+}
+.nt-command-group-heading button {
+  padding: 2px 4px;
+  border-radius: 4px;
+  color: hsl(var(--foreground));
+  cursor: pointer;
+}
+.nt-command-group-heading button:hover {
+  background: hsl(var(--muted));
+}
+.nt-command-group-heading button:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+}
+
+/* Preserve cmdk's labelled group while the visible heading hosts a separate accessible action. */
+.nt-command-group-with-action > [cmdk-group-heading] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
