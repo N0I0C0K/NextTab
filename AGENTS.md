@@ -44,6 +44,8 @@ When the user requests a release, first reconcile the draft against the changes 
 
 ## Verification and review
 
+For an on-demand product/UX critique of a bounded user journey, use [.agents/skills/nexttab-design-critique/SKILL.md](.agents/skills/nexttab-design-critique/SKILL.md), for example: `Use $nexttab-design-critique to review homepage search → find a page → open/switch; report at most 3 findings without editing UI.` Existing NextTab product and UI conventions take precedence; this is not a mandatory audit for ordinary changes.
+
 Choose checks for the changed behavior and use [DEVELOPMENT.md](DEVELOPMENT.md) for the commands:
 
 - Logic and state changes: relevant Vitest tests; extension API interactions and user flows: relevant Playwright E2E.
