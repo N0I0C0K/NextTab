@@ -69,7 +69,11 @@ for (const source of ['history', 'bookmarks', 'tabs'] as const) {
   }
 }
 
-test('tab URL-only and mixed-term matches retain separate real tabs', async ({ page, context, extensionId }) => {
+test('tab URL-only and mixed-term matches retain separate real tabs', async ({
+  page,
+  context,
+  extensionId,
+}, testInfo) => {
   await context.route('https://feedback.example/**', route =>
     route.fulfill({ contentType: 'text/html', body: '<title>Ordinary title</title>' }),
   )
@@ -98,6 +102,19 @@ test('tab URL-only and mixed-term matches retain separate real tabs', async ({ p
   await expect(page.getByTestId('command-result')).toHaveCount(2)
   await input.fill(' ordinary URL-ONLY-TOKEN ')
   await expect(page.getByTestId('command-result')).toHaveCount(2)
+  const duplicates = await page.evaluate(async () =>
+    (await chrome.tabs.query({})).filter(tab => tab.url === 'https://feedback.example/url-only-token'),
+  )
+  for (const tab of duplicates) {
+    await expect(page.locator(`[data-command-result-id="${tab.id}"]`)).toContainText(`标签页 ${tab.index + 1}`)
+  }
+  await page.screenshot({ animations: 'disabled', path: testInfo.outputPath('duplicate-tab-location.png') })
+  await page.evaluate(async id => {
+    await chrome.tabs.move(id, { index: 0 })
+  }, duplicates[1].id!)
+  await input.fill('URL-ONLY-TOKEN')
+  await expect(page.locator(`[data-command-result-id="${duplicates[1].id}"]`)).toContainText('标签页 1')
+  await expect(page.getByTestId('command-result')).toHaveCount(2)
 })
 
 test('bookmark continuation reaches beyond ten, paginates and remains reachable on small screens', async ({
@@ -114,10 +131,10 @@ test('bookmark continuation reaches beyond ten, paginates and remains reachable 
   })
   await page.getByTestId('command-shortcut-bookmarks').first().click()
   await page.getByTestId('command-input').fill('Feedback bookmark')
-  await expect(page.getByTestId('command-result')).toHaveCount(11)
-  await page.locator('[data-command-result-id="bookmarks-more"]').scrollIntoViewIfNeeded()
+  await expect(page.getByTestId('command-result')).toHaveCount(10)
+  await expect(page.locator('[data-command-action-id="bookmarks-more"]')).toBeInViewport()
   await page.screenshot({ animations: 'disabled', path: testInfo.outputPath('search-bookmarks-continuation.png') })
-  await page.locator('[data-command-result-id="bookmarks-more"]').click()
+  await page.locator('[data-command-action-id="bookmarks-more"]').click()
   const dialog = page.getByTestId('search-results-dialog')
   await expect(dialog.getByTestId('navigation-row')).toHaveCount(20)
   await expect(dialog.locator('.nt-navigation-pagination')).toContainText('共 35 条')
@@ -181,7 +198,7 @@ test('history continuation is bounded and rejects late queries, with recoverable
   })
   await page.getByTestId('command-shortcut-history').first().click()
   await page.getByTestId('command-input').fill('recent')
-  await expect(page.locator('[data-command-result-id="history-more"]')).toBeVisible()
+  await expect(page.locator('[data-command-action-id="history-more"]')).toBeVisible()
   expect(
     await page.evaluate(() =>
       JSON.parse(sessionStorage.getItem('history-calls')!).every(
@@ -189,7 +206,7 @@ test('history continuation is bounded and rejects late queries, with recoverable
       ),
     ),
   ).toBe(true)
-  await page.locator('[data-command-result-id="history-more"]').click()
+  await page.locator('[data-command-action-id="history-more"]').click()
   const dialog = page.getByTestId('search-results-dialog')
   await expect(dialog.getByTestId('navigation-row')).toHaveCount(20)
   await expect(dialog).toContainText('不是全部历史')
@@ -257,3 +274,103 @@ test('synchronous retry commands keep the panel open and a completed old action 
   await expect(input).toHaveValue('newer query')
   await expect(page.getByTestId('command-panel')).toBeVisible()
 })
+
+for (const source of ['history', 'bookmarks'] as const) {
+  test(`${source}: heading continuation is visible, keyboard reachable and never the default result`, async ({
+    page,
+    extensionId,
+  }, testInfo) => {
+    await prepare(page, extensionId)
+    await page.evaluate(source => {
+      const rows = Array.from({ length: 12 }, (_, index) => ({
+        id: String(index),
+        title: `Heading target ${index}`,
+        url: `https://heading.example/${index}`,
+      }))
+      const api = source === 'history' ? chrome.history : chrome.bookmarks
+      Object.defineProperty(api, 'search', { value: async () => rows })
+      if (source === 'bookmarks') Object.defineProperty(chrome.bookmarks, 'getRecent', { value: async () => rows })
+    }, source)
+    await page.getByTestId(`command-shortcut-${source}`).first().click()
+    const input = page.getByTestId('command-input')
+    await input.fill('Heading')
+    const results = page.getByTestId('command-result')
+    const more = page.locator(`[data-command-action-id="${source}-more"]`)
+    await expect(results).toHaveCount(10)
+    await expect(
+      page.getByRole('group', { name: source === 'history' ? '历史记录' : '书签', exact: true }),
+    ).toHaveCount(1)
+    await expect(results.first()).toHaveAttribute('aria-selected', 'true')
+    await expect(more).toHaveCount(1)
+    for (const viewport of [
+      { width: 1440, height: 1000 },
+      { width: 390, height: 700 },
+      { width: 900, height: 360 },
+    ]) {
+      await page.setViewportSize(viewport)
+      await expect(more).toBeInViewport({ ratio: 1 })
+      await expect(page.getByTestId('command-new-tab-hint')).toBeInViewport({ ratio: 1 })
+      expect(await page.getByTestId('command-results').evaluate(el => el.scrollTop)).toBe(0)
+      await page.screenshot({
+        animations: 'disabled',
+        path: testInfo.outputPath(`heading-${source}-${viewport.width}.png`),
+      })
+    }
+    await input.press('ArrowDown')
+    await expect(results.nth(1)).toHaveAttribute('aria-selected', 'true')
+    await input.press('ArrowUp')
+    await expect(results.first()).toHaveAttribute('aria-selected', 'true')
+    await input.press('Tab')
+    await expect(more).toBeFocused()
+    await more.press('Enter')
+    await expect(page.getByTestId('search-results-dialog')).toBeVisible()
+    await expect(page.getByTestId('search-results-dialog').getByRole('textbox')).toHaveValue('Heading')
+  })
+}
+
+for (const mac of [false, true]) {
+  test(`new-tab hint follows selected result capability (${mac ? 'macOS' : 'Windows'})`, async ({
+    page,
+    extensionId,
+  }, testInfo) => {
+    await page.addInitScript(
+      mac =>
+        Object.defineProperty(navigator, 'userAgent', {
+          get: () =>
+            mac ? 'Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0)' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+        }),
+      mac,
+    )
+    await prepare(page, extensionId)
+    await page.evaluate(async () => {
+      await chrome.bookmarks.create({ title: '1+1 first', url: 'https://hint.example/first' })
+      await chrome.bookmarks.create({ title: '1+1 second', url: 'https://hint.example/second' })
+      await chrome.storage.local.set({
+        'command-settings-storage': {
+          bookmarks: { active: true, includeInGlobal: true, priority: 0, activeKey: 'b' },
+          calculator: { active: true, includeInGlobal: true, priority: 1, activeKey: 'c' },
+          webSearch: { active: false },
+          quickLinks: { active: false },
+          tabs: { active: false },
+          history: { active: false },
+          numberToRmb: { active: false },
+        },
+      })
+    })
+    await page.reload()
+    const input = page.getByTestId('command-input')
+    await input.fill('1+1')
+    await expect(page.getByTestId('command-result')).toHaveCount(3)
+    await expect(page.getByTestId('command-new-tab-hint')).toContainText(mac ? '⌘+Enter' : 'Ctrl+Enter')
+    await page.screenshot({
+      animations: 'disabled',
+      path: testInfo.outputPath(`new-tab-hint-${mac ? 'mac' : 'windows'}.png`),
+    })
+    await input.press('Alt+ArrowDown')
+    await expect(page.locator('[data-command-result-id="calc-result"]')).toHaveAttribute('aria-selected', 'true')
+    await expect(page.getByTestId('command-new-tab-hint')).toHaveCount(0)
+    await page.screenshot({ animations: 'disabled', path: testInfo.outputPath('calculator-no-new-tab-hint.png') })
+    await input.press('Alt+ArrowUp')
+    await expect(page.getByTestId('command-new-tab-hint')).toBeVisible()
+  })
+}
