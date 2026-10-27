@@ -11,6 +11,7 @@ function convertHistoryItemToCommandResult(item: chrome.history.HistoryItem): IC
   return {
     id: item.id,
     url: item.url,
+    supportsNewTab: Boolean(item.url),
     title: item.title || item.url || '',
     description: `${formatLastDate} ${item.url!}`,
     iconUrl: getDefaultIconUrl(item.url!),
