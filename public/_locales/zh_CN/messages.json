@@ -1507,5 +1507,11 @@
   },
   "commandResultsFailed": {
     "message": "无法加载结果，请重试。"
+  },
+  "commandNewTabHint": {
+    "message": "$1+Enter 新标签页打开"
+  },
+  "commandTabLocation": {
+    "message": "窗口 $1 · 标签页 $2"
   }
 }
