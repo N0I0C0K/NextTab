@@ -1507,5 +1507,11 @@
   },
   "commandResultsFailed": {
     "message": "無法載入結果，請重試。"
+  },
+  "commandNewTabHint": {
+    "message": "$1+Enter 在新分頁開啟"
+  },
+  "commandTabLocation": {
+    "message": "視窗 $1 · 分頁 $2"
   }
 }
