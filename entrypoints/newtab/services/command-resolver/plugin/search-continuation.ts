@@ -8,6 +8,7 @@ export function searchContinuation(source: 'history' | 'bookmarks', params: Comm
     title: t(source === 'history' ? 'commandHistoryMore' : 'commandBookmarksMore'),
     description: source === 'history' ? t('commandHistoryLimit') : undefined,
     IconType: ArrowRight,
+    groupAction: true,
     onSelect: () => params.openSearchResults?.(source, params.query),
   }
 }
