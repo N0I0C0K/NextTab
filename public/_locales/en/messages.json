@@ -1489,5 +1489,23 @@
   },
   "popupShortcutUnavailable": {
     "message": "Could not read · check browser settings"
+  },
+  "commandHistoryMore": {
+    "message": "View more history matches"
+  },
+  "commandBookmarksMore": {
+    "message": "View all matching bookmarks"
+  },
+  "commandHistoryLimit": {
+    "message": "Up to 1,000 recent matches per search. The count below covers loaded results, not your entire history. Narrow your search to find older pages."
+  },
+  "commandBookmarksAllDescription": {
+    "message": "All matching saved bookmarks. Folders are not included."
+  },
+  "commandResultsLoading": {
+    "message": "Loading results…"
+  },
+  "commandResultsFailed": {
+    "message": "Could not load results. Try again."
   }
 }
