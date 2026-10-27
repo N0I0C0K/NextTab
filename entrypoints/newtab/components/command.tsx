@@ -1,3 +1,4 @@
+import { useCommandState } from 'cmdk'
 import { cn } from '@/entrypoints/newtab/lib/utils'
 import { useDebounce, useStorage } from '@/utils'
 import {
@@ -16,6 +17,7 @@ import type {
   ICommandResultGroup,
 } from '@/entrypoints/newtab/services/command-resolver'
 import {
+  Fragment,
   useEffect,
   useId,
   useLayoutEffect,
@@ -60,6 +62,17 @@ const CommandItemIcon: FC<{ iconUrl?: string; IconType?: React.ElementType }> = 
       {IconType && <IconType aria-hidden="true" className="stroke-2 size-6" />}
     </div>
   )
+}
+
+// Read cmdk's own selection without changing its default-selection or navigation behavior.
+function CommandNewTabHint({ groups, isMac }: { groups: ICommandResultGroup[]; isMac: boolean }) {
+  const selectedValue = useCommandState(state => state.value)
+  const supported = groups.some(group =>
+    group.result.some(item => item.supportsNewTab && `${group.groupName}:${item.id}` === selectedValue),
+  )
+  return supported ? (
+    <span data-testid="command-new-tab-hint">{t('commandNewTabHint', isMac ? '⌘' : t('keyboardControlKey'))}</span>
+  ) : null
 }
 
 export interface CommandModuleRef {
@@ -451,51 +464,71 @@ export const CommandModule = forwardRef<
                   </command.CommandGroup>
                 ) : (
                   result.map(val => {
-                    // groupName is already displayName (translated)
+                    const groupAction = val.result.find(item => item.groupAction)
+                    const items = val.result.filter(item => !item.groupAction)
+                    const groupLabel = selectedResolver ? label(selectedResolver) : val.groupName
                     return (
-                      <command.CommandGroup
-                        heading={selectedResolver ? label(selectedResolver) : val.groupName}
-                        key={val.groupName}>
-                        {val.result.length === 0 ? (
-                          <command.CommandItem disabled className="py-1.5 w-full opacity-60">
-                            <Text level="xs" gray>
-                              {t('noResultsForPlugin')}
-                            </Text>
-                          </command.CommandItem>
-                        ) : (
-                          val.result.map(res => {
-                            return (
-                              <command.CommandItem
-                                key={res.id}
-                                value={`${val.groupName}:${res.id}`}
-                                data-testid="command-result"
-                                data-command-result-id={res.id}
-                                onClickCapture={event => {
-                                  if (event.ctrlKey || event.metaKey) {
-                                    event.preventDefault()
-                                    event.stopPropagation()
-                                    void selectResult(res, true)
-                                  }
-                                }}
-                                onSelect={() => {
-                                  if (composingRef.current) return
-                                  void selectResult(res)
-                                }}
-                                className="nt-command-result">
-                                <CommandItemIcon iconUrl={res.iconUrl} IconType={res.IconType} />
-                                <div className="nt-command-result-copy">
-                                  <Text level="s" className="truncate" title={res.title}>
-                                    {res.title}
-                                  </Text>
-                                  <Text level="xs" className="truncate" gray title={res.description}>
-                                    {res.description}
-                                  </Text>
-                                </div>
-                              </command.CommandItem>
-                            )
-                          })
+                      <Fragment key={val.groupName}>
+                        {groupAction && (
+                          <div className="nt-command-group-heading">
+                            <span>{groupLabel}</span>
+                            <button
+                              type="button"
+                              data-testid="command-group-action"
+                              data-command-action-id={groupAction.id}
+                              title={groupAction.description}
+                              onKeyDown={event => {
+                                if (event.key === 'Enter' || event.key === ' ') event.stopPropagation()
+                              }}
+                              onClick={() => void selectResult(groupAction)}>
+                              {groupAction.title}
+                            </button>
+                          </div>
                         )}
-                      </command.CommandGroup>
+                        <command.CommandGroup
+                          heading={groupLabel}
+                          className={groupAction ? 'nt-command-group-with-action' : undefined}>
+                          {items.length === 0 ? (
+                            <command.CommandItem disabled className="py-1.5 w-full opacity-60">
+                              <Text level="xs" gray>
+                                {t('noResultsForPlugin')}
+                              </Text>
+                            </command.CommandItem>
+                          ) : (
+                            items.map(res => {
+                              return (
+                                <command.CommandItem
+                                  key={res.id}
+                                  value={`${val.groupName}:${res.id}`}
+                                  data-testid="command-result"
+                                  data-command-result-id={res.id}
+                                  onClickCapture={event => {
+                                    if (event.ctrlKey || event.metaKey) {
+                                      event.preventDefault()
+                                      event.stopPropagation()
+                                      void selectResult(res, true)
+                                    }
+                                  }}
+                                  onSelect={() => {
+                                    if (composingRef.current) return
+                                    void selectResult(res)
+                                  }}
+                                  className="nt-command-result">
+                                  <CommandItemIcon iconUrl={res.iconUrl} IconType={res.IconType} />
+                                  <div className="nt-command-result-copy">
+                                    <Text level="s" className="truncate" title={res.title}>
+                                      {res.title}
+                                    </Text>
+                                    <Text level="xs" className="truncate" gray title={res.description}>
+                                      {res.description}
+                                    </Text>
+                                  </div>
+                                </command.CommandItem>
+                              )
+                            })
+                          )}
+                        </command.CommandGroup>
+                      </Fragment>
                     )
                   })
                 )}
@@ -503,8 +536,11 @@ export const CommandModule = forwardRef<
               <div className="nt-command-footer">
                 {shortcuts}
                 <span className="nt-command-keyboard-hint">
-                  {showFunctions && <>{t('commandTriggerRule')} · </>}
-                  {t('commandKeyboardHint')}
+                  <span>
+                    {showFunctions && <>{t('commandTriggerRule')} · </>}
+                    {t('commandKeyboardHint')}
+                  </span>
+                  {!showFunctions && <CommandNewTabHint groups={result} isMac={isMac} />}
                 </span>
               </div>
             </div>
