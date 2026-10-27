@@ -3,7 +3,9 @@ import { historyResolver } from './history'
 import { bookmarksResolver } from './bookmarks'
 import { tabSearchResolver } from './tab-search'
 
-vi.mock('@/utils/i18n', () => ({ t: (key: string) => key }))
+vi.mock('@/utils/i18n', () => ({
+  t: (key: string, substitutions?: string[]) => [key, ...(substitutions ?? [])].join(':'),
+}))
 vi.mock('@/entrypoints/newtab/lib/url', () => ({ getDefaultIconUrl: (url: string) => url }))
 
 afterEach(() => vi.unstubAllGlobals())
@@ -78,6 +80,7 @@ describe('search result actions and continuation', () => {
         tabs: { update, create },
       })
       const result = (await resolver.resolve({ query: 'saved', rawQuery: 'saved' }))![0]
+      expect(result.supportsNewTab).toBe(true)
       await expect(result.onSelect?.()).rejects.toThrow('unavailable')
       await result.onSelect?.({ newTab: true })
       expect(create).toHaveBeenCalledExactlyOnceWith({ url: row.url, active: true })
@@ -142,10 +145,43 @@ describe('search result actions and continuation', () => {
       const results = (await resolver.resolve(params))!
       expect(results).toHaveLength(11)
       expect(results[10].id).toBe(`${resolver.properties.name}-more`)
+      expect(results[10].groupAction).toBe(true)
+      expect(results[10].supportsNewTab).not.toBe(true)
+      expect(results.filter(item => !item.groupAction)).toHaveLength(10)
       await results[10].onSelect?.()
       expect(openSearchResults).toHaveBeenCalledWith(resolver.properties.name, 'Match')
       search.mockResolvedValue(rows.slice(0, 10))
       expect(await resolver.resolve(params)).toHaveLength(10)
     },
   )
+})
+
+describe('duplicate tab location cues', () => {
+  it('labels only identical title/URL pairs using scoped windows and current positions', async () => {
+    const tabs = [
+      { id: 1, title: 'Shared', url: 'https://docs.example/a', windowId: 20, index: 3 },
+      { id: 2, title: 'Shared', url: 'https://docs.example/a', windowId: 40, index: 0 },
+      { id: 3, title: 'Shared', url: 'https://docs.example/b', windowId: 20, index: 4 },
+      { id: 4, title: 'Different title', url: 'https://docs.example/a', windowId: 40, index: 1 },
+      { id: 5, title: 'Private only', url: 'https://private.example/', windowId: 10, index: 0, incognito: true },
+      { id: 6, title: 'Private only', url: 'https://private.example/', windowId: 20, index: 5 },
+    ]
+    const query = vi.fn().mockResolvedValue(tabs)
+    vi.stubGlobal('chrome', { tabs: { query }, extension: { inIncognitoContext: false } })
+    const params = { query: '', rawQuery: '' }
+    const results = (await tabSearchResolver.resolve(params))!
+    expect(results.map(row => row.id)).toEqual(['1', '2', '3', '4', '6'])
+    expect(results[0].description).toBe('commandTabLocation:1:4 · https://docs.example/a')
+    expect(results[1].description).toBe('commandTabLocation:2:1 · https://docs.example/a')
+    expect(results.slice(2).map(row => row.description)).toEqual([
+      'https://docs.example/b',
+      'https://docs.example/a',
+      'https://private.example/',
+    ])
+    tabs[0].windowId = 40
+    tabs[0].index = 6
+    const updated = (await tabSearchResolver.resolve(params))!
+    expect(updated[0].description).toBe('commandTabLocation:2:7 · https://docs.example/a')
+    expect(query).toHaveBeenCalledTimes(2)
+  })
 })
