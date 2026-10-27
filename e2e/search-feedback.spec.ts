@@ -360,17 +360,30 @@ for (const mac of [false, true]) {
     await page.reload()
     const input = page.getByTestId('command-input')
     await input.fill('1+1')
-    await expect(page.getByTestId('command-result')).toHaveCount(3)
+    const results = page.getByTestId('command-result')
+    await expect(results).toHaveCount(3)
+    // Resolver groups arrive asynchronously: calculator may finish before native bookmark search.
+    // Select the bookmark farthest from calculator so a single-row fallback cannot pass.
+    const titles = await results.allTextContents()
+    const calculatorIndex = titles.findIndex(title => title.includes('1+1 = 2'))
+    const bookmarkIndex = calculatorIndex === 0 ? 2 : 0
+    expect(titles[bookmarkIndex]).toContain('https://hint.example/')
+    expect(bookmarkIndex).toBeGreaterThanOrEqual(0)
+    expect(calculatorIndex).toBeGreaterThanOrEqual(0)
+    await input.press('Home')
+    for (let index = 0; index < bookmarkIndex; index++) await input.press('ArrowDown')
+    await expect(results.nth(bookmarkIndex)).toHaveAttribute('aria-selected', 'true')
     await expect(page.getByTestId('command-new-tab-hint')).toContainText(mac ? '⌘+Enter' : 'Ctrl+Enter')
     await page.screenshot({
       animations: 'disabled',
       path: testInfo.outputPath(`new-tab-hint-${mac ? 'mac' : 'windows'}.png`),
     })
-    await input.press('Alt+ArrowDown')
+    const towardCalculator = calculatorIndex < bookmarkIndex ? 'Alt+ArrowUp' : 'Alt+ArrowDown'
+    await input.press(towardCalculator)
     await expect(page.locator('[data-command-result-id="calc-result"]')).toHaveAttribute('aria-selected', 'true')
     await expect(page.getByTestId('command-new-tab-hint')).toHaveCount(0)
     await page.screenshot({ animations: 'disabled', path: testInfo.outputPath('calculator-no-new-tab-hint.png') })
-    await input.press('Alt+ArrowUp')
+    await input.press(calculatorIndex < bookmarkIndex ? 'Alt+ArrowDown' : 'Alt+ArrowUp')
     await expect(page.getByTestId('command-new-tab-hint')).toBeVisible()
   })
 }
