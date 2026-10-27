@@ -20,7 +20,7 @@ for (const source of ['history', 'bookmarks', 'tabs'] as const) {
     test(`${source}: ${gesture} retains failed selection and waits for successful retry`, async ({
       page,
       extensionId,
-    }) => {
+    }, testInfo) => {
       await prepare(page, extensionId)
       await page.evaluate(source => {
         const item = {
@@ -54,6 +54,8 @@ for (const source of ['history', 'bookmarks', 'tabs'] as const) {
       await expect(input).toHaveValue('Recoverable')
       await expect(target).toHaveAttribute('aria-selected', 'true')
       await expect(page.getByTestId('command-panel')).toBeVisible()
+      if (source === 'history' && gesture === 'Enter')
+        await page.screenshot({ path: testInfo.outputPath('search-open-failed.png') })
       await activate()
       await expect.poll(() => page.evaluate(() => sessionStorage.getItem('open-attempts'))).toBe('2')
       await activate()
@@ -61,6 +63,8 @@ for (const source of ['history', 'bookmarks', 'tabs'] as const) {
       await expect(page.getByTestId('command-panel')).toBeVisible()
       await page.evaluate(() => window.dispatchEvent(new Event('finish-open')))
       await expect(page.getByTestId('command-panel')).toHaveCount(0)
+      if (source === 'history' && gesture === 'Enter')
+        await page.screenshot({ path: testInfo.outputPath('search-open-recovered.png') })
     })
   }
 }
@@ -98,6 +102,8 @@ test('bookmark continuation reaches beyond ten, paginates and remains reachable 
   await page.getByTestId('command-shortcut-bookmarks').first().click()
   await page.getByTestId('command-input').fill('Feedback bookmark')
   await expect(page.getByTestId('command-result')).toHaveCount(11)
+  await page.locator('[data-command-result-id="bookmarks-more"]').scrollIntoViewIfNeeded()
+  await page.screenshot({ path: testInfo.outputPath('search-bookmarks-continuation.png') })
   await page.locator('[data-command-result-id="bookmarks-more"]').click()
   const dialog = page.getByTestId('search-results-dialog')
   await expect(dialog.getByTestId('navigation-row')).toHaveCount(20)
@@ -107,6 +113,8 @@ test('bookmark continuation reaches beyond ten, paginates and remains reachable 
   await expect(dialog.locator('.nt-navigation-open').first()).toBeFocused()
   await dialog.getByRole('textbox').fill('Feedback bookmark 34')
   await expect(dialog.getByTestId('navigation-row')).toHaveCount(1)
+  await dialog.getByRole('textbox').fill('Feedback bookmark')
+  await expect(dialog.getByTestId('navigation-row')).toHaveCount(20)
   for (const viewport of [
     { width: 1440, height: 1000 },
     { width: 390, height: 700 },
@@ -118,6 +126,10 @@ test('bookmark continuation reaches beyond ten, paginates and remains reachable 
     expect(await dialog.evaluate(el => el.scrollWidth <= el.clientWidth + 1)).toBe(true)
     await page.screenshot({ path: testInfo.outputPath(`search-results-${viewport.width}.png`) })
   }
+  await page.setViewportSize({ width: 1440, height: 1000 })
+  await page.evaluate(() => chrome.storage.local.set({ 'theme-storage-key': 'dark' }))
+  await expect(page.locator('html')).toHaveClass(/dark/)
+  await page.screenshot({ path: testInfo.outputPath('search-results-dark.png') })
   await dialog.getByRole('textbox').press('Escape')
   await expect(dialog).toHaveCount(0)
   await expect(page.getByTestId('command-input')).toBeFocused()
@@ -126,7 +138,7 @@ test('bookmark continuation reaches beyond ten, paginates and remains reachable 
 test('history continuation is bounded and rejects late queries, with recoverable read errors', async ({
   page,
   extensionId,
-}) => {
+}, testInfo) => {
   await prepare(page, extensionId)
   await page.evaluate(() => {
     const rows = (text: string, count: number) =>
@@ -169,6 +181,7 @@ test('history continuation is bounded and rejects late queries, with recoverable
   await expect(dialog.getByTestId('navigation-row')).toHaveCount(20)
   await expect(dialog).toContainText('不是全部历史')
   await expect(dialog.locator('.nt-navigation-pagination')).toContainText('共 1000 条')
+  await page.screenshot({ path: testInfo.outputPath('search-history-bounded.png') })
   await dialog.getByRole('textbox').fill('older')
   await expect
     .poll(() =>
@@ -184,6 +197,7 @@ test('history continuation is bounded and rejects late queries, with recoverable
   await expect(dialog.getByTestId('navigation-row')).toContainText('newest match')
   await dialog.getByRole('textbox').fill('retry')
   await expect(dialog.getByRole('alert')).toBeVisible()
+  await page.screenshot({ path: testInfo.outputPath('search-history-read-failed.png') })
   await dialog.getByRole('button', { name: '重试', exact: true }).click()
   await expect(dialog.getByTestId('navigation-row')).toContainText('retry match')
   expect(
