@@ -1489,5 +1489,29 @@
   },
   "popupShortcutUnavailable": {
     "message": "无法读取快捷键 · 请查看浏览器设置"
+  },
+  "commandHistoryMore": {
+    "message": "查看更多历史匹配"
+  },
+  "commandBookmarksMore": {
+    "message": "查看全部匹配书签"
+  },
+  "commandHistoryLimit": {
+    "message": "每次搜索最多读取最近的 1,000 条匹配。下方数量仅代表已读取结果，不是全部历史；缩小搜索范围可查找更早的页面。"
+  },
+  "commandBookmarksAllDescription": {
+    "message": "全部匹配的已保存书签，不包含文件夹。"
+  },
+  "commandResultsLoading": {
+    "message": "正在加载结果…"
+  },
+  "commandResultsFailed": {
+    "message": "无法加载结果，请重试。"
+  },
+  "commandNewTabHint": {
+    "message": "$1+Enter 新标签页打开"
+  },
+  "commandTabLocation": {
+    "message": "窗口 $1 · 标签页 $2"
   }
 }

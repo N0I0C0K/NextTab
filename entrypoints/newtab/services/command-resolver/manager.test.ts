@@ -61,6 +61,14 @@ describe('command settings recovery', () => {
     mocks.resolve.mockReset().mockResolvedValue([])
   })
 
+  it('passes the continuation callback through to resolvers', async () => {
+    mocks.read.mockResolvedValue(settings(true))
+    const { commandResolverService: service } = await import('./manager')
+    const openSearchResults = vi.fn()
+    await service.resolve({ ...query, openSearchResults }, () => undefined)
+    expect(mocks.resolve).toHaveBeenCalledWith(expect.objectContaining({ openSearchResults }))
+  })
+
   it('shares a recovery read between overlapping queries after initialization fails', async () => {
     const recovery = deferred<CommandSettingsData>()
     mocks.read.mockRejectedValueOnce(new Error('unavailable')).mockReturnValue(recovery.promise)

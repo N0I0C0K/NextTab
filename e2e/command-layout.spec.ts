@@ -386,6 +386,7 @@ test('results connect to the input and shortcuts stay below the scrolling list a
   })
   await page.getByTestId('command-shortcut-bookmarks').click()
   await expect(page.getByTestId('command-result')).toHaveCount(10)
+  await expect(page.locator('[data-command-action-id="bookmarks-more"]')).toBeVisible()
   for (const viewport of [
     { width: 1440, height: 1000 },
     { width: 768, height: 700 },

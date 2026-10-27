@@ -196,6 +196,7 @@ class CommandResolverService {
       rawQuery: params.rawQuery,
       changeQuery: params.changeQuery,
       openQuickLinks: params.openQuickLinks,
+      openSearchResults: params.openSearchResults,
       addQuickLink: params.addQuickLink,
       openSearchEngines: params.openSearchEngines,
       retry: params.retry,

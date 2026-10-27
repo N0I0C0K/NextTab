@@ -19,6 +19,7 @@ export const quickLinksResolver: ICommandResolver = {
     const results: ICommandResult[] = matches.slice(0, 8).map(item => ({
       id: `quick-link-${item.id}`,
       title: item.title,
+      supportsNewTab: true,
       description: item.url,
       iconUrl: getDefaultIconUrl(item.url),
       onSelect: options => openSavedUrl(item.url, options?.newTab),

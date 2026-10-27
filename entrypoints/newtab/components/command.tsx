@@ -1,3 +1,4 @@
+import { useCommandState } from 'cmdk'
 import { cn } from '@/entrypoints/newtab/lib/utils'
 import { useDebounce, useStorage } from '@/utils'
 import {
@@ -10,12 +11,28 @@ import {
 import { command, Text, Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/shared'
 import { commandResolverService } from '@/entrypoints/newtab/services/command-resolver'
 import { matchesTriggerKey, stripTriggerKeyForPlugin } from '@/entrypoints/newtab/services/command-resolver/utils'
-import type { CommandQueryParams, ICommandResultGroup } from '@/entrypoints/newtab/services/command-resolver'
-import { useEffect, useId, useLayoutEffect, useRef, useState, forwardRef, useImperativeHandle, type FC } from 'react'
+import type {
+  CommandQueryParams,
+  ICommandResult,
+  ICommandResultGroup,
+} from '@/entrypoints/newtab/services/command-resolver'
+import {
+  Fragment,
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  forwardRef,
+  useImperativeHandle,
+  type FC,
+} from 'react'
 import { ChevronDown, Layers, X } from 'lucide-react'
 import { t, type MessageKey } from '@/utils/i18n'
 import { toast } from 'sonner'
 import { nanoid } from 'nanoid'
+import { SearchResultsDialog, type SearchResultsRequest } from './navigation/search-results-dialog'
 import { QuickLinksDialog } from './navigation/quick-links-dialog'
 import { SearchEngineSettings } from './settings/SearchEngineSettings'
 import { QuickItemEditForm } from './quick-item-edit-form'
@@ -47,6 +64,17 @@ const CommandItemIcon: FC<{ iconUrl?: string; IconType?: React.ElementType }> = 
   )
 }
 
+// Read cmdk's own selection without changing its default-selection or navigation behavior.
+function CommandNewTabHint({ groups, isMac }: { groups: ICommandResultGroup[]; isMac: boolean }) {
+  const selectedValue = useCommandState(state => state.value)
+  const supported = groups.some(group =>
+    group.result.some(item => item.supportsNewTab && `${group.groupName}:${item.id}` === selectedValue),
+  )
+  return supported ? (
+    <span data-testid="command-new-tab-hint">{t('commandNewTabHint', isMac ? '⌘' : t('keyboardControlKey'))}</span>
+  ) : null
+}
+
 export interface CommandModuleRef {
   focus: () => void
 }
@@ -70,6 +98,14 @@ export const CommandModule = forwardRef<
   const [panelHeight, setPanelHeight] = useState(360)
   const [result, setResult] = useState<ICommandResultGroup[]>([])
   const [quickListQuery, setQuickListQuery] = useState<string | null>(null)
+  const [searchResults, setSearchResults] = useState<SearchResultsRequest | null>(null)
+  const selectingRef = useRef(false)
+  const actionContext = useMemo(
+    () => ({ inputVal, selectedPlugin, open, functionPickerOpen }),
+    [inputVal, selectedPlugin, open, functionPickerOpen],
+  )
+  const actionContextRef = useRef(actionContext)
+  actionContextRef.current = actionContext
   const [enginesOpen, setEnginesOpen] = useState(false)
   const [retry, setRetry] = useState(0)
   const quickLinks = useStorage(quickUrlItemsStorage)
@@ -105,6 +141,7 @@ export const CommandModule = forwardRef<
       query: inputDelay,
       rawQuery: inputDelay,
       openQuickLinks: setQuickListQuery,
+      openSearchResults: (source, query) => setSearchResults({ source, query }),
       openSearchEngines: () => setEnginesOpen(true),
       addQuickLink: () =>
         showDialog(
@@ -199,6 +236,20 @@ export const CommandModule = forwardRef<
       inputRef.current?.focus()
     },
   }))
+
+  const selectResult = async (item: ICommandResult, newTab = false) => {
+    if (selectingRef.current) return
+    selectingRef.current = true
+    const context = actionContextRef.current
+    try {
+      await item.onSelect?.({ newTab })
+      if (!item.keepOpen && context === actionContextRef.current) setOpen(false)
+    } catch {
+      toast.error(t('returnOpenFailed'))
+    } finally {
+      selectingRef.current = false
+    }
+  }
 
   const selectPlugin = (name: string, query?: string) => {
     if (query !== undefined) setInputVal(query)
@@ -326,10 +377,7 @@ export const CommandModule = forwardRef<
                 if (item) {
                   event.preventDefault()
                   event.stopPropagation()
-                  void Promise.resolve(item.onSelect?.({ newTab: true })).catch(() =>
-                    toast.error(t('returnOpenFailed')),
-                  )
-                  if (!item.keepOpen) setOpen(false)
+                  void selectResult(item, true)
                   return
                 }
               }
@@ -416,57 +464,71 @@ export const CommandModule = forwardRef<
                   </command.CommandGroup>
                 ) : (
                   result.map(val => {
-                    // groupName is already displayName (translated)
+                    const groupAction = val.result.find(item => item.groupAction)
+                    const items = val.result.filter(item => !item.groupAction)
+                    const groupLabel = selectedResolver ? label(selectedResolver) : val.groupName
                     return (
-                      <command.CommandGroup
-                        heading={selectedResolver ? label(selectedResolver) : val.groupName}
-                        key={val.groupName}>
-                        {val.result.length === 0 ? (
-                          <command.CommandItem disabled className="py-1.5 w-full opacity-60">
-                            <Text level="xs" gray>
-                              {t('noResultsForPlugin')}
-                            </Text>
-                          </command.CommandItem>
-                        ) : (
-                          val.result.map(res => {
-                            return (
-                              <command.CommandItem
-                                key={res.id}
-                                value={`${val.groupName}:${res.id}`}
-                                data-testid="command-result"
-                                data-command-result-id={res.id}
-                                onClickCapture={event => {
-                                  if (event.ctrlKey || event.metaKey) {
-                                    event.preventDefault()
-                                    event.stopPropagation()
-                                    void Promise.resolve(res.onSelect?.({ newTab: true })).catch(() =>
-                                      toast.error(t('returnOpenFailed')),
-                                    )
-                                    if (!res.keepOpen) setOpen(false)
-                                  }
-                                }}
-                                onSelect={() => {
-                                  if (composingRef.current) return
-                                  void Promise.resolve(res.onSelect?.()).catch(() => toast.error(t('returnOpenFailed')))
-                                  // Hide the panel after selection
-                                  inputRef.current?.focus()
-                                  if (!res.keepOpen) setOpen(false)
-                                }}
-                                className="nt-command-result">
-                                <CommandItemIcon iconUrl={res.iconUrl} IconType={res.IconType} />
-                                <div className="nt-command-result-copy">
-                                  <Text level="s" className="truncate" title={res.title}>
-                                    {res.title}
-                                  </Text>
-                                  <Text level="xs" className="truncate" gray title={res.description}>
-                                    {res.description}
-                                  </Text>
-                                </div>
-                              </command.CommandItem>
-                            )
-                          })
+                      <Fragment key={val.groupName}>
+                        {groupAction && (
+                          <div className="nt-command-group-heading">
+                            <span>{groupLabel}</span>
+                            <button
+                              type="button"
+                              data-testid="command-group-action"
+                              data-command-action-id={groupAction.id}
+                              title={groupAction.description}
+                              onKeyDown={event => {
+                                if (event.key === 'Enter' || event.key === ' ') event.stopPropagation()
+                              }}
+                              onClick={() => void selectResult(groupAction)}>
+                              {groupAction.title}
+                            </button>
+                          </div>
                         )}
-                      </command.CommandGroup>
+                        <command.CommandGroup
+                          heading={groupLabel}
+                          className={groupAction ? 'nt-command-group-with-action' : undefined}>
+                          {items.length === 0 ? (
+                            <command.CommandItem disabled className="py-1.5 w-full opacity-60">
+                              <Text level="xs" gray>
+                                {t('noResultsForPlugin')}
+                              </Text>
+                            </command.CommandItem>
+                          ) : (
+                            items.map(res => {
+                              return (
+                                <command.CommandItem
+                                  key={res.id}
+                                  value={`${val.groupName}:${res.id}`}
+                                  data-testid="command-result"
+                                  data-command-result-id={res.id}
+                                  onClickCapture={event => {
+                                    if (event.ctrlKey || event.metaKey) {
+                                      event.preventDefault()
+                                      event.stopPropagation()
+                                      void selectResult(res, true)
+                                    }
+                                  }}
+                                  onSelect={() => {
+                                    if (composingRef.current) return
+                                    void selectResult(res)
+                                  }}
+                                  className="nt-command-result">
+                                  <CommandItemIcon iconUrl={res.iconUrl} IconType={res.IconType} />
+                                  <div className="nt-command-result-copy">
+                                    <Text level="s" className="truncate" title={res.title}>
+                                      {res.title}
+                                    </Text>
+                                    <Text level="xs" className="truncate" gray title={res.description}>
+                                      {res.description}
+                                    </Text>
+                                  </div>
+                                </command.CommandItem>
+                              )
+                            })
+                          )}
+                        </command.CommandGroup>
+                      </Fragment>
                     )
                   })
                 )}
@@ -474,8 +536,11 @@ export const CommandModule = forwardRef<
               <div className="nt-command-footer">
                 {shortcuts}
                 <span className="nt-command-keyboard-hint">
-                  {showFunctions && <>{t('commandTriggerRule')} · </>}
-                  {t('commandKeyboardHint')}
+                  <span>
+                    {showFunctions && <>{t('commandTriggerRule')} · </>}
+                    {t('commandKeyboardHint')}
+                  </span>
+                  {!showFunctions && <CommandNewTabHint groups={result} isMac={isMac} />}
                 </span>
               </div>
             </div>
@@ -485,6 +550,7 @@ export const CommandModule = forwardRef<
           {shortcuts}
         </div>
       </div>
+      <SearchResultsDialog request={searchResults} onClose={() => setSearchResults(null)} finalFocus={inputRef} />
       <QuickLinksDialog query={quickListQuery} onClose={() => setQuickListQuery(null)} finalFocus={inputRef} />
       <Dialog open={enginesOpen} onOpenChange={setEnginesOpen}>
         <DialogContent className="nt-engine-dialog" finalFocus={inputRef}>

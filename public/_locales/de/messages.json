@@ -1489,5 +1489,29 @@
   },
   "popupShortcutUnavailable": {
     "message": "Lesen fehlgeschlagen · Browsereinstellungen prüfen"
+  },
+  "commandHistoryMore": {
+    "message": "Weitere Verlaufstreffer anzeigen"
+  },
+  "commandBookmarksMore": {
+    "message": "Alle passenden Lesezeichen anzeigen"
+  },
+  "commandHistoryLimit": {
+    "message": "Bis zu 1.000 aktuelle Treffer pro Suche. Die Anzahl unten zählt nur geladene Ergebnisse, nicht den gesamten Verlauf. Grenzen Sie die Suche ein, um ältere Seiten zu finden."
+  },
+  "commandBookmarksAllDescription": {
+    "message": "Alle passenden gespeicherten Lesezeichen, ohne Ordner."
+  },
+  "commandResultsLoading": {
+    "message": "Ergebnisse werden geladen…"
+  },
+  "commandResultsFailed": {
+    "message": "Ergebnisse konnten nicht geladen werden. Bitte erneut versuchen."
+  },
+  "commandNewTabHint": {
+    "message": "$1+Enter In neuem Tab öffnen"
+  },
+  "commandTabLocation": {
+    "message": "Fenster $1 · Tab $2"
   }
 }

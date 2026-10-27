@@ -1489,5 +1489,29 @@
   },
   "popupShortcutUnavailable": {
     "message": "無法讀取快捷鍵 · 請查看瀏覽器設定"
+  },
+  "commandHistoryMore": {
+    "message": "查看更多歷史符合項目"
+  },
+  "commandBookmarksMore": {
+    "message": "查看全部符合的書籤"
+  },
+  "commandHistoryLimit": {
+    "message": "每次搜尋最多讀取最近的 1,000 筆符合項目。下方數量僅代表已讀取結果，不是全部歷史；縮小搜尋範圍可尋找更早的頁面。"
+  },
+  "commandBookmarksAllDescription": {
+    "message": "全部符合的已儲存書籤，不包含資料夾。"
+  },
+  "commandResultsLoading": {
+    "message": "正在載入結果…"
+  },
+  "commandResultsFailed": {
+    "message": "無法載入結果，請重試。"
+  },
+  "commandNewTabHint": {
+    "message": "$1+Enter 在新分頁開啟"
+  },
+  "commandTabLocation": {
+    "message": "視窗 $1 · 分頁 $2"
   }
 }

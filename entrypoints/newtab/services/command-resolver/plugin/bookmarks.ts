@@ -1,5 +1,7 @@
 import { getDefaultIconUrl } from '@/entrypoints/newtab/lib/url'
 import type { ICommandResolver, ICommandResult } from '../protocol'
+import { openSavedUrl } from '@/utils/quick-link-search'
+import { searchContinuation } from './search-continuation'
 import { Star } from 'lucide-react'
 import { t } from '@/utils/i18n'
 
@@ -7,15 +9,12 @@ function convertBookmarkToCommandResult(item: chrome.bookmarks.BookmarkTreeNode)
   return {
     id: item.id,
     url: item.url,
+    supportsNewTab: Boolean(item.url),
     title: item.title,
     description: item.url,
     iconUrl: item.url ? getDefaultIconUrl(item.url) : undefined,
     IconType: item.url ? undefined : Star,
-    onSelect: () => {
-      if (item.url) {
-        chrome.tabs.update({ url: item.url })
-      }
-    },
+    onSelect: options => (item.url ? openSavedUrl(item.url, options?.newTab) : undefined),
   }
 }
 
@@ -36,12 +35,12 @@ export const bookmarksResolver: ICommandResolver = {
   },
   resolve: async params => {
     const query = params.query.trim()
-    if (query.length === 0) {
-      return (await chrome.bookmarks.getRecent(10)).map(convertBookmarkToCommandResult)
-    }
-
-    const result = await chrome.bookmarks.search({ query })
+    const result = (
+      query.length === 0 ? await chrome.bookmarks.getRecent(11) : await chrome.bookmarks.search({ query })
+    ).filter(item => item.url)
     if (result.length === 0) return null
-    return result.slice(0, 10).map(convertBookmarkToCommandResult)
+    const items = result.slice(0, 10).map(convertBookmarkToCommandResult)
+    if (result.length > 10) items.push(searchContinuation('bookmarks', params))
+    return items
   },
 }

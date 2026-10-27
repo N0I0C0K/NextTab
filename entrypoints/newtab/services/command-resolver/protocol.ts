@@ -3,6 +3,7 @@ export type CommandQueryParams = {
   rawQuery: string // Original query as typed by the user
   changeQuery?: (newQuery: string) => void
   resolverName?: string // Explicit mode ('all' for global search); query is already the user's search text
+  openSearchResults?: (source: 'history' | 'bookmarks', query: string) => void
   openQuickLinks?: (query: string) => void
   addQuickLink?: () => void
   openSearchEngines?: () => void
@@ -23,6 +24,8 @@ export interface ICommandResult {
   IconType?: React.ElementType
   onSelect?: (options?: { newTab?: boolean }) => void | Promise<void>
   keepOpen?: boolean
+  groupAction?: boolean
+  supportsNewTab?: boolean
 }
 
 export interface CommandSettings {
