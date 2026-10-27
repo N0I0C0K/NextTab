@@ -16,18 +16,27 @@ export const tabSearchResolver: ICommandResolver = {
   },
   resolve: async params => {
     const query = params.query.trim()
-    const result = (await chrome.tabs.query({})).filter(
-      tab =>
-        Boolean(tab.incognito) === Boolean(chrome.extension?.inIncognitoContext) &&
-        matchesSearch(query, tab.title ?? '', tab.url ?? tab.pendingUrl ?? ''),
+    const tabs = (await chrome.tabs.query({})).filter(
+      tab => Boolean(tab.incognito) === Boolean(chrome.extension?.inIncognitoContext),
     )
+    const identity = (tab: chrome.tabs.Tab) => JSON.stringify([tab.title ?? '', tab.url ?? tab.pendingUrl ?? ''])
+    const duplicates = new Map<string, number>()
+    for (const tab of tabs) duplicates.set(identity(tab), (duplicates.get(identity(tab)) ?? 0) + 1)
+    const windowOrder = new Map(
+      [...new Set(tabs.map(tab => tab.windowId))].sort((a, b) => a - b).map((id, index) => [id, index + 1]),
+    )
+    const result = tabs.filter(tab => matchesSearch(query, tab.title ?? '', tab.url ?? tab.pendingUrl ?? ''))
     if (result.length === 0) return null
     return result.map(it => {
       return {
         id: it.id!.toString(),
         url: it.url ?? it.pendingUrl,
+        supportsNewTab: Boolean(it.url ?? it.pendingUrl),
         title: it.title || it.url || it.pendingUrl || '',
-        description: it.url ?? it.pendingUrl,
+        description:
+          (duplicates.get(identity(it)) ?? 0) > 1 && Number.isInteger(it.index)
+            ? `${t('commandTabLocation', [String(windowOrder.get(it.windowId)), String(it.index + 1)])} · ${it.url ?? it.pendingUrl ?? ''}`
+            : (it.url ?? it.pendingUrl),
         iconUrl: it.favIconUrl!,
         onSelect: async options => {
           if (options?.newTab) {
