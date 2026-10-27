@@ -60,7 +60,7 @@ jobs:
           name: playwright-test-results
           path: |
             test-results/**/trace.zip
-            test-results/**/test-failed-*.png
+            test-results/**/*.png
             test-results/**/error-context.md
           if-no-files-found: ignore
           retention-days: 7
