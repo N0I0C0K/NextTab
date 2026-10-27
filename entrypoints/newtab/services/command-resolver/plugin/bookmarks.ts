@@ -9,6 +9,7 @@ function convertBookmarkToCommandResult(item: chrome.bookmarks.BookmarkTreeNode)
   return {
     id: item.id,
     url: item.url,
+    supportsNewTab: Boolean(item.url),
     title: item.title,
     description: item.url,
     iconUrl: item.url ? getDefaultIconUrl(item.url) : undefined,
