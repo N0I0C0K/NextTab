@@ -385,7 +385,8 @@ test('results connect to the input and shortcuts stay below the scrolling list a
     }
   })
   await page.getByTestId('command-shortcut-bookmarks').click()
-  await expect(page.getByTestId('command-result')).toHaveCount(10)
+  await expect(page.getByTestId('command-result')).toHaveCount(11)
+  await expect(page.locator('[data-command-result-id="bookmarks-more"]')).toBeVisible()
   for (const viewport of [
     { width: 1440, height: 1000 },
     { width: 768, height: 700 },
@@ -419,7 +420,7 @@ test('results connect to the input and shortcuts stay below the scrolling list a
     expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth)).toBe(false)
     await page.screenshot({ path: testInfo.outputPath(`command-${viewport.width}x${viewport.height}.png`) })
   }
-  for (let index = 0; index < 9; index++) await page.getByTestId('command-input').press('ArrowDown')
+  for (let index = 0; index < 10; index++) await page.getByTestId('command-input').press('ArrowDown')
   await expect(page.getByTestId('command-result').last()).toBeInViewport({ ratio: 1 })
   await page.setViewportSize({ width: 1440, height: 1000 })
   for (const zoom of [1.25, 1.5]) {
