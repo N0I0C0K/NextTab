@@ -2,6 +2,8 @@ import { getDefaultIconUrl } from '@/entrypoints/newtab/lib/url'
 import type { ICommandResolver, ICommandResult } from '../protocol'
 import moment from 'moment'
 import { t } from '@/utils/i18n'
+import { openSavedUrl } from '@/utils/quick-link-search'
+import { searchContinuation } from './search-continuation'
 import { Clock } from 'lucide-react'
 
 function convertHistoryItemToCommandResult(item: chrome.history.HistoryItem): ICommandResult {
@@ -12,9 +14,7 @@ function convertHistoryItemToCommandResult(item: chrome.history.HistoryItem): IC
     title: item.title || item.url || '',
     description: `${formatLastDate} ${item.url!}`,
     iconUrl: getDefaultIconUrl(item.url!),
-    onSelect: () => {
-      chrome.tabs.update({ url: item.url })
-    },
+    onSelect: options => openSavedUrl(item.url!, options?.newTab),
   }
 }
 
@@ -32,10 +32,12 @@ export const historyResolver: ICommandResolver = {
   resolve: async params => {
     const result = await chrome.history.search({
       text: params.query.trim(),
-      maxResults: 10,
+      maxResults: 11,
       startTime: 0,
     })
     if (result.length === 0) return null
-    return result.map(convertHistoryItemToCommandResult)
+    const items = result.slice(0, 10).map(convertHistoryItemToCommandResult)
+    if (result.length > 10) items.push(searchContinuation('history', params))
+    return items
   },
 }
