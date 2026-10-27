@@ -1507,5 +1507,11 @@
   },
   "commandResultsFailed": {
     "message": "Ergebnisse konnten nicht geladen werden. Bitte erneut versuchen."
+  },
+  "commandNewTabHint": {
+    "message": "$1+Enter In neuem Tab öffnen"
+  },
+  "commandTabLocation": {
+    "message": "Fenster $1 · Tab $2"
   }
 }
