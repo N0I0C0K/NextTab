@@ -24,6 +24,8 @@ export interface ICommandResult {
   IconType?: React.ElementType
   onSelect?: (options?: { newTab?: boolean }) => void | Promise<void>
   keepOpen?: boolean
+  groupAction?: boolean
+  supportsNewTab?: boolean
 }
 
 export interface CommandSettings {
