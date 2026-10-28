@@ -46,8 +46,10 @@ test('site details expose all three sources with only four tabs and preserve sav
   await page.bringToFront()
   const card = page.getByTestId('quick-link-card').first()
   await card.click({ button: 'right' })
-  await expect(page.getByTestId('all-site-tabs')).toContainText('4')
-  await expect(page.getByTestId('all-site-bookmarks')).toContainText('2')
+  await expect(page.getByTestId('related-tab')).toHaveCount(4)
+  await expect(page.getByTestId('related-bookmark')).toHaveCount(2)
+  await expect(page.getByTestId('all-site-tabs')).toHaveCount(0)
+  await expect(page.getByTestId('all-site-bookmarks')).toHaveCount(0)
   await page.screenshot({ path: testInfo.outputPath('entry-menu.png'), animations: 'disabled' })
   await page.keyboard.press('Escape')
   await card.locator('.nt-link-expand').click()
@@ -58,11 +60,72 @@ test('site details expose all three sources with only four tabs and preserve sav
   await page.screenshot({ path: testInfo.outputPath('tabs-desktop.png'), animations: 'disabled' })
   const firstTabRow = dialog.getByTestId('navigation-row').first()
   expect(((await firstTabRow.locator('.nt-return-meta').textContent())?.match(/窗口/g) ?? []).length).toBe(1)
+  const close = firstTabRow.locator('.nt-navigation-close')
+  const more = firstTabRow.locator('.nt-return-more')
+  await page.mouse.move(0, 0)
+  await expect(close).toHaveCSS('opacity', '0')
+  const rowLayout = () =>
+    firstTabRow.evaluate(row =>
+      ['.nt-return-open', '.nt-return-more', '.nt-navigation-close'].map(selector => {
+        const { x, y, width, height } = row.querySelector(selector)!.getBoundingClientRect()
+        return { x, y, width, height }
+      }),
+    )
+  const idleLayout = await rowLayout()
+  await firstTabRow.hover()
+  await expect(close).toHaveCSS('opacity', '1')
+  expect(await rowLayout()).toEqual(idleLayout)
+  for (const property of ['width', 'height', 'color', 'border-width', 'background-color']) {
+    expect(await close.evaluate((el, prop) => getComputedStyle(el).getPropertyValue(prop), property)).toBe(
+      await more.evaluate((el, prop) => getComputedStyle(el).getPropertyValue(prop), property),
+    )
+  }
+  const closeBounds = (await close.boundingBox())!
+  const moreBounds = (await more.boundingBox())!
+  const rowBounds = (await firstTabRow.boundingBox())!
+  expect(closeBounds.x + closeBounds.width).toBe(moreBounds.x)
+  expect(moreBounds.x + moreBounds.width).toBe(rowBounds.x + rowBounds.width)
+  await expect(close).toHaveCSS('border-top-right-radius', '0px')
+  await expect(more).toHaveCSS('border-top-right-radius', '7px')
+  await page.screenshot({ path: testInfo.outputPath('tabs-hover.png'), animations: 'disabled' })
+  await page.mouse.move(0, 0)
+  await expect(close).toHaveCSS('opacity', '0')
+  expect(await rowLayout()).toEqual(idleLayout)
+  await firstTabRow.locator('.nt-return-open').focus()
+  await expect(close).toHaveCSS('opacity', '1')
+  await page.keyboard.press('Tab')
+  await expect(close).toBeFocused()
+  await expect(close).toHaveCSS('opacity', '1')
+  await page.keyboard.press('Tab')
+  await expect(more).toBeFocused()
+  await page.keyboard.press('Shift+Tab')
+  await expect(close).toBeFocused()
+  for (const viewport of [
+    { width: 390, height: 700 },
+    { width: 900, height: 360 },
+  ]) {
+    await page.setViewportSize(viewport)
+    await expect
+      .poll(async () => {
+        const bounds = await dialog.boundingBox()
+        return !!bounds && bounds.y >= 15 && bounds.y + bounds.height <= viewport.height - 15
+      })
+      .toBe(true)
+    await expect(close).toBeInViewport()
+    expect(await dialog.evaluate(el => el.scrollWidth <= el.clientWidth + 1)).toBe(true)
+    await page.screenshot({ path: testInfo.outputPath(`tabs-focused-${viewport.width}-${viewport.height}.png`) })
+  }
+  await page.setViewportSize({ width: 1440, height: 1000 })
   await firstTabRow.hover()
   await firstTabRow.locator('.nt-return-more').click()
   await expect(page.getByTestId('save-quick-link')).toBeVisible()
   await expect(page.getByRole('menuitem', { name: '复制链接', exact: true })).toBeVisible()
   await expect(page.getByRole('menuitem', { name: '关闭标签页', exact: true })).toBeVisible()
+  const menuLayout = await rowLayout()
+  await page.getByRole('menuitem', { name: '复制链接', exact: true }).hover()
+  await expect(close).toHaveCSS('opacity', '0')
+  expect(await rowLayout()).toEqual(menuLayout)
+  await page.screenshot({ path: testInfo.outputPath('tabs-menu-pointer-outside.png'), animations: 'disabled' })
   await page.keyboard.press('Escape')
 
   await dialog.getByRole('textbox').fill('no matching tab')
@@ -126,6 +189,50 @@ test('site details expose all three sources with only four tabs and preserve sav
     ),
   )
   await page.screenshot({ path: testInfo.outputPath('saved-dark.png'), animations: 'disabled' })
+})
+
+test('site menu view-all entries appear only when more than five records exist', async ({
+  page,
+  context,
+  extensionId,
+}) => {
+  await context.route('https://preview.example/**', route =>
+    route.fulfill({ contentType: 'text/html', body: '<title>Preview tab</title>' }),
+  )
+  await page.goto(`chrome-extension://${extensionId}/newtab.html`)
+  await page.evaluate(async () => {
+    await chrome.storage.local.set({
+      'onboarding-completed-key': true,
+      'settings-storage': {
+        autoFocusCommandInput: false,
+        showRecentPages: false,
+        showBookmarksInQuickUrlMenu: true,
+        showOpenTabsInQuickUrlMenu: true,
+      },
+      'quick-url-item-storage-key': [{ id: 'site', title: 'Boundary', url: 'https://preview.example/' }],
+    })
+    for (let index = 0; index < 6; index++) {
+      await chrome.bookmarks.create({ title: `Bookmark ${index}`, url: `https://preview.example/${index}` })
+      await chrome.tabs.create({ url: `https://preview.example/${index}`, active: false })
+    }
+  })
+  await page.reload()
+  await page.bringToFront()
+  const card = page.getByTestId('quick-link-card')
+  for (const count of [6, 5, 3, 0]) {
+    await page.evaluate(async count => {
+      const bookmarks = await chrome.bookmarks.search('https://preview.example/')
+      for (const bookmark of bookmarks.slice(count)) await chrome.bookmarks.remove(bookmark.id)
+      const tabs = await chrome.tabs.query({ url: 'https://preview.example/*' })
+      for (const tab of tabs.slice(count)) await chrome.tabs.remove(tab.id!)
+    }, count)
+    await card.click({ button: 'right' })
+    await expect(page.getByTestId('related-tab')).toHaveCount(Math.min(count, 5))
+    await expect(page.getByTestId('related-bookmark')).toHaveCount(Math.min(count, 5))
+    await expect(page.getByTestId('all-site-tabs')).toHaveCount(count > 5 ? 1 : 0)
+    await expect(page.getByTestId('all-site-bookmarks')).toHaveCount(count > 5 ? 1 : 0)
+    await page.keyboard.press('Escape')
+  }
 })
 
 test('empty site tabs stay visible and history can be saved without moving the active row', async ({

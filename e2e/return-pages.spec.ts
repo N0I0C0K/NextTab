@@ -930,10 +930,14 @@ test('site expansion shows open, saved and recent pages and returns focus', asyn
         )
       })
       .toBe(true)
-    const heading = (await dialog.getByRole('heading', { name: 'GitHub', exact: true }).boundingBox())!
-    const description = (await dialog.locator('[data-slot="dialog-description"]').boundingBox())!
-    expect(description.y - heading.y - heading.height).toBeGreaterThanOrEqual(0)
-    expect(description.y - heading.y - heading.height).toBeLessThanOrEqual(2)
+    // Measure both in one frame: resize transitions can move the dialog between locator calls.
+    const headingGap = await dialog.locator('.nt-site-detail-heading').evaluate(element => {
+      const heading = element.querySelector('[data-slot="dialog-title"]')!.getBoundingClientRect()
+      const description = element.querySelector('[data-slot="dialog-description"]')!.getBoundingClientRect()
+      return description.top - heading.bottom
+    })
+    expect(headingGap).toBeGreaterThanOrEqual(0)
+    expect(headingGap).toBeLessThanOrEqual(2)
     await expect(dialog.locator('[data-slot="dialog-close"]')).toBeInViewport()
     expect(await dialog.evaluate(element => element.scrollWidth <= element.clientWidth)).toBe(true)
     await page.screenshot({ path: test.info().outputPath(`site-pages-${viewport.width}.png`), fullPage: true })
@@ -997,13 +1001,13 @@ test('multiple matching tabs prompt for a target instead of opening or closing t
   await expect(visibleRows(page).first().locator('.nt-return-open')).toBeFocused()
 })
 
-test('page rows use hidden action space for long titles and reveal controls on hover or keyboard focus', async ({
+test('site page rows reserve action space for long titles and reveal controls on hover or keyboard focus', async ({
   page,
   context,
   extensionId,
 }, testInfo) => {
   await prepare(page, context, extensionId)
-  const title = 'NextTab 项目资料与页面布局说明 · 长标题应该使用隐藏操作区域的空间 '.repeat(4)
+  const title = 'NextTab 项目资料与页面布局说明 · 长标题与操作按钮保留稳定的布局空间 '.repeat(4)
   const url = `https://github.return.test/docs/${'long-localized-path/'.repeat(8)}`
   await page.evaluate(({ title, url }) => chrome.bookmarks.create({ title, url }), { title, url })
   await page.getByRole('button', { name: 'Show pages from GitHub', exact: true }).click()
@@ -1022,22 +1026,32 @@ test('page rows use hidden action space for long titles and reveal controls on h
     await page.setViewportSize(viewport)
     await page.mouse.move(0, 0)
     await dialog.getByRole('heading', { name: 'GitHub', exact: true }).focus()
-    await expect(more).toHaveCSS('width', '0px')
+    await expect(more).toHaveCSS('width', '40px')
+    await expect(more).toHaveCSS('opacity', '0')
     const idle = await row.evaluate(element => ({
       titleWidth: element.querySelector('.nt-return-title')!.getBoundingClientRect().width,
       copyRight: element.querySelector('.nt-return-copy')!.getBoundingClientRect().right,
+      moreLeft: element.querySelector('.nt-return-more')!.getBoundingClientRect().left,
+      moreRight: element.querySelector('.nt-return-more')!.getBoundingClientRect().right,
       right: element.getBoundingClientRect().right,
       hintWidth: element.querySelector('.nt-return-hint')!.getBoundingClientRect().width,
     }))
     expect(idle.hintWidth).toBe(0)
-    expect(idle.right - idle.copyRight).toBeLessThanOrEqual(10)
+    expect(idle.moreLeft - idle.copyRight).toBeGreaterThanOrEqual(0)
+    expect(idle.moreLeft - idle.copyRight).toBeLessThanOrEqual(10)
+    expect(idle.moreRight).toBe(idle.right)
     await expect(primary).toHaveAccessibleName(`${title} — Open page`)
     await primary.scrollIntoViewIfNeeded()
     await page.screenshot({ path: testInfo.outputPath(`row-idle-${viewport.width}.png`) })
     await primary.hover()
     await expect(more).toHaveCSS('width', '40px')
+    await expect(more).toHaveCSS('opacity', '1')
     const activeTitle = (await row.locator('.nt-return-title').boundingBox())!
-    expect(activeTitle.width).toBeLessThan(idle.titleWidth)
+    if (viewport.width > 650) expect(activeTitle.width).toBeLessThan(idle.titleWidth)
+    else expect(activeTitle.width).toBe(idle.titleWidth)
+    const activeMore = (await more.boundingBox())!
+    expect(activeMore.x).toBe(idle.moreLeft)
+    expect(activeMore.x + activeMore.width).toBe(idle.moreRight)
     expect(await hint.evaluate(element => element.getBoundingClientRect().width > 0)).toBe(viewport.width > 650)
     await page.mouse.move(0, 0)
     await primary.focus()

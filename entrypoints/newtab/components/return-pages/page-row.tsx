@@ -1,5 +1,5 @@
 import { useRef, useState, type MouseEvent } from 'react'
-import { ArrowUpRight, MoreHorizontal } from 'lucide-react'
+import { ArrowUpRight, MoreHorizontal, X } from 'lucide-react'
 import { toast } from 'sonner'
 import {
   Dialog,
@@ -160,6 +160,16 @@ export function PageRow({
           <span>{action}</span>
         </TooltipContent>
       </Tooltip>
+      {onCloseTab && tabId !== undefined && (
+        <button
+          type="button"
+          className="nt-navigation-close"
+          disabled={closeDisabled}
+          aria-label={t('navigationCloseNamedTab', page.title)}
+          onClick={() => void onCloseTab().catch(() => toast.error(t('returnCloseTabFailed')))}>
+          <X size={16} />
+        </button>
+      )}
       <DropdownMenu onOpenChange={setMenuOpen}>
         <DropdownMenuTrigger
           render={
