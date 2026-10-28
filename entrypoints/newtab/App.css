@@ -37,7 +37,7 @@
 }
 .nt-navigation-row {
   display: flex;
-  gap: 10px;
+  gap: 0;
   align-items: center;
   border-bottom: 1px solid hsl(var(--border));
 }
@@ -86,7 +86,6 @@
 .nt-navigation-action {
   flex-shrink: 0;
 }
-.nt-navigation-close,
 .nt-engine-more {
   flex-shrink: 0;
   display: inline-flex;
@@ -652,7 +651,9 @@
 .nt-link-expand:focus-visible,
 .nt-return-more:hover,
 .nt-return-more:focus-visible,
-.nt-return-more[data-popup-open] {
+.nt-return-more[data-popup-open],
+.nt-navigation-close:hover,
+.nt-navigation-close:focus-visible {
   background: hsl(var(--accent) / 0.65);
 }
 .nt-link-grip {
@@ -829,7 +830,8 @@
 .nt-tab-choice:hover {
   background: hsl(var(--accent));
 }
-.nt-return-more {
+.nt-return-more,
+.nt-navigation-close {
   display: grid;
   place-items: center;
   flex: none;
@@ -843,9 +845,21 @@
   pointer-events: none;
   transition: opacity 0.15s ease;
 }
+.nt-site-detail-panel .nt-return-more,
+.nt-navigation-close {
+  width: 40px;
+}
+.nt-return-row > .nt-navigation-close {
+  border-radius: 0;
+}
 .nt-return-row:hover .nt-return-more,
 .nt-return-row:focus-within .nt-return-more,
-.nt-return-row[data-interacting='true'] .nt-return-more {
+.nt-return-row[data-interacting='true'] .nt-return-more,
+.nt-return-row:hover > .nt-navigation-close,
+.nt-return-row:focus-within > .nt-navigation-close,
+.nt-navigation-row:hover > .nt-navigation-close,
+.nt-navigation-row:focus-within > .nt-navigation-close,
+.nt-navigation-close:disabled {
   width: 40px;
   opacity: 1;
   pointer-events: auto;
@@ -1279,6 +1293,7 @@
 }
 .nt-return-open:focus-visible,
 .nt-return-more:focus-visible,
+.nt-navigation-close:focus-visible,
 .nt-view-all:focus-visible,
 .nt-link-expand:focus-visible,
 .nt-tab-choice:focus-visible {
@@ -1286,6 +1301,7 @@
   outline-offset: 2px;
 }
 .nt-return-more:focus-visible,
+.nt-navigation-close:focus-visible,
 .nt-link-expand:focus-visible {
   outline-offset: -2px;
 }
@@ -1369,11 +1385,13 @@
 }
 @media (pointer: coarse) {
   .nt-link-expand,
-  .nt-return-more {
+  .nt-return-more,
+  .nt-navigation-close {
     min-width: 36px;
     min-height: 44px;
   }
-  .nt-return-more {
+  .nt-return-more,
+  .nt-navigation-close {
     width: 40px;
     opacity: 1;
     pointer-events: auto;

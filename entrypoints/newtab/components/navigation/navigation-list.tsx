@@ -163,7 +163,7 @@ export function NavigationList({
                 </span>
               </button>
             )}
-            {onClose && item.tabId !== undefined && (
+            {!renderItem && onClose && item.tabId !== undefined && (
               <button
                 type="button"
                 className="nt-navigation-close"
