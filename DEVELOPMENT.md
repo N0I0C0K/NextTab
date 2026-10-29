@@ -99,7 +99,7 @@ Logo 源文件、导出命令和使用规则见 [品牌资源](doc/BRANDING.md)�
 
 整理完成后，将条目归入带版本号和发布日期的章节，保留空的未发布区域。用 `pnpm update-version <版本>` 更新根目录 `package.json`，同步更新中英文 README 中的源码版本。WXT 从 `package.json` 生成 Chrome 与 Firefox manifest，「关于」页面读取当前 manifest 的版本。
 
-完成 `pnpm check` 和 `pnpm test:e2e` 后，运行 `pnpm zip` 与 `pnpm zip:firefox`，核对包内 manifest 的版本、图标和页面。GitHub Release 使用对应的 `v<版本>` 标签及更新日志；工作流会校验标签与 `package.json` 一致，再检查类型、lint、单测并上传双浏览器 ZIP 和 Firefox 源码包。商店上传使用生产 ZIP，商店图标使用 `public/icon-128.png`。
+完成 `pnpm check`、`pnpm test:release` 和 `pnpm test:e2e` 后，运行 `pnpm zip` 与 `pnpm zip:firefox`，核对包内 manifest 的版本、图标和页面。GitHub Release 使用对应的 `v<版本>` 标签及更新日志；正式发布事件触发校验、测试、构建与附件保存，显式启用后分别提交 Chrome 和 Firefox。默认不开启商店写入；手动入口提供构建、只读检查、上传和送审。完整凭据配置、发布操作、产物复用与失败恢复见 [自动发布流程](doc/RELEASING.md)。商店上传使用生产 ZIP，商店图标使用 `public/icon-128.png`。
 
 ## 推荐日志排查
 

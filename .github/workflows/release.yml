@@ -1,57 +1,206 @@
-name: Build and Upload Release Assets
+name: Release extension
 
 on:
   release:
-    types: [created]
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Existing stable release tag, for example v1.6.0 (must be merged into master)'
+        required: true
+        type: string
+      target:
+        description: Store to check, upload, or submit
+        type: choice
+        default: all
+        options: [all, chrome, firefox]
+      mode:
+        description: 'check is read-only for stores; upload/submit require explicit enablement'
+        type: choice
+        default: check
+        options: [build, check, upload, submit]
+
+permissions:
+  contents: read
+
+concurrency:
+  # Serialise releases across versions as well as retries. Never cancel a submission in flight.
+  group: extension-release
+  cancel-in-progress: false
+
+env:
+  RELEASE_TAG: ${{ inputs.tag || github.event.release.tag_name }}
+  RELEASE_MODE: ${{ inputs.mode || 'submit' }}
 
 jobs:
   build:
+    if: github.event_name == 'workflow_dispatch' || (!github.event.release.prerelease && !github.event.release.draft)
     runs-on: ubuntu-latest
-
+    timeout-minutes: 40
     permissions:
       contents: write
-
+    outputs:
+      stores: ${{ steps.targets.outputs.stores }}
     steps:
+      - name: Require explicit enablement for manual store writes
+        if: >-
+          github.event_name == 'workflow_dispatch' &&
+          (inputs.mode == 'upload' || inputs.mode == 'submit') && vars.STORE_PUBLISHING_ENABLED != 'true'
+        run: |
+          echo 'Set repository variable STORE_PUBLISHING_ENABLED=true after reviewing the release setup.'
+          exit 1
+
+      - name: Validate requested tag
+        shell: bash
+        run: '[[ "$RELEASE_TAG" =~ ^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]'
+
       - uses: actions/checkout@v4
+        with:
+          ref: refs/tags/${{ env.RELEASE_TAG }}
+          fetch-depth: 0
+          persist-credentials: false
 
       - uses: pnpm/action-setup@v4
-
       - uses: actions/setup-node@v4
         with:
-          node-version-file: '.nvmrc'
+          node-version-file: .nvmrc
           cache: pnpm
 
-      - name: Install dependencies
+      - name: Install locked dependencies
         run: pnpm install --frozen-lockfile --prefer-offline
 
-      - name: Validate release version
+      - name: Select stores
+        id: targets
         env:
-          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          TARGET: ${{ inputs.target || 'all' }}
         run: |
           node --input-type=module -e '
-            import { readFileSync } from "node:fs";
-            const { version } = JSON.parse(readFileSync("package.json", "utf8"));
-            if (process.env.RELEASE_TAG !== `v${version}`) {
-              throw new Error(`Release tag ${process.env.RELEASE_TAG} must match v${version}`);
-            }
+            import { appendFileSync } from "node:fs";
+            const target = process.env.TARGET;
+            if (!["all", "chrome", "firefox"].includes(target)) throw new Error("Invalid target");
+            appendFileSync(process.env.GITHUB_OUTPUT, `stores=${JSON.stringify(target === "all" ? ["chrome", "firefox"] : [target])}\n`);
           '
 
-      - name: Check release
+      - name: Validate version, ancestry and consolidated notes
+        run: node scripts/release/bundle.mjs prepare
+
+      - name: Restore previously saved release bundle
+        id: restore
+        run: node scripts/release/assets.mjs restore
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Check release code and publishing scripts
+        if: steps.restore.outputs.reused != 'true'
         run: |
           pnpm type-check
           pnpm lint
           pnpm test
+          pnpm test:release
+          pnpm exec eslint scripts/release --ext .mjs
+          pnpm exec prettier scripts/release .github/workflows/release.yml --check
+          git diff --check
 
-      - name: Build Chrome extension
-        run: pnpm zip
+      - name: Install E2E browser
+        if: steps.restore.outputs.reused != 'true'
+        run: pnpm exec playwright install --with-deps chromium
 
-      - name: Build Firefox extension
-        run: pnpm zip:firefox
+      - name: Test extension flows
+        if: steps.restore.outputs.reused != 'true'
+        run: pnpm test:e2e
 
-      - name: Upload release assets
-        uses: softprops/action-gh-release@v2
+      - name: Build production packages and verify bundle
+        if: steps.restore.outputs.reused != 'true'
+        run: |
+          pnpm zip
+          pnpm zip:firefox
+          pnpm exec web-ext lint --source-dir .output/firefox-mv3
+          node scripts/release/bundle.mjs seal
+
+      - name: Verify restored or freshly built bundle
+        run: node scripts/release/bundle.mjs verify
+
+      - name: Keep recoverable build artifacts
+        uses: actions/upload-artifact@v4
         with:
-          files: |
-            ./.output/*-chrome.zip
-            ./.output/*-firefox.zip
-            ./.output/*-sources.zip
+          name: release-bundle
+          path: .output/release/
+          if-no-files-found: error
+          retention-days: 90
+          overwrite: true
+
+      - name: Save immutable GitHub Release assets
+        if: github.event_name == 'release' || inputs.mode == 'upload' || inputs.mode == 'submit'
+        run: node scripts/release/assets.mjs save
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+  stores:
+    needs: build
+    if: >-
+      (github.event_name == 'release' && vars.STORE_PUBLISHING_ENABLED == 'true') ||
+      (github.event_name == 'workflow_dispatch' && inputs.mode != 'build')
+    strategy:
+      fail-fast: false
+      matrix:
+        store: ${{ fromJSON(needs.build.outputs.stores) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: ${{ matrix.store == 'chrome' && 'chrome-web-store' || 'firefox-amo' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: refs/tags/${{ env.RELEASE_TAG }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - name: Install locked dependencies without store credentials
+        run: pnpm install --frozen-lockfile --prefer-offline
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-bundle
+          path: .output/release/
+      - name: Check or submit selected store
+        run: node scripts/release/publish.mjs
+        env:
+          RELEASE_STORE: ${{ matrix.store }}
+          STORE_PUBLISHING_ENABLED: ${{ vars.STORE_PUBLISHING_ENABLED }}
+          CHROME_PUBLISHER_ID: ${{ vars.CHROME_PUBLISHER_ID }}
+          CHROME_SERVICE_ACCOUNT_CLIENT_EMAIL: ${{ secrets.CHROME_SERVICE_ACCOUNT_CLIENT_EMAIL }}
+          CHROME_SERVICE_ACCOUNT_PRIVATE_KEY: ${{ secrets.CHROME_SERVICE_ACCOUNT_PRIVATE_KEY }}
+          FIREFOX_JWT_ISSUER: ${{ secrets.FIREFOX_JWT_ISSUER }}
+          FIREFOX_JWT_SECRET: ${{ secrets.FIREFOX_JWT_SECRET }}
+      - name: Keep submission result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: store-result-${{ matrix.store }}
+          path: .output/release/${{ matrix.store }}-result.json
+          if-no-files-found: warn
+          overwrite: true
+
+  summary:
+    if: always()
+    needs: [build, stores]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Report pipeline completion
+        env:
+          BUILD_RESULT: ${{ needs.build.result }}
+          STORE_RESULT: ${{ needs.stores.result }}
+          ENABLED: ${{ vars.STORE_PUBLISHING_ENABLED }}
+        run: |
+          {
+            echo '## Extension release'
+            echo "Tag: $RELEASE_TAG"
+            echo "Mode: $RELEASE_MODE"
+            echo "Bundle: $BUILD_RESULT"
+            echo "Store jobs: $STORE_RESULT"
+            echo "Store publishing enabled: ${ENABLED:-false}"
+            echo 'Per-store states and errors are in the store job summaries and store-result artifacts.'
+            echo 'A successful submission is not proof of approval or publication.'
+          } >> "$GITHUB_STEP_SUMMARY"
