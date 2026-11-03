@@ -1,13 +1,7 @@
 import { getDefaultIconUrl } from '@/entrypoints/newtab/lib/url'
 import { QuickItemEditForm } from '@/entrypoints/newtab/components/quick-item-edit-form'
 import { putQuickUrlById, removeQuickUrlById } from '@/utils/storage'
-import {
-  ContextMenuItem,
-  ContextMenuItemWitchIcon,
-  ContextMenuSeparator,
-  ContextMenuLabel,
-  ContextMenuGroup,
-} from '@/components/shared/ui/context-menu'
+import { ContextMenuItem, ContextMenuItemWitchIcon, ContextMenuSeparator } from '@/components/shared/ui/context-menu'
 import type { GlobalDialogProps } from '@/entrypoints/newtab/providers'
 import { Pencil, Trash, History } from 'lucide-react'
 import { t } from '@/utils/i18n'
@@ -28,7 +22,7 @@ interface LinkCardContextMenuContentProps {
   showOpenTabs: boolean
   recommendedPages: RecentPage[]
   globalDialog: GlobalDialogProps
-  onShowAll: (source: 'tabs' | 'bookmarks') => void
+  onShowAll: () => void
 }
 
 /**
@@ -43,8 +37,7 @@ const getDomainFromUrl = (urlString: string): string => {
 }
 
 /**
- * LinkCardContextMenuContent - The context menu items (edit, delete, bookmarks, and open tabs)
- * Returns an array of menu items to be placed inside ContextMenuContent
+ * Quick-link actions and a flat preview of related pages, with one entry to site details.
  */
 export const LinkCardContextMenuContent = ({
   id,
@@ -59,6 +52,10 @@ export const LinkCardContextMenuContent = ({
   globalDialog,
   onShowAll,
 }: LinkCardContextMenuContentProps): ReactNode => {
+  const hasPreview =
+    recommendedPages.length > 0 ||
+    (showBookmarks && (relatedBookmarks.length > 0 || bookmarkError)) ||
+    (showOpenTabs && relatedTabs.length > 0)
   return (
     <>
       <ContextMenuItemWitchIcon
@@ -110,133 +107,112 @@ export const LinkCardContextMenuContent = ({
         {t('deleteQuickItem')}
       </ContextMenuItemWitchIcon>
 
-      {recommendedPages.length > 0 && (
-        <>
-          <ContextMenuSeparator />
-          <ContextMenuGroup>
-            <ContextMenuLabel>{t('domainRecommendedPages')}</ContextMenuLabel>
-            {recommendedPages.map(page => (
-              <ContextMenuItem
-                key={page.url}
-                data-testid="domain-recommended-page"
-                className="flex min-w-0 items-center gap-2"
-                onClick={event => {
-                  if (event.ctrlKey || event.metaKey) {
-                    void chrome.tabs.create({ url: page.url, active: true })
-                  } else {
-                    void chrome.tabs.update({ url: page.url })
-                  }
-                }}>
-                <img
-                  src={getDefaultIconUrl(page.url)}
-                  alt=""
-                  className="size-4 shrink-0 rounded-sm"
-                  onError={event => {
-                    event.currentTarget.style.display = 'none'
-                  }}
-                />
-                <span className="min-w-0 flex-1 truncate" title={`${page.title}\n${page.url}`}>
-                  {page.title}
-                </span>
-              </ContextMenuItem>
-            ))}
-          </ContextMenuGroup>
-        </>
-      )}
+      {hasPreview && <ContextMenuSeparator />}
+      {recommendedPages.map(page => (
+        <ContextMenuItem
+          key={page.url}
+          data-testid="domain-recommended-page"
+          className="flex min-w-0 items-center gap-2"
+          onClick={event => {
+            if (event.ctrlKey || event.metaKey) {
+              void chrome.tabs.create({ url: page.url, active: true })
+            } else {
+              void chrome.tabs.update({ url: page.url })
+            }
+          }}>
+          <img
+            src={getDefaultIconUrl(page.url)}
+            alt=""
+            className="size-4 shrink-0 rounded-sm"
+            onError={event => {
+              event.currentTarget.style.display = 'none'
+            }}
+          />
+          <span className="min-w-0 flex-1 truncate" title={`${page.title}\n${page.url}`}>
+            {page.title}
+          </span>
+          <span className="shrink-0 text-xs text-muted-foreground" data-testid="site-page-source">
+            {t('siteFrequentSource')}
+          </span>
+        </ContextMenuItem>
+      ))}
 
-      {/* Related Bookmarks Section */}
-      {showBookmarks && (relatedBookmarks.length > 0 || bookmarkError) && (
-        <>
-          <ContextMenuSeparator />
-          <ContextMenuGroup>
-            <ContextMenuLabel>
-              {t('relatedBookmarks')} · {bookmarkError ? '—' : relatedBookmarks.length}
-            </ContextMenuLabel>
-            {relatedBookmarks.slice(0, 5).map(bookmark => (
-              <ContextMenuItem
-                key={bookmark.id}
-                data-testid="related-bookmark"
-                data-bookmark-id={bookmark.id}
-                onClick={event => {
-                  if (bookmark.url) {
-                    if (event.ctrlKey || event.metaKey) void chrome.tabs.create({ url: bookmark.url, active: true })
-                    else void chrome.tabs.update({ url: bookmark.url })
-                  }
-                }}
-                className="flex items-center gap-2">
-                <img
-                  src={getDefaultIconUrl(bookmark.url || '')}
-                  alt={bookmark.title || bookmark.url || 'Bookmark icon'}
-                  className="size-4 rounded-sm flex-shrink-0"
-                  onError={e => {
-                    // Fallback to hide broken images
-                    e.currentTarget.style.display = 'none'
-                  }}
-                />
-                <span className="min-w-0 flex-1 truncate" title={bookmark.title || bookmark.url}>
-                  {bookmark.title || bookmark.url}
-                </span>
-              </ContextMenuItem>
-            ))}
-            {(relatedBookmarks.length > 5 || bookmarkError) && (
-              <ContextMenuItem data-testid="all-site-bookmarks" onClick={() => onShowAll('bookmarks')}>
-                {bookmarkError
-                  ? t('navigationReadFailed') + ' · ' + t('retryAction')
-                  : t('navigationAllBookmarks', String(relatedBookmarks.length))}
-              </ContextMenuItem>
-            )}
-          </ContextMenuGroup>
-        </>
-      )}
+      {showBookmarks &&
+        relatedBookmarks.slice(0, 5).map(bookmark => (
+          <ContextMenuItem
+            key={bookmark.id}
+            data-testid="related-bookmark"
+            data-bookmark-id={bookmark.id}
+            onClick={event => {
+              if (bookmark.url) {
+                if (event.ctrlKey || event.metaKey) void chrome.tabs.create({ url: bookmark.url, active: true })
+                else void chrome.tabs.update({ url: bookmark.url })
+              }
+            }}
+            className="flex min-w-0 items-center gap-2">
+            <img
+              src={getDefaultIconUrl(bookmark.url || '')}
+              alt=""
+              className="size-4 rounded-sm flex-shrink-0"
+              onError={e => {
+                // Fallback to hide broken images
+                e.currentTarget.style.display = 'none'
+              }}
+            />
+            <span className="min-w-0 flex-1 truncate" title={`${bookmark.title}\n${bookmark.url}`}>
+              {bookmark.title || bookmark.url}
+            </span>
+            <span className="shrink-0 text-xs text-muted-foreground" data-testid="site-page-source">
+              {t('relatedBookmarks')}
+            </span>
+          </ContextMenuItem>
+        ))}
 
-      {/* Related Open Tabs Section */}
-      {showOpenTabs && relatedTabs.length > 0 && (
-        <>
-          <ContextMenuSeparator />
-          <ContextMenuGroup>
-            <ContextMenuLabel>
-              {t('relatedOpenTabs')} · {relatedTabs.length}
-            </ContextMenuLabel>
-            {relatedTabs.slice(0, 5).map(tab => (
-              <ContextMenuItem
-                key={tab.id}
-                data-testid="related-tab"
-                data-tab-id={tab.id}
-                onClick={() => {
-                  void queryProfileTabs()
-                    .then(async tabs => {
-                      const current = tabs.find(
-                        item =>
-                          item.id === tab.id &&
-                          getDomainFromUrl(item.url ?? item.pendingUrl ?? '') === getDomainFromUrl(url),
-                      )
-                      if (current) await switchToPageTab(current)
-                    })
-                    .catch(() => toast.error(t('returnOpenFailed')))
-                }}
-                className="flex items-center gap-2">
-                <img
-                  src={tab.favIconUrl || getDefaultIconUrl(tab.url || '')}
-                  alt={tab.title || tab.url || 'Tab icon'}
-                  className="size-4 rounded-sm flex-shrink-0"
-                  onError={e => {
-                    // Fallback to hide broken images
-                    e.currentTarget.style.display = 'none'
-                  }}
-                />
-                <span className="min-w-0 flex-1 truncate" title={tab.title || tab.url}>
-                  {tab.title || tab.url}
-                </span>
-              </ContextMenuItem>
-            ))}
-            {relatedTabs.length > 5 && (
-              <ContextMenuItem data-testid="all-site-tabs" onClick={() => onShowAll('tabs')}>
-                {t('navigationAllTabs', String(relatedTabs.length))}
-              </ContextMenuItem>
-            )}
-          </ContextMenuGroup>
-        </>
+      {showOpenTabs &&
+        relatedTabs.slice(0, 5).map(tab => (
+          <ContextMenuItem
+            key={tab.id}
+            data-testid="related-tab"
+            data-tab-id={tab.id}
+            onClick={() => {
+              void queryProfileTabs()
+                .then(async tabs => {
+                  const current = tabs.find(
+                    item =>
+                      item.id === tab.id &&
+                      getDomainFromUrl(item.url ?? item.pendingUrl ?? '') === getDomainFromUrl(url),
+                  )
+                  if (current) await switchToPageTab(current)
+                })
+                .catch(() => toast.error(t('returnOpenFailed')))
+            }}
+            className="flex min-w-0 items-center gap-2">
+            <img
+              src={tab.favIconUrl || getDefaultIconUrl(tab.url || '')}
+              alt=""
+              className="size-4 rounded-sm flex-shrink-0"
+              onError={e => {
+                // Fallback to hide broken images
+                e.currentTarget.style.display = 'none'
+              }}
+            />
+            <span className="min-w-0 flex-1 truncate" title={`${tab.title}\n${tab.url ?? tab.pendingUrl ?? ''}`}>
+              {tab.title || tab.url}
+            </span>
+            <span className="shrink-0 text-xs text-muted-foreground" data-testid="site-page-source">
+              {t('relatedOpenTabs')}
+            </span>
+          </ContextMenuItem>
+        ))}
+      {showBookmarks && bookmarkError && (
+        <div role="status" className="px-1.5 py-1 text-xs text-muted-foreground">
+          {t('relatedBookmarks')} · {t('navigationReadFailed')}
+        </div>
       )}
+      <ContextMenuSeparator />
+      <ContextMenuItem data-testid="all-site-pages" onClick={onShowAll}>
+        {t('returnViewAll')}
+      </ContextMenuItem>
     </>
   )
 }

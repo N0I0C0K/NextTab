@@ -234,6 +234,9 @@
   "domainRecommendedPages": {
     "message": "常去頁面"
   },
+  "siteFrequentSource": {
+    "message": "常去"
+  },
   "showOpenTabsInQuickUrlMenu": {
     "description": "Show open tabs in quick URL context menu setting title",
     "message": "在快捷連結選單中顯示開啟的頁面"

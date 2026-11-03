@@ -234,6 +234,9 @@
   "domainRecommendedPages": {
     "message": "Frequently visited pages"
   },
+  "siteFrequentSource": {
+    "message": "Frequent"
+  },
   "showOpenTabsInQuickUrlMenu": {
     "description": "Show open tabs in quick URL context menu setting title",
     "message": "Show Open Tabs in Quick URL Menu"

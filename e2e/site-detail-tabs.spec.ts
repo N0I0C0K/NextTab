@@ -48,11 +48,10 @@ test('site details expose all three sources with only four tabs and preserve sav
   await card.click({ button: 'right' })
   await expect(page.getByTestId('related-tab')).toHaveCount(4)
   await expect(page.getByTestId('related-bookmark')).toHaveCount(2)
-  await expect(page.getByTestId('all-site-tabs')).toHaveCount(0)
-  await expect(page.getByTestId('all-site-bookmarks')).toHaveCount(0)
+  await expect(page.getByTestId('all-site-pages')).toHaveCount(1)
   await page.screenshot({ path: testInfo.outputPath('entry-menu.png'), animations: 'disabled' })
-  await page.keyboard.press('Escape')
-  await card.locator('.nt-link-expand').click()
+  await page.getByTestId('all-site-pages').click()
+  await expect(page.locator('[data-slot="context-menu-content"]')).toHaveCount(0)
   const dialog = page.getByTestId('site-pages-dialog')
   await expect(dialog.getByRole('tab')).toHaveCount(3)
   await expect(dialog.getByTestId('site-tab-tabs')).toHaveAttribute('aria-selected', 'true')
@@ -191,7 +190,7 @@ test('site details expose all three sources with only four tabs and preserve sav
   await page.screenshot({ path: testInfo.outputPath('saved-dark.png'), animations: 'disabled' })
 })
 
-test('site menu view-all entries appear only when more than five records exist', async ({
+test('site menu has one view-all entry for every preview size including an empty list', async ({
   page,
   context,
   extensionId,
@@ -229,10 +228,48 @@ test('site menu view-all entries appear only when more than five records exist',
     await card.click({ button: 'right' })
     await expect(page.getByTestId('related-tab')).toHaveCount(Math.min(count, 5))
     await expect(page.getByTestId('related-bookmark')).toHaveCount(Math.min(count, 5))
-    await expect(page.getByTestId('all-site-tabs')).toHaveCount(count > 5 ? 1 : 0)
-    await expect(page.getByTestId('all-site-bookmarks')).toHaveCount(count > 5 ? 1 : 0)
+    await expect(page.getByTestId('all-site-pages')).toHaveCount(1)
+    await expect(page.locator('[data-slot="context-menu-label"]')).toHaveCount(0)
     await page.keyboard.press('Escape')
   }
+})
+
+test('a failed menu bookmark read keeps the unified entry and recovers in the existing dialog', async ({
+  page,
+  extensionId,
+}) => {
+  await page.goto(`chrome-extension://${extensionId}/newtab.html`)
+  await page.evaluate(async () => {
+    await chrome.storage.local.set({
+      'onboarding-completed-key': true,
+      'settings-storage': { autoFocusCommandInput: false, showRecentPages: false, showBookmarksInQuickUrlMenu: true },
+      'quick-url-item-storage-key': [{ id: 'site', title: 'Recovery', url: 'https://recovery.example/' }],
+    })
+    await chrome.bookmarks.create({ title: 'Recovered bookmark', url: 'https://recovery.example/saved' })
+  })
+  await page.reload()
+  await expect(page.getByTestId('quick-link-card')).toHaveCount(1)
+  await page.evaluate(() => {
+    const original = chrome.bookmarks.getTree.bind(chrome.bookmarks)
+    let failed = false
+    chrome.bookmarks.getTree = () => {
+      if (!failed) {
+        failed = true
+        return Promise.reject(new Error('Test: menu bookmarks unavailable'))
+      }
+      return original()
+    }
+  })
+  await page.getByTestId('quick-link-card').click({ button: 'right' })
+  const menu = page.locator('[data-slot="context-menu-content"]')
+  const failure = await page.evaluate(() => chrome.i18n.getMessage('navigationReadFailed'))
+  await expect(menu.getByRole('status')).toContainText(failure)
+  await expect(menu.getByTestId('all-site-pages')).toHaveCount(1)
+  await menu.getByTestId('all-site-pages').click()
+  const dialog = page.getByTestId('site-pages-dialog')
+  await expect(menu).toHaveCount(0)
+  await dialog.getByTestId('site-tab-saved').click()
+  await expect(dialog.getByTestId('navigation-row').filter({ hasText: 'Recovered bookmark' })).toHaveCount(1)
 })
 
 test('empty site tabs stay visible and history can be saved without moving the active row', async ({

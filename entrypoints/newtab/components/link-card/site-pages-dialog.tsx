@@ -31,14 +31,12 @@ export function SitePagesDialog({
   open,
   onOpenChange,
   finalFocus,
-  initialSource,
 }: {
   url: string
   title: string
   open: boolean
   onOpenChange: (open: boolean) => void
   finalFocus: RefObject<HTMLButtonElement>
-  initialSource?: 'tabs' | 'bookmarks'
 }) {
   const settings = useStorage(settingStorage)
   const quickUrls = useStorage(quickUrlItemsStorage)
@@ -77,10 +75,10 @@ export function SitePagesDialog({
   )
   useEffect(() => {
     if (!open) return
-    setSource(initialSource === 'bookmarks' ? 'saved' : 'tabs')
+    setSource('tabs')
     setQuery('')
     setClosedIds(new Set())
-  }, [open, initialSource, host])
+  }, [open, host])
 
   useEffect(() => {
     if (!open || !host) return
