@@ -255,7 +255,8 @@ test('deleting history while bookmarks load does not cancel their first result',
         }),
     })
   })
-  await page.getByTestId('all-site-bookmarks').click()
+  await page.getByTestId('all-site-pages').click()
+  await page.getByTestId('site-tab-saved').click()
   const dialog = page.getByTestId('site-pages-dialog')
   await expect.poll(() => page.evaluate(() => sessionStorage.getItem('review-bookmarks-pending'))).toBe('true')
   await page.evaluate(async () => {
@@ -281,7 +282,8 @@ test('a bookmark refresh failure preserves the last list and can be retried', as
       await chrome.bookmarks.create({ title: `Recover ${index}`, url: `https://navigation.example/?q=${index}` })
   })
   await page.getByTestId('quick-link-card').click({ button: 'right' })
-  await page.getByTestId('all-site-bookmarks').click()
+  await page.getByTestId('all-site-pages').click()
+  await page.getByTestId('site-tab-saved').click()
   const dialog = page.getByTestId('site-pages-dialog')
   await expect(dialog.getByTestId('navigation-row')).toHaveCount(7)
   await dialog.getByRole('textbox').press('Escape')
@@ -300,7 +302,8 @@ test('a bookmark refresh failure preserves the last list and can be retried', as
       },
     })
   })
-  await page.getByTestId('all-site-bookmarks').click()
+  await page.getByTestId('all-site-pages').click()
+  await page.getByTestId('site-tab-saved').click()
   await expect(dialog.getByTestId('navigation-row')).toHaveCount(7)
   await expect(dialog.getByRole('button', { name: '重试', exact: true })).toBeVisible()
   await dialog.getByRole('button', { name: '重试', exact: true }).click()
@@ -335,7 +338,8 @@ test('site previews show five records and the full source searches folders witho
   await page.getByTestId('quick-link-card').click({ button: 'right' })
   const menu = page.locator('[data-slot="context-menu-content"]')
   await expect(menu.getByTestId('related-bookmark')).toHaveCount(5)
-  await menu.getByTestId('all-site-bookmarks').click()
+  await menu.getByTestId('all-site-pages').click()
+  await page.getByTestId('site-tab-saved').click()
   const dialog = page.getByTestId('site-pages-dialog')
   await expect(dialog.getByTestId('navigation-row')).toHaveCount(20)
   await dialog.getByRole('textbox').fill('Research folder q=26')
@@ -448,7 +452,7 @@ test('duplicate open tabs stay independent and close targets a single current ta
   })
   await page.bringToFront()
   await page.getByTestId('quick-link-card').click({ button: 'right' })
-  await page.getByTestId('all-site-tabs').click()
+  await page.getByTestId('all-site-pages').click()
   const dialog = page.getByTestId('site-pages-dialog')
   await expect(dialog.getByTestId('navigation-row')).toHaveCount(7)
   await page.evaluate(async id => {
@@ -478,7 +482,7 @@ test('closing the only tab on the last page focuses its preceding record', async
   })
   await page.bringToFront()
   await page.getByTestId('quick-link-card').click({ button: 'right' })
-  await page.getByTestId('all-site-tabs').click()
+  await page.getByTestId('all-site-pages').click()
   const dialog = page.getByTestId('site-pages-dialog')
   // Wait for the real background tabs to finish populating before exercising pagination.
   await expect(dialog.getByTestId('navigation-row')).toHaveCount(20, { timeout: 20000 })

@@ -8,7 +8,7 @@
 
 <!-- 未发布草稿：同一功能持续更新已有条目。发版前核对实际发布范围、合并去重并整理中英文说明，再移入带版本号和日期的章节。 -->
 
-- 常用网站菜单仅在收藏或标签页超过预览数量时显示“查看全部”；站点标签页的关闭按钮位于“更多”左侧，仅行末按钮保留外侧圆角，悬停或键盘聚焦时显示，触屏保持可见。按钮隐藏时保留位置，避免移出鼠标或操作菜单时列表跳动。
+- 常用网站右键菜单将常去页面、收藏和标签页合并展示，用灰字标注来源，并统一通过一个“查看全部”入口打开站点聚合弹窗；站点标签页的关闭按钮位于“更多”左侧，仅行末按钮保留外侧圆角，悬停或键盘聚焦时显示，触屏保持可见。按钮隐藏时保留位置，避免移出鼠标或操作菜单时列表跳动。
 
 ### English
 
@@ -16,7 +16,7 @@
 
 <!-- Working draft: update existing entries as a feature evolves. Before releasing, reconcile the shipping scope, merge duplicates, and edit matching Chinese and English notes, then move them to a dated version section. -->
 
-- Show “View all” in site menus only when bookmarks or tabs exceed the preview limit. Tab close buttons sit to the left of More, with outer rounded corners only on the last action. Actions appear on hover or keyboard focus and remain visible on touchscreens. Hidden actions retain their space so rows stay stable when moving the pointer away or using menus.
+- Merge frequent pages, bookmarks, and open tabs into one site-menu list with muted source labels and a single “View all” entry opening the existing site dialog. Tab close buttons sit to the left of More, with outer rounded corners only on the last action. Actions appear on hover or keyboard focus and remain visible on touchscreens. Hidden actions retain their space so rows stay stable when moving the pointer away or using menus.
 
 ## 1.5.1
 

@@ -37,7 +37,6 @@ export const SortableLinkCardItem: FC<LinkCardProps> = ({
   const { ref, handleRef } = useSortable({ id, index, disabled: !canReorder })
   const [contextMenuOpen, setContextMenuOpen] = useState(false)
   const [siteOpen, setSiteOpen] = useState(false)
-  const [siteSource, setSiteSource] = useState<'tabs' | 'bookmarks'>()
   const expandRef = useRef<HTMLButtonElement>(null)
   const canExpand = normalizePageUrl(url) !== null
   const settings = useStorage(settingStorage)
@@ -137,7 +136,6 @@ export const SortableLinkCardItem: FC<LinkCardProps> = ({
                     aria-expanded={siteOpen}
                     aria-haspopup="dialog"
                     onClick={() => {
-                      setSiteSource(undefined)
                       setSiteOpen(true)
                     }}
                   />
@@ -159,7 +157,7 @@ export const SortableLinkCardItem: FC<LinkCardProps> = ({
             </button>
           )}
         </ContextMenuTrigger>
-        <ContextMenuContent className="w-72 max-w-[calc(100vw-24px)]" finalFocus={siteOpen ? false : undefined}>
+        <ContextMenuContent className="w-96 max-w-[calc(100vw-24px)]" finalFocus={siteOpen ? false : undefined}>
           <LinkCardContextMenuContent
             id={id}
             title={title}
@@ -171,21 +169,13 @@ export const SortableLinkCardItem: FC<LinkCardProps> = ({
             showOpenTabs={settings.showOpenTabsInQuickUrlMenu}
             recommendedPages={recommendedPages}
             globalDialog={globalDialog}
-            onShowAll={source => {
-              setSiteSource(source)
+            onShowAll={() => {
               setSiteOpen(true)
             }}
           />
         </ContextMenuContent>
       </ContextMenu>
-      <SitePagesDialog
-        url={url}
-        title={title}
-        open={siteOpen}
-        initialSource={siteSource}
-        onOpenChange={setSiteOpen}
-        finalFocus={expandRef}
-      />
+      <SitePagesDialog url={url} title={title} open={siteOpen} onOpenChange={setSiteOpen} finalFocus={expandRef} />
     </>
   )
 }

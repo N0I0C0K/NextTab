@@ -82,22 +82,46 @@ test('quick link menu recommends two frequent recent pages from its domain', asy
   for (const [width, height, name] of [
     [1440, 1000, 'desktop'],
     [390, 700, 'narrow'],
+    [320, 600, 'small'],
     [900, 360, 'short'],
   ] as const) {
     await page.setViewportSize({ width, height })
     await page.bringToFront()
     await card.click({ button: 'right' })
-    await expect(page.getByText('常去页面')).toBeVisible()
+    await expect(menu.locator('[data-slot="context-menu-label"]')).toHaveCount(0)
     await expect(page.getByTestId('related-tab')).toHaveCount(1)
     await expect(recommended).toHaveCount(2)
     await expect(recommended.nth(0)).toContainText('recent')
     await expect(recommended.nth(1)).toContainText('another')
-    await expect(recommended.nth(0).locator('span')).toHaveAttribute(
+    await expect(recommended.nth(0).locator('span[title]')).toHaveAttribute(
       'title',
       /long project page title.*code\.example\.com/s,
     )
     await expect(page.getByTestId('related-bookmark')).toHaveCount(5)
-    await expect(page.getByTestId('all-site-bookmarks')).toBeVisible()
+    await expect(page.getByTestId('all-site-pages')).toHaveCount(1)
+    await expect(menu.getByTestId('site-page-source')).toHaveText([
+      '常去',
+      '常去',
+      '收藏',
+      '收藏',
+      '收藏',
+      '收藏',
+      '收藏',
+      '标签页',
+    ])
+    for (const row of await menu
+      .locator('[data-slot="context-menu-item"]')
+      .filter({
+        has: page.getByTestId('site-page-source'),
+      })
+      .all()) {
+      const label = await row.getByTestId('site-page-source').boundingBox()
+      const title = await row.locator('span[title]').boundingBox()
+      expect(label).not.toBeNull()
+      expect(title).not.toBeNull()
+      expect(title!.width).toBeGreaterThan(100)
+      expect(title!.x + title!.width).toBeLessThanOrEqual(label!.x)
+    }
     await expect(page.getByTestId('related-tab')).toHaveCount(1)
     const bounds = await menu.boundingBox()
     expect(bounds).not.toBeNull()
@@ -108,8 +132,8 @@ test('quick link menu recommends two frequent recent pages from its domain', asy
     await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
     await page.screenshot({ path: testInfo.outputPath(`domain-menu-${name}.png`) })
     if (name === 'short') {
-      await page.getByTestId('related-tab').focus()
-      const lastItem = await page.getByTestId('related-tab').boundingBox()
+      await page.getByTestId('all-site-pages').focus()
+      const lastItem = await page.getByTestId('all-site-pages').boundingBox()
       expect(lastItem).not.toBeNull()
       expect(lastItem!.y).toBeGreaterThanOrEqual(0)
       expect(lastItem!.y + lastItem!.height).toBeLessThanOrEqual(height)
@@ -120,6 +144,22 @@ test('quick link menu recommends two frequent recent pages from its domain', asy
 
   await page.setViewportSize({ width: 1440, height: 1000 })
   await card.click({ button: 'right' })
+  await recommended.first().focus()
+  await page.keyboard.press('End')
+  await expect(page.getByTestId('all-site-pages')).toBeFocused()
+  await page.keyboard.press('Enter')
+  const dialog = page.getByTestId('site-pages-dialog')
+  await expect(dialog).toBeVisible()
+  await expect(menu).toHaveCount(0)
+  await expect(dialog.getByTestId('site-tab-tabs')).toHaveAttribute('aria-selected', 'true')
+  await expect(dialog.getByRole('tab')).toHaveCount(3)
+  await page.keyboard.press('Escape')
+  await expect(card.locator('.nt-link-expand')).toBeFocused()
+  await page.evaluate(() => chrome.storage.local.set({ 'theme-storage-key': 'dark' }))
+  await expect(page.locator('html')).toHaveClass(/dark/)
+  await card.click({ button: 'right' })
+  await expect(menu.getByTestId('site-page-source')).toHaveCount(8)
+  await page.screenshot({ path: testInfo.outputPath('domain-menu-dark.png'), animations: 'disabled' })
   await expect(recommended).toHaveCount(2)
   await recommended.first().focus()
   await page.keyboard.press('Enter')
