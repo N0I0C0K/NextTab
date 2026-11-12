@@ -8,35 +8,42 @@ interface QuickLinkIconProps {
   iconUrl?: string
 }
 
-export function QuickLinkIcon({ url, title, className, iconUrl }: QuickLinkIconProps) {
-  const [resolved, setResolved] = useState<{ url: string; src: string | null } | null>(null)
-  const [failedSrc, setFailedSrc] = useState<string | null>(null)
-  const preferIcon = Boolean(iconUrl && failedSrc !== iconUrl)
+export function QuickLinkIcon(props: QuickLinkIconProps) {
+  // A new page or supplied icon gets a fresh load/error lifecycle.
+  return <ResolvedQuickLinkIcon key={`${props.url}\0${props.iconUrl ?? ''}`} {...props} />
+}
+
+function ResolvedQuickLinkIcon({ url, title, className, iconUrl }: QuickLinkIconProps) {
+  const [resolved, setResolved] = useState<{ src: string | null } | null>(null)
+  const [failedSources, setFailedSources] = useState<string[]>([])
+  const [loadedSrc, setLoadedSrc] = useState<string | null>(null)
+  const preferIcon = Boolean(iconUrl && !failedSources.includes(iconUrl))
 
   useEffect(() => {
     if (preferIcon) return
     let active = true
-    void resolveFaviconUrl(url).then(src => {
-      if (active) setResolved({ url, src })
+    void resolveFaviconUrl(url, failedSources).then(src => {
+      if (active) setResolved({ src })
     })
     return () => {
       active = false
     }
-  }, [url, preferIcon])
+  }, [url, preferIcon, failedSources])
 
-  const src = preferIcon ? iconUrl : resolved?.url === url ? resolved.src : null
-  const status = preferIcon
-    ? 'loaded'
-    : resolved?.url === url
-      ? src && failedSrc !== src
-        ? 'loaded'
-        : 'fallback'
-      : 'loading'
+  const candidate = preferIcon ? iconUrl : resolved?.src
+  const src = candidate && !failedSources.includes(candidate) ? candidate : null
+  const status = src ? (loadedSrc === src ? 'loaded' : 'loading') : resolved ? 'fallback' : 'loading'
 
   return (
     <span className={className} data-icon-status={status} aria-hidden="true">
-      {src && failedSrc !== src ? (
-        <img src={src} alt="" onError={() => setFailedSrc(src)} />
+      {src ? (
+        <img
+          src={src}
+          alt=""
+          referrerPolicy="no-referrer"
+          onLoad={() => setLoadedSrc(src)}
+          onError={() => setFailedSources(previous => (previous.includes(src) ? previous : [...previous, src]))}
+        />
       ) : (
         <span className="text-base font-semibold leading-none text-muted-foreground">{getFaviconInitial(title)}</span>
       )}

@@ -4,6 +4,8 @@
 
 ### 简体中文
 
+- 修复 Firefox 常用网站、页面列表、搜索、菜单及引导中的网站图标：优先使用当前页面标签提供的图标，再尝试站点图标，失败时显示首字母，不依赖 Chromium 专属接口。
+
 - 搜索结果打开失败时保留查询和选择以便重试；标签搜索支持标题与网址多词匹配，书签和历史预览新增分页入口，历史明确限定为最近最多 1,000 条匹配。继续查看入口直接位于分组标题旁，适用结果显示 Ctrl／⌘+Enter 新开提示；同名同地址标签补充窗口和位置以便区分。
 
 <!-- 未发布草稿：同一功能持续更新已有条目。发版前核对实际发布范围、合并去重并整理中英文说明，再移入带版本号和日期的章节。 -->
@@ -11,6 +13,8 @@
 - 常用网站菜单仅在收藏或标签页超过预览数量时显示“查看全部”；站点标签页的关闭按钮位于“更多”左侧，仅行末按钮保留外侧圆角，悬停或键盘聚焦时显示，触屏保持可见。按钮隐藏时保留位置，避免移出鼠标或操作菜单时列表跳动。
 
 ### English
+
+- Fix Firefox favicons across saved sites, page lists, search, menus, and onboarding. Prefer the current page’s tab icon, then its origin favicon, with an initial fallback instead of relying on Chromium-only APIs.
 
 - Keep search and selection when opening a result fails; search tabs by title and URL, and browse beyond bookmark/history previews with pagination and an explicit 1,000-match history limit. Continuation is visible beside group headings, applicable results show the Ctrl/⌘+Enter hint, and identical tabs include window/position cues.
 

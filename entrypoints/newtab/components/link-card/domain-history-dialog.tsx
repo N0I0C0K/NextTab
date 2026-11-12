@@ -1,4 +1,4 @@
-import { getDefaultIconUrl } from '@/entrypoints/newtab/lib/url'
+import { QuickLinkIcon } from '@/components/shared/custom/quick-link-icon'
 import { command, Text } from '@/components/shared'
 import { t } from '@/utils/i18n'
 import { useMemo, useState, useEffect, type FC } from 'react'
@@ -180,14 +180,7 @@ const DomainHistoryItem: FC<DomainHistoryItem> = ({ id, title, url, lastVisitTim
       )}
       onClickCapture={handleClickCapture}
       onSelect={() => chrome.tabs.update({ url })}>
-      <img
-        src={getDefaultIconUrl(url)}
-        alt=""
-        className="size-5 rounded-sm flex-shrink-0"
-        onError={e => {
-          e.currentTarget.style.display = 'none'
-        }}
-      />
+      <QuickLinkIcon url={url} title={title} className="size-5 shrink-0 rounded-sm [&>img]:size-full" />
       <div className="flex flex-col min-w-0 gap-1">
         <Text level="s" className="font-medium truncate" title={title}>
           {title}
