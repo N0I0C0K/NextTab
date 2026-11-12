@@ -1,4 +1,3 @@
-import { getDefaultIconUrl } from '@/entrypoints/newtab/lib/url'
 import type { ICommandResolver, ICommandResult } from '../protocol'
 import { openSavedUrl } from '@/utils/quick-link-search'
 import { searchContinuation } from './search-continuation'
@@ -12,7 +11,6 @@ function convertBookmarkToCommandResult(item: chrome.bookmarks.BookmarkTreeNode)
     supportsNewTab: Boolean(item.url),
     title: item.title,
     description: item.url,
-    iconUrl: item.url ? getDefaultIconUrl(item.url) : undefined,
     IconType: item.url ? undefined : Star,
     onSelect: options => (item.url ? openSavedUrl(item.url, options?.newTab) : undefined),
   }
