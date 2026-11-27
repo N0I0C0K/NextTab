@@ -41,6 +41,12 @@ jobs:
       - name: Run unit tests
         run: pnpm test
 
+      - name: Test release validation and submission recovery
+        run: |
+          pnpm test:release
+          pnpm exec eslint scripts/release --ext .mjs
+          pnpm exec prettier scripts/release .github/workflows/release.yml --check
+
       - name: Install Playwright Chromium
         run: pnpm exec playwright install --with-deps chromium
 
