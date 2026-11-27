@@ -865,7 +865,7 @@ test('domain history keeps rows aligned and supports keyboard selection from sea
   await expect(items.first()).toHaveAttribute('aria-selected', 'true')
 
   const layout = await items.first().evaluate(row => {
-    const icon = row.querySelector('img')!.getBoundingClientRect()
+    const icon = row.querySelector('[data-icon-status]')!.getBoundingClientRect()
     const text = row.children[1].getBoundingClientRect()
     const metadata = row.children[2].getBoundingClientRect()
     return {

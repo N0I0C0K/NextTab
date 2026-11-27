@@ -131,3 +131,15 @@ Logo 源文件、导出命令和使用规则见 [品牌资源](doc/BRANDING.md)�
 ```
 
 快照请求会校正当前前台状态；它不会清空或改写已有事件。推荐日志只展示筛选后的摘要，不能据此推断未输出的页面没有被记录。
+
+### Firefox favicon E2E
+
+This regression installs the **unmodified Firefox build** as a temporary extension in an isolated profile, with a local HTTP fixture (no CORS headers), real tabs/bookmarks/history, and screenshots. It does not use your browser profile or a mocked extension API.
+
+Prerequisites: Mozilla Firefox, official Mozilla geckodriver, and Python with `selenium==4.51.0`. Build with `pnpm build:firefox`, then run:
+
+```sh
+python tests/firefox/favicons.py --firefox /path/to/firefox --geckodriver /path/to/geckodriver
+```
+
+Firefox versions restricting WebDriver access to extension pages require an explicitly authorized test process with `MOZ_REMOTE_ALLOW_SYSTEM_ACCESS=1`. Do not apply this to a personal browser. Output is under `artifacts/firefox-icons/current/`. For a before/after comparison, supply `--extension /path/to/baseline/.output/firefox-mv3 --expect-broken --output artifacts/firefox-icons/baseline`.

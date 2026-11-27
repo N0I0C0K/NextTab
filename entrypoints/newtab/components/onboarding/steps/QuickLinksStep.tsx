@@ -1,3 +1,4 @@
+import { QuickLinkIcon } from '@/components/shared/custom/quick-link-icon'
 import { useState, useEffect, type FC } from 'react'
 import { Stack, Text, ScrollArea, toast } from '@/components/shared'
 import { quickUrlItemsStorage, updateStorageItem } from '@/utils/storage'
@@ -20,14 +21,6 @@ const getHostname = (url: string): string => {
   } catch {
     return ''
   }
-}
-
-/**
- * Get favicon URL for a given page URL using the extension's favicon service
- */
-const getFaviconUrl = (pageUrl: string, size = 32): string => {
-  const baseUrl = chrome.runtime.getURL('_favicon/')
-  return `${baseUrl}?pageUrl=${encodeURIComponent(pageUrl)}&size=${size}`
 }
 
 export const QuickLinksStep: FC<StepNavigationProps> = ({ onNext, onBack }) => {
@@ -135,14 +128,7 @@ export const QuickLinksStep: FC<StepNavigationProps> = ({ onNext, onBack }) => {
               aria-checked={site.selected}
               aria-label={`${site.title} - ${getHostname(site.url)}`}
               className={cn('flex items-center gap-3 p-3 rounded-lg border transition-colors text-left w-full')}>
-              <img
-                src={getFaviconUrl(site.url)}
-                alt=""
-                className="size-6 rounded shrink-0"
-                onError={e => {
-                  ;(e.target as HTMLImageElement).style.display = 'none'
-                }}
-              />
+              <QuickLinkIcon url={site.url} title={site.title} className="size-6 rounded shrink-0 [&>img]:size-full" />
               <Stack direction="column" className="flex-1 min-w-0">
                 <Text level="s" className="max-w-full truncate">
                   {site.title}

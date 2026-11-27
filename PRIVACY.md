@@ -1,12 +1,14 @@
 # NextTab 隐私说明 / Privacy notice
 
-适用版本：1.5.0、1.5.1 · 更新日期：2026-10-14
+适用版本：1.5.0、1.5.1 · 更新日期：2026-11-12
 
 ## 简体中文
 
 NextTab 的历史访问、标签页、书签、前台使用记录、推荐偏好、快捷链接和设置用于在当前浏览器内提供搜索与推荐。前台日志保留近 10 天，最多 2 MiB。扩展不上传这些浏览记录，不包含分析埋点或广告追踪。
 
-联网功能由用户选择：
+网站图标：Firefox 优先使用当前页面标签提供的图标，否则会向该站点的 `/favicon.ico` 请求图片。图标服务可能收到常规网络信息（如 IP 地址和浏览器按其策略附带的 Cookie）；站点兜底请求不附带页面路径、查询参数或 Referer，不使用第三方图标代理。图标缺失时显示首字母。Chromium 继续使用浏览器自带的本地图标接口。
+
+其他联网功能由用户选择：
 
 - 搜索网页或打开链接时，浏览器访问用户选择的网站或搜索引擎。
 - 授予 GitHub API 访问权限后，「关于」页面向 `api.github.com` 查询本项目最新 Release。请求不会附带历史、书签、标签列表或使用日志。
@@ -20,11 +22,13 @@ Firefox 中，MQTT 的身份／认证信息和技术／交互数据需要另行�
 
 ## English
 
-Versions 1.5.0 and 1.5.1 · Updated 2026-10-14
+Versions 1.5.0 and 1.5.1 · Updated 2026-11-12
 
 NextTab uses history, tabs, bookmarks, foreground events, preferences, quick links, and settings locally for search and recommendations. Foreground logs retain ten days, up to 2 MiB. These browsing records are not uploaded. The extension contains no analytics or advertising trackers.
 
-Network features are user-selected:
+Website icons: Firefox prefers the current page’s tab icon, otherwise requesting `/favicon.ico` from the site itself. Icon hosts may receive normal network information (such as IP addresses and cookies allowed by browser policy). The origin fallback does not send page paths, query parameters, or a Referer, and no third-party favicon proxy is used. Missing icons fall back to initials. Chromium continues to use its built-in local favicon endpoint.
+
+Other network features are user-selected:
 
 - Web search and links open the selected websites or search engines in the browser.
 - After GitHub host authorization, About requests this project's latest release from `api.github.com`, without attaching browsing records.

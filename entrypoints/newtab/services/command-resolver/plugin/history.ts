@@ -1,4 +1,3 @@
-import { getDefaultIconUrl } from '@/entrypoints/newtab/lib/url'
 import type { ICommandResolver, ICommandResult } from '../protocol'
 import moment from 'moment'
 import { t } from '@/utils/i18n'
@@ -14,7 +13,6 @@ function convertHistoryItemToCommandResult(item: chrome.history.HistoryItem): IC
     supportsNewTab: Boolean(item.url),
     title: item.title || item.url || '',
     description: `${formatLastDate} ${item.url!}`,
-    iconUrl: getDefaultIconUrl(item.url!),
     onSelect: options => openSavedUrl(item.url!, options?.newTab),
   }
 }

@@ -92,7 +92,7 @@ test('quick link menu recommends two frequent recent pages from its domain', asy
     await expect(recommended).toHaveCount(2)
     await expect(recommended.nth(0)).toContainText('recent')
     await expect(recommended.nth(1)).toContainText('another')
-    await expect(recommended.nth(0).locator('span')).toHaveAttribute(
+    await expect(recommended.nth(0).locator('span[title]')).toHaveAttribute(
       'title',
       /long project page title.*code\.example\.com/s,
     )

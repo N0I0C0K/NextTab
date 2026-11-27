@@ -1,4 +1,4 @@
-import { getDefaultIconUrl } from '@/entrypoints/newtab/lib/url'
+import { QuickLinkIcon } from '@/components/shared/custom/quick-link-icon'
 import { QuickItemEditForm } from '@/entrypoints/newtab/components/quick-item-edit-form'
 import { putQuickUrlById, removeQuickUrlById } from '@/utils/storage'
 import {
@@ -127,13 +127,10 @@ export const LinkCardContextMenuContent = ({
                     void chrome.tabs.update({ url: page.url })
                   }
                 }}>
-                <img
-                  src={getDefaultIconUrl(page.url)}
-                  alt=""
-                  className="size-4 shrink-0 rounded-sm"
-                  onError={event => {
-                    event.currentTarget.style.display = 'none'
-                  }}
+                <QuickLinkIcon
+                  url={page.url}
+                  title={page.title}
+                  className="size-4 shrink-0 rounded-sm [&>img]:size-full"
                 />
                 <span className="min-w-0 flex-1 truncate" title={`${page.title}\n${page.url}`}>
                   {page.title}
@@ -164,14 +161,10 @@ export const LinkCardContextMenuContent = ({
                   }
                 }}
                 className="flex items-center gap-2">
-                <img
-                  src={getDefaultIconUrl(bookmark.url || '')}
-                  alt={bookmark.title || bookmark.url || 'Bookmark icon'}
-                  className="size-4 rounded-sm flex-shrink-0"
-                  onError={e => {
-                    // Fallback to hide broken images
-                    e.currentTarget.style.display = 'none'
-                  }}
+                <QuickLinkIcon
+                  url={bookmark.url || ''}
+                  title={bookmark.title || bookmark.url || ''}
+                  className="size-4 shrink-0 rounded-sm [&>img]:size-full"
                 />
                 <span className="min-w-0 flex-1 truncate" title={bookmark.title || bookmark.url}>
                   {bookmark.title || bookmark.url}
@@ -215,14 +208,11 @@ export const LinkCardContextMenuContent = ({
                     .catch(() => toast.error(t('returnOpenFailed')))
                 }}
                 className="flex items-center gap-2">
-                <img
-                  src={tab.favIconUrl || getDefaultIconUrl(tab.url || '')}
-                  alt={tab.title || tab.url || 'Tab icon'}
-                  className="size-4 rounded-sm flex-shrink-0"
-                  onError={e => {
-                    // Fallback to hide broken images
-                    e.currentTarget.style.display = 'none'
-                  }}
+                <QuickLinkIcon
+                  url={tab.url || ''}
+                  title={tab.title || tab.url || ''}
+                  iconUrl={tab.favIconUrl}
+                  className="size-4 shrink-0 rounded-sm [&>img]:size-full"
                 />
                 <span className="min-w-0 flex-1 truncate" title={tab.title || tab.url}>
                   {tab.title || tab.url}

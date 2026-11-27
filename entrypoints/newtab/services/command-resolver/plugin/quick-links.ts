@@ -2,7 +2,6 @@ import { Link, ArrowRight, Plus } from 'lucide-react'
 import { t } from '@/utils/i18n'
 import { getDisplayQuickUrls, quickUrlItemsStorage, settingStorage } from '@/utils/storage'
 import { openSavedUrl, searchQuickLinks } from '@/utils/quick-link-search'
-import { getDefaultIconUrl } from '../../../lib/url'
 import type { ICommandResolver, ICommandResult } from '../protocol'
 
 export const quickLinksResolver: ICommandResolver = {
@@ -19,9 +18,9 @@ export const quickLinksResolver: ICommandResolver = {
     const results: ICommandResult[] = matches.slice(0, 8).map(item => ({
       id: `quick-link-${item.id}`,
       title: item.title,
+      url: item.url,
       supportsNewTab: true,
       description: item.url,
-      iconUrl: getDefaultIconUrl(item.url),
       onSelect: options => openSavedUrl(item.url, options?.newTab),
     }))
     if (!items.length && params.resolverName === 'quickLinks')

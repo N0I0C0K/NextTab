@@ -1,3 +1,4 @@
+import { QuickLinkIcon } from '@/components/shared/custom/quick-link-icon'
 import { useCommandState } from 'cmdk'
 import { cn } from '@/entrypoints/newtab/lib/utils'
 import { useDebounce, useStorage } from '@/utils'
@@ -55,10 +56,17 @@ const placeholders: Record<string, MessageKey> = {
   numberToRmb: 'commandRmbPlaceholder',
 }
 
-const CommandItemIcon: FC<{ iconUrl?: string; IconType?: React.ElementType }> = ({ iconUrl, IconType }) => {
+const CommandItemIcon: FC<Pick<ICommandResult, 'url' | 'title' | 'iconUrl' | 'IconType'>> = ({
+  url,
+  title,
+  iconUrl,
+  IconType,
+}) => {
   return (
     <div className="bg-muted rounded-lg size-9 flex items-center justify-center shrink-0">
-      {iconUrl && <img src={iconUrl} alt="" className="size-6 rounded-md" />}
+      {url && (
+        <QuickLinkIcon url={url} title={title} iconUrl={iconUrl} className="size-6 rounded-md [&>img]:size-full" />
+      )}
       {IconType && <IconType aria-hidden="true" className="stroke-2 size-6" />}
     </div>
   )
@@ -449,7 +457,7 @@ export const CommandModule = forwardRef<
                         title={triggerLabel(plugin) ? t('commandTriggerHint', triggerLabel(plugin)) : undefined}
                         onSelect={() => selectPlugin(plugin.properties.name)}
                         className="nt-command-result">
-                        <CommandItemIcon IconType={plugin.properties.icon ?? Layers} />
+                        <CommandItemIcon title={label(plugin)} IconType={plugin.properties.icon ?? Layers} />
                         <div className="nt-command-result-copy">
                           <Text level="s" className="truncate" title={label(plugin)}>
                             {label(plugin)}
@@ -514,7 +522,12 @@ export const CommandModule = forwardRef<
                                     void selectResult(res)
                                   }}
                                   className="nt-command-result">
-                                  <CommandItemIcon iconUrl={res.iconUrl} IconType={res.IconType} />
+                                  <CommandItemIcon
+                                    url={res.url}
+                                    title={res.title}
+                                    iconUrl={res.iconUrl}
+                                    IconType={res.IconType}
+                                  />
                                   <div className="nt-command-result-copy">
                                     <Text level="s" className="truncate" title={res.title}>
                                       {res.title}
